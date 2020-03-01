@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style type="text/css">
+
+div.code {
+  color: black;
+  background-color: #CEE7FF;
+  border: 1px solid #62A0FF;
+  white-space: pre;
+  font-family: 'Monotype.com', "Courier New", Courier, monospace;
+  line-height: 125%;
+  margin: auto;
+  margin-left: 1em;
+  margin-right: 1em;
+  margin-top: .5em;
+} 
+
+body {
+  margin-left: 1em;
+  margin-right: 1em;
+  font-family: tahoma, verdana, arial, helvetica, geneva, sans-serif;
+  background-color:#ffffff;
+}
+
+p {
+  margin-left: 1em;
+  line-height: 130%;
+}
+
+p.info {
+  margin-left: 3em;
+}
+
+h1 {
+   text-align:center;
+  background-color: blue;
+color:white;
+  border: 1px solid #808080;
+  margin:0;
+}
+
+h2,h3,h4 {
+   margin:1.5em 0 .5em 0;
+  background-color: #E1E1E1;
+  border: 1px solid #808080;
+  color: #5C5C5C;
+}
+
+
+h1 {
+  padding: 4px;
+  font-size: 22pt;
+}
+
+h2 {
+  padding: 4px 4px 4px 2em;
+  font-size: 18pt;
+}
+
+h3 {
+  padding: 2px 2px 2px 3em;
+  font-size: 16pt;
+}
+
+h4 {
+  padding: 1px 1px 1px 4em;
+  font-size: 14pt;
+}
+
+</style>
+</head>
+<body>
+
+<h1>Blocking Firmware Upload (Lua Version)</h1>
+
+<p>The Lua blocking  firmware upload example cannot be used by a single threaded server since the upload logic in index.lsp blocks the executing thread until the upload is completed and the zip file is unpacked. This example is much easier than the non blocking example since we can do all the work in index.lsp.</p>
+
+<img src="overview.png" />
+
+<p>When the browser uploads the zip file to the server, the Barracuda Socket Dispatcher triggers and sends the event to the Barracuda Server. The server parses the request and delegates the request to a thread in the Barracuda Thread Pool. The thread in the Thread Pool executes the index.lsp page. The server can manage concurrent requests as long as the server has threads available in the thread pool.</p>
+
+
+<p><b>Files:</b></p>
+<ul>
+<li>.preload: Creates the upload IO (uio) used by index.lsp.</li>
+<li>index.lsp: The "Upload Firmware" page.</li>
+<li>.managezip.lsp: Unzips the zip file when the upload has completed.</li>
+<li>upload.js: Javascript code for managing drag and drop upload.</li>
+<li>style.css: The style for index.lsp.</li>
+</ul>
+
+<p><b>External resources used by this example:</b></p>
+<ul>
+<li>https://realtimelogic.com/rtl/jquery.js: The <a target="_blank" href="http://jquery.com/">JQuery library</a> is used by upload.js.</li>
+<li>https://realtimelogic.com/rtl/wfm/dropbox.png: The drag and drop image.</li>
+<li>https://realtimelogic.com/rtl/wfm/progressbar.png: Image used by the progress bar.</li>
+</ul>
+
+</body>
+</html>

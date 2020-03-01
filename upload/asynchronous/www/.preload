@@ -1,0 +1,173 @@
+
+--[[
+The .preload script includes Lua code designed for performing
+asynchronous (non blocking socket) upload of zip files.
+
+A good understanding of the Lua _ENV is required. See the Lua
+reference manual section 2.2 Environments and the Global Environment
+for more information:
+http://realtimelogic.com/ba/doc/en/lua/man/manual.html#2.2
+--]]
+
+
+
+-- Function ba.create.upload() requires an IO object. We use the 'home'
+-- IO created by the wfs. An IO object can be created from another IO
+-- object by using ba.mkio(). Modify the line below to suit your application.
+-- uio (Upload IO) has the base set to the upload directory.
+local uio=ba.openio("home")
+assert(uio, "This application is designed to be run by the wfs")
+
+
+-- Location where we put the uploaded data.
+uio:mkdir"tmpupl"
+-- Create a new IO with the upload dir as base.
+uio=ba.mkio(uio, "tmpupl")
+assert(uio, "Cannot create directory 'tmpupl'")
+
+local fmt=string.format -- alias
+
+-- We could have worked on the "deferred response object" directly by
+-- calling response:write() for creating HTML response data. A better
+-- solution is to design a simple loader that loads, parses, and runs
+-- an LSP page. This LSP page looks like any other LSP page, but
+-- will not have a "request" object.
+-- The code below is based on the example included with the ba.parselsp() doc:
+-- http://realtimelogic.com/ba/doc/?url=en/lua/lua.html#ba_parselsp
+local function runlsp(pagename, env)
+   local ok,err
+   local fp,err=io:open(pagename)
+   if fp then
+      local data
+      data,err = fp:read"*a"
+      fp:close()
+      if data then
+         -- Convert LSP to Lua
+         data,err = ba.parselsp(data)
+         if data then
+
+            -- Enable the trace() if you want to know how an LSP page
+            -- looks like when it is parsed (converted) to Lua code.
+            -- trace("LSP raw data:", data)
+
+            local func
+            -- Compile Lua code
+            func,err = load(data)
+            if func then
+               -- The LSP page requires the _emit(data) function
+               env._emit=function(data) env.response:write(data) end
+               -- Call LSP with args: _ENV,pagename,io,page-tab,app-tab.
+               -- We do not need a page-tab so we use app-tab (_ENV).
+               ok,err = pcall(func,env,pagename,io,_ENV,_ENV)
+            end
+         end
+      end
+   end
+   if not ok then
+      -- This would typically be from programming errors in the LSP page.
+      err=fmt("Error in %s: %s",pagename,err or "?")
+      trace(err)
+      env.response:write(err)
+   end
+end
+
+
+-- Called via completefunc() when zip file is uploaded.
+-- This function runs in a separate thread.
+local function asynchresp(_ENV)
+    -- For debugging purposes
+   trace("Firwmare uploader running in separate thread:", zipname)
+
+   runlsp(".managezip.lsp", _ENV)
+
+   -- Close(): not socket close, but flushes and completes the response.
+   response:close()
+end
+
+
+-- Uploader callback: upload completed successfully.
+-- This function runs in the context of the socket dispatcher.
+local function completefunc(_ENV, upload)
+
+   -- fetch the "Deferred Response Object"
+   -- http://realtimelogic.com/ba/doc/en/lua/lua.html#defresp
+   local response = upload:response()
+   -- We must fetch the "Deferred Response Object" to signal that we
+   -- are actually taking care of the response. It would be too late
+   -- to do this later. We cannot use the "upload" object after this
+   -- function returns.
+   local zipname = upload:name() -- The same holds true for any data in upload.
+
+   -- Assemble the environment (_ENV) table used by the LSP page.
+
+   -- Notice how we pass in the isJavaScriptDragDrop, uio and
+   -- zip-file-name in addition to the response object.
+   -- (ref-lspenv)
+   local env={
+      response=response,zipname=zipname,
+      uio=uio,isJavaScriptDragDrop=isJavaScriptDragDrop
+   }
+   -- Make env inherit from global env so we can use global functions.
+   setmetatable(env,{__index=_G})
+
+   -- Delegate to thread. Notice how we use a closure.
+   -- http://en.wikipedia.org/wiki/Closure_%28computer_science%29
+   ba.thread.run(function() asynchresp(env) end)
+end
+
+
+-- Uploader callback: error
+local function errorfunc(_ENV, upload, error, extra)
+   -- You must improve the error response. The error would
+   -- typically be noaccess,ioerror,nospace, or socketreadfailed
+   local response=upload:response()
+   response:write("Error:", error, extra)
+end
+
+-- Create the uploader object
+-- http://realtimelogic.com/ba/doc/?url=en/lua/lua.html#ba_create_upload
+local uploader=ba.create.upload(uio, 5)
+
+-- Upload counter
+local uploadcntr=0
+
+-- The upload function used by the lsp upload page (index.lsp).
+-- Note: this function is the only non-local object. The uploader
+-- function object references all other objects in this file and
+-- prevents the "local" objects from Garbage Collecting (GC).
+function upload(request)
+   -- This is what we can manage
+   -- PUT: drag and drop upload
+   -- POST: form method='post' enctype='multipart/form-data'
+   request:allow{"PUT", "POST"}
+
+   uploadcntr=uploadcntr+1
+   
+   -- The uploader is designed for making file managers and to be used
+   -- by a directory function, which includes the path element.
+   -- However, in this code, the uploader is used by an LSP page, thus
+   -- we have no path. We will save the uploaded data in the root of
+   -- uio. A PUT to a directory would include path+filename and a POST
+   -- would include the path only, thus we must add a filename when
+   -- PUT is used since we do not have this information when used by
+   -- an LSP page. A "POST multipart/form-data" includes the name
+   -- embedded in the uploaded data.
+   local name = request:method() == "PUT" and 
+      fmt("upload%d.zip",uploadcntr) or ""
+
+   -- Our uploader created by calling ba.create.upload() 
+   uploader(request, -- The HTTP request object
+            name, -- The path is the name only
+            function() end, -- startfunc not used
+            completefunc,
+            errorfunc,
+            -- (ref-lspenv)
+            {isJavaScriptDragDrop=request:header"x-requested-with" == "upload"}
+         )
+   -- The "x-requested-with" is set by JavaScript code in upload.js
+
+   -- Ref: 
+   --  http://realtimelogic.com/ba/doc/?url=en/lua/lua.html#ba_create_upload
+   --  The function does not return control to the caller.
+   assert(nil,"This cannot happen")
+end

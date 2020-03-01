@@ -1,0 +1,15 @@
+
+-- Function ba.create.upload() requires an IO object. We use the 'home'
+-- IO created by the wfs. An IO object can be created from another IO
+-- object by using ba.mkio(). Modify the line below to suit your application.
+-- uio (Upload IO) has the base set to the upload directory.
+uio=ba.openio("home")
+assert(uio, "This application is designed to be run by a server, such as Mako Server, with a 'home' I/O")
+
+
+-- Location where we put the uploaded data.
+uio:mkdir"tmpupl"
+-- Create a new IO with the upload dir as base.
+uio=ba.mkio(uio, "tmpupl")
+assert(uio, "Cannot create directory 'tmpupl'")
+
