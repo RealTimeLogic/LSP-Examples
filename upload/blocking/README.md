@@ -17,3 +17,5 @@ Run the example, using the Mako Server, as follows:
 cd upload/blocking
 mako -l::www
 ```
+
+See the [Mako Server command line video tutorial](https://youtu.be/vwQ52ZC5RRg) for more information on how to start the Mako Server.

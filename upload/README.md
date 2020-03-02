@@ -15,6 +15,6 @@ Note that you may also consider using the ready to use [Web File Manager](https:
 
 Navigate to one of the two sub-directories:
 
-* [Blocking upload example](blocking/README.md) - easy
-* [Asynchronous upload example](asynchronous/EADME.md) - complex
+* [Blocking upload example](blocking/) - easy
+* [Asynchronous upload example](asynchronous/) - complex
 

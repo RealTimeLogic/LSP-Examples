@@ -1,0 +1,60 @@
+
+-- Create a list such as: local list={"192.168.1.100","192.168.116.1", "192.168.216.1"}
+local list
+-- Optionally, the following loads a list if you have executed autoconf.lsp
+if not list then
+   if io:stat"ip-address-list.lua" then
+      list=io:dofile"ip-address-list.lua"
+      assert(list)
+   else
+      print"\nAborting SMQ cluster installation: No IP address list in .preload.\n"
+      return
+   end
+end
+
+
+-------------------------------------------------------------------
+
+-- The following is the example from the documentation:
+-- https://realtimelogic.com/ba/doc/?url=SMQ-Cluster.html#server2server
+-- The difference is that we bind to a specific interface: intf=require"loadconf".host}
+-- See the SMQ documentation for details.
+
+local mtl=require"smq.mtl".create("cluster password")
+local conn,err=require"smq.conn".create(mtl, 1900,{intf=require"loadconf".host})
+assert(conn,err)
+conn:setlist(list) -- Connect the nodes
+local smq=require"smq.hub".create()
+cluster=require"smq.cluster".create(smq, mtl)
+
+smq:create("ping", 2)
+smq:createsub("ping", 3)
+smq:createsub("pong", 4)
+
+local function onping(data,ptid,tid,subtid)
+   trace(string.format("%-20s %10X %d %d",data,ptid,tid,subtid))
+   smq:publish("I am good, thanks!", ptid, "pong")
+end
+
+local function onpong(data,ptid,tid,subtid)
+   trace(string.format("%-20s %10X %d %d",data,ptid,tid,subtid))
+end
+
+--smq:subscribe('self', {subtopic="ping",onmsg=onping})
+smq:subscribe('ping', {onmsg=onping})
+smq:subscribe('self', {subtopic="pong",onmsg=onpong})
+
+local function oneshot()
+   for ip,stat in pairs(conn:status()) do
+      trace(ip, stat and "connected" or "broken")
+   end
+   --cluster:publish("How are you?", "ping")
+   smq:publish("How are you?", "ping")
+end
+
+ba.timer(oneshot):set(3000,true)
+
+-- Used by smq.lsp: Start SMQ connection
+function connect(request)
+   smq:connect(request)
+end
