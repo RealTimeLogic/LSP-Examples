@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"/>
+  <script src="/rtl/jquery.js"></script>
+  <script>
+
+
+/* Create the required full WebSocket URL from a path component
+*/
+function wsURL(path) {
+    var l = window.location;
+    if(path == undefined) path = l.pathname;
+    return ((l.protocol === "https:") ? "wss://" : "ws://") +
+        l.hostname +
+        (l.port!=80 && l.port!=443 && l.port.length!=0 ? ":" + l.port : "") +
+        path;
+};
+
+
+/* AJAX service factory function (the AJAX client library).  
+   createAjax Args:
+     service: the URI (relative path) to the AJAX WebSocket server resource
+     onopen: A callback that is called when the AJAX library is ready
+     onclose: A callback that is called should the WebSocket connection go down.
+  Note: A new AJAX client library must be created should the socket
+  connection go down.
+
+   This function connects to the server using WebSocket and returns
+   the AJAX function:
+     ajax(callback, REST-URI, ...args)
+       callback: the callback function that is called when an AJAX
+                 response is received. The callback receives two
+                 arguments, the response data and an error code. The
+                 response data is null on error and the error code is
+                 set.
+      REST-URI: the server side service to call, example: 'math/add'
+      ...args: the arguments sent to the server side service, if any.
+*/
+function createAjax(service,onopen,onclose) {
+   var sock = new WebSocket(wsURL(service));
+   var sock = new WebSocket(wsurl);
+   sock.onopen=onopen;
+   sock.onclose=onclose;
+   var callbacks={} // saved ajax callbacks: key=id, val=function
+   /* WebSocket data received from server. Convert the JSON response to
+      an object, find the AJAX callback, and call the callback.
+   */
+   sock.onmessage = function(e) {
+       var resp=JSON.parse(e.data); // Convert the JSON response to an object
+      var callback=callbacks[resp.rpcID]; // Find the callback
+      delete callbacks[resp.rpcID]; // Release
+      callback(resp.rsp, resp.err); // Call the callback function
+   };
+   // Return function used for sending AJAX requests.
+   return function(callback, service, ...args) {
+      if(typeof callback != "function") throw("Missing callback");
+      var rpcID; // Find a unique ID
+      do {
+         rpcID=Math.floor(Math.random() * 100000);
+      } while(callbacks[rpcID]); // while collisions
+      callbacks[rpcID]=callback; // Save callback, where rpcID is the key.
+      // Convert to JSON and send data to server.
+      sock.send(JSON.stringify({rpcID:rpcID,service:service,args:args}));
+   };
+}; // End 'createAjax': 22 lines of code :-)
+
+
+// We use JQuery for interacting with the HTML
+$(function() {
+
+    // Disable/enable all HTML input elements
+    function disableInputs(disable) {
+        $("input").prop('disabled', disable);
+    };
+    disableInputs(true); //Initially disabled, then enabled when WebSocket is up
+
+    // Create the AJAX client instance
+    var ajax=createAjax('service.lsp', // The server side WebSocket service
+                        function() { disableInputs(false); }, // WS Up
+                        function() { disableInputs(true); } // WS Down
+                       );
+
+    /* This function is called via the two functions below when the
+       'add' or 'subtract' button is clicked: Extract a and b from
+       HTML input elements and call the AJAX service.
+    */
+    function math(serviceFunc,button) {
+        $("#err").html(""); // Erase errors, if any
+        // Extract the two values from the two input elems.
+        var list=$(button).parent().parent().children();
+        var a = list.eq(0).find('input').val(); //First input
+        var b = list.eq(2).find('input').val(); // Second input
+        // Call server function "math/[add|subtract]"
+        ajax(function(rsp,err) { // Ajax callback
+            console.log(rsp);console.log(err); //debug
+            if(rsp != null)
+                list.find("h2").html(rsp+""); // Show response (number)
+            else
+                $("#err").html(err);
+          },
+          "math/"+serviceFunc, // REST URI: "math/[add|subtract]"
+          a, b); // AJAX arguments
+    };
+
+    $("#addBut").click(function() { math("add",this); });
+
+    $("#subBut").click(function() { math("subtract",this); });
+
+    $("#timeBut").click(function() {
+        /* Call the Lua function os.date with arg "*t".
+           Function os.date returns an object with time values.
+           This example shows how a complex data object may be sent.
+        */
+        ajax(function(rsp,err) {
+            if(rsp) {
+                var html="";
+                // The response is an object
+                for (var key in rsp) {
+                    html += key + " : " + rsp[key] + "\n";
+                }
+                $("#time").html(html);
+            }
+            else $("#err").html(err);
+        }, "os/date", "*t");
+        
+    });
+
+});
+
+
+
+  </script>
+</head>
+<body>
+  <div class="container">
+    <div class="row">
+      <h1>Ajax over WebSockets</h1> 
+    </div>
+    <div class="row">
+        <div class="col"><input></input></div>
+        <div class="col-1"><h3>+</h3></div>
+        <div class="col"><input></input></div>
+        <div class="col"><input style="width:100%" id="addBut" type="button" value="Calc"></input></div>
+        <div class="col"><h2></h2></div>
+    </div>
+    <div class="row">
+        <div class="col"><input/></div>
+        <div class="col-1"><h3>-</h3></div>
+        <div class="col"><input/></div>
+        <div class="col"><input style="width:100%" id="subBut" type="button" value="Calc"></input></div>
+        <div class="col"><h2></h2></div>
+    </div>
+    <div class="row"><p id="err" class="alert-danger"></p></div>
+    <div class="row">
+      <div style="margin-right:20px">
+        <input id="timeBut" type="button" value="Get Time"/>
+      </div>
+      <div class="alert-success"><pre id="time"></pre></div>
+    </div>
+  </div>
+</body>
+</html>

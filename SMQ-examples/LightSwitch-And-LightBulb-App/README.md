@@ -25,8 +25,8 @@ mako -l::LightSwitch-And-LightBulb-App
 ```
 
 Navigate to:
-http://localhost[:portno]/bulb.html
-http://localhost[:portno]/switch.html
+1. http://localhost[:portno]/bulb.html
+2. http://localhost[:portno]/switch.html
 
 See the
 [Mako Server command line video tutorial](https://youtu.be/vwQ52ZC5RRg)
@@ -37,4 +37,3 @@ for more information on how to start the Mako Server.
 
 SMQ documentation: https://realtimelogic.com/ba/doc/?url=SMQ.html
 SMQ (IoT) tutorials: https://makoserver.net/tutorials/
-
