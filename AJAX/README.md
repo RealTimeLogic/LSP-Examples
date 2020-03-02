@@ -5,7 +5,7 @@ This is the companion example for the [Ajax for Beginners](https://makoserver.ne
 Run the example, using the Mako Server, as follows:
 
 ```
-cd ajax
+cd AJAX
 mako -l::www
 ```
 
