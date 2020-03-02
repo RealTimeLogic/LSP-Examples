@@ -1,0 +1,53 @@
+
+-- Create DB file 'test-database.db' in the home directory and reset/initialize DB
+
+local dbname=ba.openio"home":realpath"test-database.db"
+local env = luasql.sqlite()
+local conn = assert(env:connect(dbname)) -- DB connection used for write operations
+assert(conn:setautocommit"EXCLUSIVE") -- EXCLUSIVE for first DB operation only
+function onunload() -- auto run when app terminates
+   trace"closing DB"
+   conn:close()
+   env:close()
+end
+conn:execute"DROP TABLE list" -- reset/initialize
+assert(conn:execute"CREATE TABLE list (id INTEGER PRIMARY KEY, element TEXT)")
+
+-- Function used for committing and preparing next transaction for EXCLUSIVE use.
+--  The function is used exclusively by dbexec below.
+local function commit()
+   while true do
+      local ok, err = conn:commit"IMMEDIATE" -- Commit and prepare for IMMEDIATE transaction type
+      if ok then break end
+      if err ~= "BUSY" then
+         trace("ERROR: commit failed on exclusive connection:",err)
+         break
+      end
+      trace"BUSY writing, but we will try again"
+   end
+end
+commit() -- the two conn:exec above (in EXCLUSIVE mode)
+
+-- Create the thread and the function used for inserting callback
+-- functions into the thread queue.
+local dbthread=ba.thread.create()
+function dbexec(doit) -- used by index.lsp
+   dbthread:run(doit)   -- queue the doit function in index.lsp
+   dbthread:run(commit) -- queue commit
+end
+
+-- Opens/creates a new DB 'read' connection object -- i.e. should only
+-- be used for read operations
+function openconn()
+   local conn = assert(env:connect(dbname))
+   return conn,env
+end
+
+-- Returns our persistent DB write connection object
+function getexconn()
+   return conn,env
+end
+
+-- The functions dbexec, getexconn, and openconn above are used by index.lsp
+
+                

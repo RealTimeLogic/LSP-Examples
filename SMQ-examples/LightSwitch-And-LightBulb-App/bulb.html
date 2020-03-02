@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Light Bulb</title>
+  <link rel="stylesheet" href="bulb.css">
+  <script src='https://simplemq.com/rtl/jquery.js'></script>
+  <script src='https://simplemq.com/rtl/smq.js'></script>
+  <script>
+    $(function() {
+ 
+        var on = false;
+        var smq = SMQ.Client("wss://simplemq.com/smq.lsp");
+
+        smq.subscribe("/switchui/hello", {
+            onmsg:function(msg,ptid) {
+                smq.pubjson({on:on}, ptid, "/switch/set");
+            }
+        });
+        smq.subscribe("self", "/switch/set", {
+            datatype:"json",
+            onmsg:function(msg,ptid) {
+                if(on != msg.on) {
+                    on = msg.on;
+                    if(on) $('.lamp').addClass('lamp-on');
+                    else {$('.lamp').removeClass('lamp-on');}
+                    smq.pubjson({on:on}, "/switch/set");
+                }
+            }
+        });
+        smq.pubjson({on:on}, "/switch/set");
+    });
+  </script>
+</head>
+<body>
+  <div class="lamp-wrapper">
+  <div class="lamp">
+    <div class="lamp__inner"></div>
+  </div>
+</div>
+</body>
+</html>

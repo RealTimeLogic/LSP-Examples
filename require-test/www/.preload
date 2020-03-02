@@ -1,0 +1,23 @@
+
+trace'===== Start .preload ======\n'
+
+
+-- Add a loader that uses my own application I/O
+mako.createloader(io) -- io is defined in my app i.e. in .preload
+
+trace'--- dofile"helloworld1.lua" ----'
+io:dofile"helloworld1.lua"
+hello()
+
+trace'--- dofile"helloworld1.lua" using t as env ----'
+local t=setmetatable({},{__index=_G})
+io:dofile("helloworld1.lua",t)
+t.hello()
+
+trace'--- require"helloworld2".hello() ----'
+require"helloworld2".hello()
+
+trace'--- require"subdir.helloworld3".hello() ----'
+require"subdir.helloworld3".hello()
+
+trace' ===== End .preload ======\n'

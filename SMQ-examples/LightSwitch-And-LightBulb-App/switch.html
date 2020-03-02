@@ -1,0 +1,64 @@
+<html>
+  <head>
+    <link rel="stylesheet" href="switch.css" />
+    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+    <script src='https://simplemq.com/rtl/smq.js'></script>
+  </head>
+  <body>
+    <div id="app">
+      <switchcomp v-for="bulb in bulbs" :bulb="bulb" :key="bulb.etid"></switchcomp>
+    </div>
+    <script>
+
+Vue.component('switchcomp',{
+    template: 
+    '<div class="switch"><div>\
+     <input type="checkbox" @change="lightswitch" v-model="checked" />\
+     <div data-unchecked="On" data-checked="Off"></div>\
+     </div></div>',
+    props: ['bulb'],
+    data()  {
+        var data = {
+            checked: this.bulb.on,
+            etid: this.bulb.etid
+        };
+        this.bulb.lightSwitch=data;
+        return data;
+    },
+    methods: {
+        lightswitch(e) {
+            smq.pubjson({on:this.checked}, this.etid, "/switch/set");
+        }
+    }
+});
+
+var app=new Vue({
+    el: '#app',
+    data: { 
+        bulbs: { }
+    }
+});
+
+var smq = SMQ.Client("wss://simplemq.com/smq.lsp");
+
+function onSet(msg, ptid) {
+    var bulb = app.bulbs[ptid];
+    if(bulb)
+        bulb.lightSwitch.checked=msg.on;
+    else
+    {
+        Vue.set(app.bulbs, ptid, {on:msg.on,etid:ptid});
+        smq.observe(ptid, function() {
+            Vue.delete(app.bulbs, ptid);
+        });
+
+    }
+};
+
+smq.subscribe("self", "/switch/set", {datatype:"json", onmsg:onSet});
+smq.subscribe("/switch/set", {datatype:"json", onmsg:onSet});
+smq.publish("", "/switchui/hello");
+
+    </script>
+  </body>
+</html>
