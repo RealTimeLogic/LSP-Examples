@@ -1,0 +1,134 @@
+
+if not ba.forkpty then
+   error("\n\nThis server does not include ba.forkpty!!!\nDetails: https://realtimelogic.com/ba/doc/?url=auxlua.html#forkptylib\n\n")
+end
+
+local shell = os.getenv"SHELL"
+if not shell then
+   local dio = ba.openio"disk"
+   if not dio or dio:stat"/bin/bash" then
+      shell = "/bin/bash"
+   elseif dio:stat"/bin/sh" then
+      shell = "/bin/sh"
+   else
+      error"\n\nWebshell: cannot find /bin/sh!!!\n\n"
+   end
+end
+tracep(false,5,"Webshell using:",shell)
+
+local fmt=string.format
+local smq -- broker instance
+SMQ = require"smq.broker" -- Used by index.lsp
+
+-- table with ptys: ptys[etid] = pty, where etid = ephemeral topic ID
+local ptys={}
+
+-- Asynch PTY event callback sends data to browser client
+local function ptyRead(pty, etid)
+   local d,e=true,nil
+   while true do
+      d,e = pty:read(true)
+      if not d or #d== 0 then break end
+      smq.publish({d,e}, etid)
+   end
+   if ptys[etid] then -- if not closed by function 'onclose'
+      local ok, status = pty:terminate()
+      smq.shutdown(fmt("Child terminated with status %d",status or 0), etid)
+   end
+end
+
+-- SMQ onconnect called for each new client request.
+-- Creates and initializes a PTY.
+local function onconnect(etid, info, peer)
+   -- username set if authenticated.
+   local uname = info.uname
+   -- The PTY callback function receives pty as arg, but we also need the etid.
+   -- We solve this problem by using the etid as a closure
+   local pty,err
+   if not pcall(function()
+         local conf ={
+            async=function(pty) ptyRead(pty,etid) end,
+            stty="sane",
+            arg0="-"..(shell:match".-([^/]+)$" or shell),
+         env={TERM="xterm-color",HOME=os.getenv"HOME"}
+         }
+         pty,err=ba.forkpty(conf, shell,"-l","-i")
+   end) then
+      print"Using old API"
+      pty,err=ba.forkpty(function(pty) ptyRead(pty,etid) end,
+                            shell,"-l","-i") 
+      if pty then
+         pty:write"export TERM=xterm-256color\nstty sane\n\n"
+      end
+   end
+   --local pty,err=ba.forkpty(conf, shell)
+   if pty then
+      ptys[etid]=pty
+   else
+      smq.shutdown("Opening PTY failed: "..err, etid)
+   end
+end
+
+-- Called when client disconnects.
+-- Terminates the PTY associated with the client.
+local function onclose(etid, sock, peer, err)
+   local pty=ptys[etid]
+   if pty then
+      ptys[etid]=nil
+      pty:terminate()
+   end
+end
+
+-- Create an SMQ instance and register two callbacks
+smq = SMQ.create{
+   onconnect=onconnect,
+   onclose=onclose
+}
+app.smq = smq -- Must be accessible to index.lsp
+
+-- Called when client publishes to server's ephemeral TID
+local function ondata(data,ptid)
+   -- ptid (publisher's tid) is the ephemeral topic ID
+   local pty = ptys[ptid]
+   if pty then pty:write(data) end
+end
+
+-- Called when browser window is resized.
+local function onresize(size,ptid)
+   local pty = ptys[ptid]
+   if pty then pty:winsize(size.rows,size.cols) end
+end
+
+
+-- Enable above function
+smq.subscribe("self", {onmsg=ondata,subtopic="data"})
+smq.subscribe("self", {onmsg=onresize,subtopic="resize",json=true})
+
+
+
+
+
+if bd then -- If run in FuguHub
+   -- The 'pty' application should for security reasons only
+   -- be available to users in the pty group:
+   -- Create the permission rules.
+   local constraints = {} -- The constraints list. 
+
+   local roles={"admin"} -- Access to users in the 'admin' group.
+   local urls={"/*"} -- Protect "/* i.e. everything"
+   local methods={} -- empty = all methods
+   -- Add the 'admin' constraint. Name is of no importance.
+   constraints.admin={roles=roles,urls=urls,methods=methods} -- Assemble
+
+   -- Enable authentication for this application.
+   local authorizer = bd.db.user.jdb:authorizer()
+   authorizer:set(json.encode(constraints)) 
+   dir:setauth(bd.auth, authorizer)
+elseif mako then
+   if mako.udb then
+      local udb=mako.udb()
+      dir:setauth(ba.create.authenticator(udb,{type="digest"}))
+   else
+      tracep(false, 5, "Warning: no authenticator for webshell")
+   end
+end

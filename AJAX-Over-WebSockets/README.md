@@ -15,7 +15,7 @@ See the [Mako Server command line video tutorial](https://youtu.be/vwQ52ZC5RRg) 
 After starting the Mako Server, use a browser and navigate to http://localhost:portno, where portno is
 the HTTP port number used by the Mako Server (printed in the console).
 
-Resources:
-www/index.html: The client AJAX library and the examples
-www/promise.html: Same as above, but redesigned to use the new JS Promise
-www/service.lsp The AJAX WebSocket service and server side examples
+### Resources:
+* www/index.html - The client AJAX library and the examples
+* www/promise.html - Same as above, but redesigned to use the new JS Promise
+* www/service.lsp - The AJAX WebSocket service and server side examples
