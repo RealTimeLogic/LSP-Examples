@@ -1,0 +1,69 @@
+
+local su=require"sqlutil" -- Load SQL utility library
+
+if not su.exist"wiki" then
+   -- Create a database environment object and open data/wiki.sqlite.db
+   local env,conn = su.open"wiki"
+   local sql="CREATE TABLE wiki (key INTEGER PRIMARY KEY, relpath TEXT, data TEXT)"
+   local ok,err=conn:execute(sql)
+   if ok then 
+      print("Database 'wiki' created in ",su.dir())
+   else
+      trace("Creating DB failed",err)
+   end
+   su.close(env,conn)
+end
+
+
+-- The following table and functions are used by function text2html.
+local specialchars = {
+  ['&'] = '&amp;',
+  ['"'] = '&quot;',
+  ['<'] = '&lt;',
+  ['>'] = '&gt;',
+}
+local function special(x) return specialchars[x] end
+local function quote(str)
+  return(gsub(str, '([&"<>])', special))
+end
+local function p(txt)
+   return string.format("<p>%s</p>",txt)
+end
+-- Convert text to html. Used by 'wikifunc' and '.edit/modify.lsp'
+function text2html(txt)
+   return txt:gsub('([&"<>])',special):gsub("\n","<br>")
+end
+local text2html=text2html -- Must be a closure when used in wikifunc
+
+
+local wikidir -- The Wiki directory object is used as a closure in 'wikifunc'
+
+-- The Wiki directory function
+local function wikifunc(_ENV,relpath)
+   local sql=string.format("data FROM wiki WHERE relpath=%s",
+                           luasql.quotestr(relpath))
+   local data=su.find(function() return su.open"wiki" end, sql)
+   if data then
+      if request:data"edit" then
+         _ENV.relpath=relpath
+         _ENV.wikidata = data
+         response:forward(wikidir:baseuri()..".edit/modify.lsp")
+      else
+         response:write("<html><body>",
+                        text2html(data),
+                        "<p><a href='?edit='>edit</a> <a href='",
+                        wikidir:baseuri(),
+                        "'>index</a></p>",
+                        "</body></html>")
+      end
+   else
+      _ENV.relpath=relpath
+      response:forward(wikidir:baseuri()..".edit/create.lsp")
+   end
+end
+
+
+wikidir=ba.create.dir() -- No 'name' makes dir a sibling when inserted
+wikidir:setfunc(wikifunc)
+dir:insert(wikidir,true) -- Insert into app's dir as a sibling
+

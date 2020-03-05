@@ -1,0 +1,15 @@
+
+local su=require"sqlutil" -- Load SQL utility library
+if not su.exist"file" then
+   -- Create a database environment object and open data/file.sqlite.db
+   local env,conn = su.open"file"
+   local sql="CREATE TABLE messages (key INTEGER PRIMARY KEY, msg TEXT)"
+   local ok,err=conn:execute(sql)
+   if ok then 
+      print("Database file created in ",su.dir())
+   else
+      trace("Creating DB failed",err)
+   end
+   su.close(env,conn)
+end
+

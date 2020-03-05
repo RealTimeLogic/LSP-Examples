@@ -15,7 +15,24 @@ After starting the Mako Server, use a browser and navigate to http://localhost:p
 the HTTP port number used by the Mako Server (printed in the console).
 
 
-### Resources:
+## Online Testing Server
+
+You can test the shell using the online tutorial/testing server:
+
+https://embedded-app-server.info/shell/
+
+The testing server includes a few ASCII powered games and apps you may
+run in the shell:
+
+| Command | What it is         | How to exit |
+| ------- |:------------------:| -----------:|
+|   sl    | Steam Locomotive   | N/A         |
+| cmatrix | "The Matrix"       | CTRL-C      |
+| bastet  | Terminal Tetris    | CTRL-C      |
+| mc      | Midnight Commander | F10         |
+
+
+## Resources:
 * .preload: Manages a bash shell via ba.forkpty and manages the server side SMQ connection
 * index.lsp: Browser terminal uses the xterm.js lib and sets up an SMQ connection with server
 * xterm-compressed.js: Compressed version of xterm.js and fit.js: https://xtermjs.org/

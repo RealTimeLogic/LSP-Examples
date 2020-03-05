@@ -5,7 +5,7 @@ This is the companion example for the [Modern Approach to Embedding a Web Server
 
 The HTML files bulb.html and switch.html are designed to be dragged
 and dropped into a browser window without you having to install any
-software, however, you can also run a local server as follows:
+software. However, you can also run a local server as follows:
 
 Open switch.html and bulb.html in an editor
 

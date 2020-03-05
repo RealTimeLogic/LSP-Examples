@@ -1,0 +1,102 @@
+
+-- Use one of the following:
+local authtype="form"
+--local authtype="basic"
+--local authtype="digest"
+
+
+
+-- Create faster versions i.e. no lookup
+local sfind,ssub=string.find,string.sub
+
+
+-- The username/password callback function.
+local function getpassword(username, upasswd, _ENV)
+   trace("In getpassword:\tusername=",username)
+   if username == "admin" then return "admin" end
+end
+
+
+-- The login response message handler.
+-- We could print out the HTML response here, but it is easier
+-- forwarding the request to an LSP page.
+--
+-- Method response::forward does not return. In addition,
+-- response::forward removes any headers set by the authenticator. We
+-- can for this reason not use response::forward when using digest or
+-- basic authentication since these authenticators set HTTP
+-- authenticate headers. What we do instead is to include the error
+-- page. Basic and digest authentication should only include error
+-- information. The error page is shown if you press the cancle button
+-- in the browser's popup window.
+local function loginresponse(_ENV, authinfo)
+   trace("In loginresponse:", authinfo.username and "Setting password" or "Fetching login page")
+   if authinfo.type == "form" then
+      if authinfo.username then response:forward"/.login/failed.lsp" end
+      response:forward"/.login/form.lsp"
+   end
+   response:include"/.login/failed.lsp"
+end
+
+
+-- Create the username database from our getpassword func.
+local authuser=ba.create.authuser(getpassword)
+-- Create the authenticator that will be applied to the application's directory
+local authenticator=ba.create.authenticator(authuser,{response=loginresponse, type=authtype})
+
+
+
+
+-- List of all pages in our application
+local pages = {
+   {"Page 1","/page1.lsp"},
+   {"Page 2","/page2.lsp"},
+   {"Page 3","/page3.lsp"},
+}
+
+
+local htmlHeader=[[
+<!DOCTYPE html>
+<html>
+  <head>
+   <link type="text/css" href="/style.css" rel="Stylesheet" />
+  </head>
+<body>
+<div id="menu"><ul>
+]]
+
+-- Authenticate and emit the HTML header that is common for all pages.
+function emitHeader(cmd)
+
+   -- See function emitFooter()
+   if cmd:data"logout" == "true" then
+      cmd:logout()
+      cmd:sendredirect""
+   end
+
+   -- We pass in the request object, but request and response are the
+   -- same object. We call it 'cmd' in this function, where cmd is
+   -- short for Command Environment:
+   -- http://realtimelogic.com/ba/doc/?url=en/lua/lua.html#CMDE
+
+   local uri=cmd:uri()
+   -- Call the authenticator manually.
+   if not authenticator:authenticate(cmd, uri) then
+      cmd:abort() -- Do not return. Response sent by loginresponse() above.
+   end
+   -- User is authenticated. Print out the HTML header and our application menu
+   cmd:write(htmlHeader)
+   -- Prints out the above pages as HTML <li> elements and sets
+   -- class='selected' on the active page.
+   -- See style.css for more information
+   for _,v in ipairs(pages) do
+      cmd:write("<li><a ",
+                uri == v[2] and "class='selected'" or "",
+                " href='",v[2],"'>",v[1],"</a></li>")
+   end
+   cmd:write"</ul></div>"
+end
+
+function emitFooter(cmd)
+   cmd:write'<p><a href="?logout=true">Logout</a></p></body></html>'
+end

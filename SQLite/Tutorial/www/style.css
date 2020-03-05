@@ -1,0 +1,33 @@
+#form, div.messages {
+  max-width:600px;
+  margin:auto;
+  padding:0;
+}
+
+#form textarea {
+  width: 100%;
+  height:100px;
+}
+
+#form p:first-of-type {
+  font-weight:bold;
+}
+
+div.messages {
+  border: 1px solid #999;
+}
+
+
+div.messages div{
+  background-color: #D4D4E8;
+  margin:0;
+  padding:3px 10px 5px 10px;
+}
+
+div.messages div:nth-of-type(odd){
+  background-color: #E8E8FC;
+}
+
+div.messages div h3{
+  margin:0;
+}

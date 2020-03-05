@@ -1,0 +1,66 @@
+
+local authtype -- The string: form, basic, or digest
+local authtypes={form=true,basic=true,digest=true}
+for _,arg in pairs(mako.argv) do -- Check if authtype set on the command line
+   if authtypes[arg] then authtype=arg break end
+end
+authtype = authtype or "basic"
+
+
+
+-- 'dir' is created by the 'mako', and it is the applications's Resource
+-- Reader.  The Resource Reader is created by calling:
+-- http://realtimelogic.com/ba/doc/?url=en/lua/lua.html#ba_create_resrdr
+print(string.format("\n\nStarting application with IO base:\n\t%s\n\tand authentication type: %s\n",
+                    dir:io():realpath"", authtype))
+
+
+-- The code below is partly based on examples from:
+-- http://realtimelogic.com/ba/doc/?url=en/lua/lua.html#auth_overview
+
+-- The username/password callback function.
+local function getpassword(username, upasswd, _ENV)
+   trace("In getpassword:\tusername=",username)
+   if username == "admin" then return "admin" end
+end
+
+
+-- The login response message handler.
+-- We could print out the HTML response here, but it is easier
+-- forwarding the request to an LSP page.
+--
+-- Method response::forward does not return. In addition,
+-- response::forward removes any headers set by the authenticator. We
+-- can for this reason not use response::forward when using digest or
+-- basic authentication since these authenticators set HTTP
+-- authenticate headers. What we do instead is to include the error
+-- page. Basic and digest authentication should only include error
+-- information. The error page is shown if you press the cancle button
+-- in the browser's popup window.
+local function loginresponse(_ENV, authinfo)
+   trace("In loginresponse:", authinfo.username and "Setting password" or "Fetching login page")
+   if authinfo.type == "form" then
+      if authinfo.username then response:forward"/.login/failed.lsp" end
+      response:forward"/.login/form.lsp"
+   end
+   response:include"/.login/failed.lsp"
+end
+
+
+-- Create the username database from our getpassword func.
+local authuser=ba.create.authuser(getpassword)
+-- Create the authenticator that will be applied to the application's directory
+local authenticator=ba.create.authenticator(authuser,{response=loginresponse, type=authtype})
+
+ -- Create a dir and use the same name as our protected dir.
+local sdir=ba.create.dir("my-protected")
+
+-- Apply authenticator to this directory
+sdir:setauth(authenticator)
+
+-- Insert as a prologue directory in our application's Resource Reader object.
+-- A prologue directory is search before its parent thus kicking in
+-- the authenticator for our protected dir.
+-- Notice how we prevent sdir from being garbage collected by setting
+-- second param to true.
+dir:insertprolog(sdir, true)

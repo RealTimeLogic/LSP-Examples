@@ -4,8 +4,8 @@ Simple Message Queue (SMQ) is an "Internet of Things" IoT / M2M "Machine-to-Mach
 
 ## Lua and JavaScript Examples
 
-
-* [Cluster example](cluster) shows how to scale horizontally and add redundancy
+* [a light bulb app and a light switch app](LightSwitch-And-LightBulb-App)
+* [Cluster example](cluster) shows how to scale an SMQ solution horizontally and add redundancy
 
 
 ## Additional SMQ Examples

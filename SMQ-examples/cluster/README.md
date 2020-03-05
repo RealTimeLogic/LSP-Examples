@@ -2,7 +2,7 @@
 
 This example shows how to set up an SMQ testing cluster similar to the
 [online SMQ testing cluster](https://realtimelogic.com/IoT-LED-Cluster.html),
-but you do not need anything but your own desktop computer. The
+using only your desktop computer and without requiring any installation. The
 example shows how to simulate several computers on your own desktop
 computer.
 

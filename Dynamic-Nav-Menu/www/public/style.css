@@ -1,0 +1,85 @@
+
+#nav {
+    margin: 0 auto;
+    width: 660px;
+}
+
+#nav ul {
+    list-style: none;
+}
+
+
+#nav li {
+    float:left;
+}
+
+#nav a {
+    float:left;
+    padding: .8em 1.5em;
+    text-decoration: none;
+    color: #555;
+    text-shadow: 0 1px 0 rgba(255,255,255,.5);
+    font: bold 1.1em/1 'trebuchet MS', Arial, Helvetica;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    border-width: 1px;
+    border-style: solid;
+    border-color: #fff #ccc #999 #eee;
+    background: #c1c1c1;
+    background: -moz-linear-gradient(#f5f5f5, #c1c1c1);
+    background: -webkit-linear-gradient(#f5f5f5, #c1c1c1);
+    background: -o-linear-gradient(#f5f5f5, #c1c1c1);
+    background: linear-gradient(#f5f5f5, #c1c1c1);            
+
+    background: -ms-linear-gradient(#f5f5f5, #c1c1c1);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f5f5f5', endColorstr='#c1c1c1',GradientType=0);
+}
+
+#nav a:hover, #nav a:focus {
+    outline: 0;
+    color: #fff;
+    text-shadow: 0 1px 0 rgba(0,0,0,.2);
+    background: #fac754;
+    background: -moz-linear-gradient(#fac754, #f8ac00);
+    background: -webkit-linear-gradient(#fac754, #f8ac00);
+    background: -o-linear-gradient(#fac754, #f8ac00);
+    background: linear-gradient(#fac754, #f8ac00);
+
+    background: -ms-linear-gradient(#fac754, #f8ac00);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fac754', endColorstr='#f8ac00',GradientType=0);
+}
+
+#nav a:active {
+    box-shadow: 0 0 2px 2px rgba(0,0,0,.3) inset;
+}
+
+#nav li:first-child a {
+    border-left: 0;
+    border-radius: 4px 0 0 4px;            
+}
+
+#nav li:last-child a {
+    border-right: 0;
+    border-radius: 0 4px 4px 0;            
+}
+
+a.selected{
+    background: -moz-linear-gradient(#c1c1c1,#f5f5f5)!important;
+    background: -webkit-linear-gradient(#c1c1c1,#f5f5f5)!important;
+    background: -o-linear-gradient(#c1c1c1,#f5f5f5)!important;
+    background: linear-gradient(#c1c1c1,#f5f5f5)!important;
+
+    background: -ms-linear-gradient(#c1c1c1,#f5f5f5)!important;
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#c1c1c1', endColorstr='#f5f5f5',GradientType=0 )!important;
+}
+
+#maincontent {
+    clear:both;
+    max-width: 700px;
+    padding-top:1em;
+    margin:auto;
+}
+
+h1, .center {
+  text-align: center;
+}

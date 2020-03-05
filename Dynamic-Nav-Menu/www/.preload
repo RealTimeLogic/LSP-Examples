@@ -1,0 +1,101 @@
+
+
+-- 404 management:
+-- The following code Installs a sub directory with no name into the
+-- application's 'dir'. A sub directory with no name behaves as a
+-- sibling. The directory is activated if the parent does not find the
+-- resource. We install a directory function, which traps all requests
+-- to the sub-directory. The directory function forward delegates the
+-- response to the .404.lsp page.
+local d404=ba.create.dir()
+d404:setfunc(function(_ENV) response:forward"/.404.lsp" end)
+dir:insert(d404, true)
+
+
+
+--[[
+
+------------------ Authentication Management -----------------
+
+The .preload script sets up authentication for the application's "dir"
+object (pre-defined in the context of this app) and installs a 404
+handler.
+'
+The form based authentication page .login-form.lsp is setup to use
+seeded hash based authentication as explained in our documentation:
+https://realtimelogic.com/ba/doc/?url=lua.html#sha1_login
+
+When using hash based form authentication, the user database must
+store passwords as HA1 hashes:
+https://realtimelogic.com/ba/doc/?url=lua.html#EncryptedPasswords
+
+Note that the authenticator realm name must match the hashed passwords.
+
+--]]
+
+if ba.version() < 4369 then
+   trace"Server too old. No '/public/' dir. support. Skipping authentication."
+   return
+end
+
+local realm = "Mega Toaster" -- The authenticator realm name (also used for HA1)
+
+
+-- Ref-1
+-- The following is a valid JSON string (with C++ comments). We
+-- include the user database here for convenience. The user database
+-- would normally be stored on the file system and you would design a
+-- page that could add and remove users to/from this database.
+
+local userdb=[[
+{
+   "admin":{ // User 1
+      /* Store password as a HA1 value:
+            https://realtimelogic.com/ba/doc/?url=lua.html#EncryptedPasswords
+         The HA1 can be created using Linux commands as follows:
+          printf '%s:Mega Toaster:%s' admin password | md5sum | cut -d ' ' -f 1
+      */
+      "pwd":["eec0f5d2ed68dc8adb05f45bc0a488b4"],
+      "roles":[] // Not used, but must be included
+   },
+   "user": { // User 2
+      "pwd": ["8be0411cebd6e3a255883840996086bb"], // pwd=password
+      "roles":[]
+   }
+}
+]]
+
+-- Ref-2
+-- The following disabled code shows how to construct a user database using Lua
+-- Remove the comments --[[ and --]] to test the code.
+--[[
+
+-- https://realtimelogic.com/ba/doc/en/lua/auth.html
+local function ha1(realm,username,password)
+   return ba.crypto.hash"md5"(username)":"(realm)":"(password)(true,"hex")
+end
+
+userdb = {
+   admin={ pwd=ha1(realm, "admin", "password"), roles={} },
+   user={ pwd=ha1(realm, "user", "password"), roles={} },
+}
+
+--]]
+
+
+-- JSON User Database: https://realtimelogic.com/ba/doc/?url=lua.html#ba_create_jsonuser
+local ju=ba.create.jsonuser()
+assert(ju:set(userdb)) -- Insert JSON string (Ref-1) or Lua table (Ref-2)
+
+-- ba.create.authenticator() callback function
+local function loginresponse(_ENV, authinfo)
+   -- How _ENV is used: https://realtimelogic.com/ba/doc/?url=lua.html#CMDE
+   _ENV.authinfo = authinfo -- Makes it possible for .login-form.lsp to use authinfo
+   authinfo.realm=realm -- Used by .login-form.lsp
+   response:forward"/.login-form.lsp"
+end
+
+
+-- Create the authenticator that will be applied to the application's directory
+local authenticator=ba.create.authenticator(ju,{response=loginresponse, type="form", realm=realm})
+dir:setauth(authenticator)
