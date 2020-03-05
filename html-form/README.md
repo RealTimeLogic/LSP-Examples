@@ -16,3 +16,5 @@ http://localhost:portno, where portno is the HTTP port number used by
 the Mako Server (printed in the console).
 
 Enter any value in the login field and click the Login button.
+
+Please note that the Mako Server (Barracuda App Server) includes advanced authentication and authorization management APIs and you would normally not create a login page as shown in this example. See the [authentication](../authentication) example for more information.
