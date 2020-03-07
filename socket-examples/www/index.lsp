@@ -38,12 +38,36 @@ margin-bottom:0;
 <body>
 <h1>Lua Socket Examples</h1>
 
+<h2>Blocking Web Socket Server</h2>
+
+<p>The Blocking Web Socket Server example is similar to the example included in the Lua Tutorials. You may try the online copy of the <a href="https://embedded-app-server.info/WebSockets.lsp">Lua Tutorials : Web Socket Server</a> prior to running this example.</p>
+
+<p><b>Blocking Web Socket Server Example: <a href="Blocking-WS-Server/">Blocking-WS-Server/</a></b>
+
+<p>The above example (link) runs in the context of an LSP page, which in turn uses one of the threads from the Barracuda Server Pool, as illustrated in the following diagram:</p>
+<img src="https://realtimelogic.com/ba/doc/en/img/BaEventContainer.png" alt=""/>
+
+<p>When you run the above example, pay attention to the text "New WebSocket connection" and the text "End of Request/Response" being printed in the console. The server side WebSocket example runs until the browser closes the connection. Click the above link and let it run for a while, then click the back button in the browser.</p>
+
+<p>We do not recommend running a socket thread using the Barracuda Server Pool. You may modify the example ws.lsp and instead run the WebSocket server in the context of the Lua Thread Library. See the comments in Blocking-WS-Server/ws.lsp and modify the code as instructed.  When running the modified example, make sure to pay attention to the two messages "New WebSocket connection" and "End of Request/Response" being printed in the console.</p>
+
+<h2>Cosocket Web Socket Server</h2>
+
+<p>Cosockets are recommended for any implementation using several sockets simultaneously. A cosocket appears to be blocking, but is under the hood using non blocking sockets. The following example is a modified version of the above Blocking Web Socket Server. </p>
+
+<p><b>Cosocket Web Socket Server Example: <a href="Blocking-WS-Server/">Cosockets-WS-Server/</a></b>
+
+<p>Compare the two files Blocking-WS-Server/ws.lsp and Cosocket-WS-Server/ws.lsp</p>
+
+<h2>Designing Socket Protocols in Lua: Companion Examples</h2>
+<p>The following examples are the companion examples for the <a href="https://realtimelogic.com/ba/doc/?url=SockLib.html">Socket API Design Document</a>. Clicking the first column below takes you to the online example documentation and clicking column two runs the example.</p>
+
 <table>
 <tr><th>Documentation</th><th>Execute</th><th>Information</th></tr>
 <tr>
 <td><a href="https://realtimelogic.com/ba/doc/en/lua/SockLib.html#example1">Example 1</a></td>
 <td><a href="ntp.lsp">ntp.lsp</a></td>
-<td>Blocking socket example. NTP (Network Time Protocol Client)</td>
+<td>Blocking socket example. NTP (Network Time Protocol) client</td>
 </tr>
 <tr>
 <td><a href="https://realtimelogic.com/ba/doc/en/lua/SockLib.html#example2">Example 2</a></td>
@@ -73,7 +97,7 @@ margin-bottom:0;
 </table>
 
 
-<p>Example 13 (non blocking proxy) shows how flow control is managed when using cosockets. In order to test this, we need a service that enables us to send and receive large files. The destination server for the proxy is set to the online Barracuda App Server's Web File Manager (<a href="http://lua-tutorial.tk/fs/tmp/">http://lua-tutorial.tk/fs/tmp/</a>). When you click the proxy address <a href="<?lsp=proxyAddr?>/fs/tmp/"><?lsp=proxyAddr?>/fs/tmp/</a>, the proxy tunnels your request to the online server's <a href="https://realtimelogic.com/ba/doc/?url=lua.html#ba_create_wfs">Web File Manager</a>. Note that the proxy fails if you attempt to use or switch to a secure connection. Use a browser that supports drag and drop, such as Chrome, and drop a file into the Web File Manager's web interface. The file dropped into your browser window uploads via your local proxy. The proxy prints out the data usage to the console window when actively working.</p>
+<p>Example 13 (non blocking proxy) shows how flow control is managed when using cosockets. In order to test this, we need a service that enables us to send and receive large files. The destination server for the proxy is set to the online Barracuda App Server's Web File Manager (<a href="https://embedded-app-server.info/fs/tmp/">http://embedded-app-server.info/fs/tmp/</a>). When you click the proxy address <a href="<?lsp=proxyAddr?>/fs/tmp/"><?lsp=proxyAddr?>/fs/tmp/</a>, the proxy tunnels your request to the online server's <a href="https://realtimelogic.com/ba/doc/?url=lua.html#ba_create_wfs">Web File Manager</a>. Note that the proxy fails if you attempt to use or switch to a secure connection. Use a browser that supports drag and drop, such as Chrome, and drop a file into the Web File Manager's web interface. The file dropped into your browser window uploads via your local proxy. The proxy prints out the data usage to the console window when actively working.</p>
 
 </body>
 </html>

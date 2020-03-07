@@ -1,0 +1,36 @@
+<html>
+  <head>
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"></script>
+    <script>
+$(function() {
+    function print(txt) {
+        $("#console").append(txt+"\n");
+    };
+    let l=window.location
+    let wsurl="ws://"+l.host+l.pathname+"ws.lsp"
+    print("Connecting to: "+wsurl);
+    let s = new WebSocket(wsurl);
+    if( ! s ) {
+        print("Cannot connect to: "+wsurl);
+        return;
+    }
+    s.onopen = function() {
+        print("Connected");
+    };
+    s.onmessage = function (e) {
+        print('Server: ' + e.data);
+    };
+    s.onclose = function (e) {
+        print("Server closed the connection");
+    };
+    s.onerror = function (error) {
+        print('WebSocket Error ' + error);
+    };
+});
+    </script>
+  </head>
+  <body>
+  <p><b>Console Window:</b></p>
+  <pre id="console"></pre>
+  </body>
+</html>

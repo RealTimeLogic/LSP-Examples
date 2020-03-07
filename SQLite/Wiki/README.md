@@ -1,6 +1,6 @@
 # Basic Wiki Engine
 
-This is the companion example for the [URL to Database Mapping Tutorial](https://makoserver.net/articles/URL-to-Database-Mapping-Tutorial) tutorial.
+This is the companion example for the [URL to Database Mapping Tutorial](https://makoserver.net/articles/URL-to-Database-Mapping-Tutorial).
 
 This example implements a basic wiki engine by using a [directory function](https://realtimelogic.com/ba/doc/?url=lua.html#ba_dir) and SQLite for data storage.
 
