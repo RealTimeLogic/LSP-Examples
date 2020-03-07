@@ -9,7 +9,8 @@ local function webSockFunc(s)
          break -- Socket closed
       end
       -- We cannot use ba.sleep in a cosocket, but we can use a timer.
-      -- We can also use receive with a timeout since we do not receive data.
+      -- We can also use 'read' with a timeout as a timer since we do
+      -- not receive data.
       s:read(1000)
       count = count + 1
    end
