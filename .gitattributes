@@ -1,4 +1,4 @@
 # Auto detect text files and perform LF normalization
 * text=auto
 *.lua linguist-language=Lua
-*.lsp linguist-language=LSP
+*.lsp linguist-language=Lua
