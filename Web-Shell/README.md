@@ -27,10 +27,17 @@ run in the shell:
 | Command | What it is         | How to exit |
 | ------- |:------------------:| -----------:|
 |   sl    | Steam Locomotive   | N/A         |
+| cowsay  | [cowsay](https://en.wikipedia.org/wiki/Cowsay)| N/A         |
 | cmatrix | "The Matrix"       | CTRL-C      |
 | bastet  | Terminal Tetris    | CTRL-C      |
 | mc      | Midnight Commander | F10         |
 
+Examples:
+cowsay -f ghostbusters Who you Gonna Call
+fortune | cowsay
+fortune | cowsay -f tux
+toilet -f mono12 -F metal "Mako Server"
+More examples: https://www.binarytides.com/linux-fun-commands/
 
 ## Resources:
 * .preload: Manages a bash shell via ba.forkpty and manages the server side SMQ connection

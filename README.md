@@ -12,6 +12,7 @@
 * [How to add 'require' search path to an app](require-test)
 * [SMQ IoT Examples](SMQ-examples) - Easy and secure device management
 * [SQLite Examples](SQLite) - Database examples
+* [PostgreSQL Example](PostgreSQL) - Database example
 * [Sockets and webSockets examples](socket-examples)
 * [Web Shell](Web-Shell) - web based alternative to SSH
 * [The ephemeral request/response environment](command-env) - using response:include() and response:forward()

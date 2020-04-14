@@ -1,0 +1,29 @@
+
+-- Check if pgsql.so can be found
+if not pcall(function() require "pgsql" end) then
+   trace("**************** Error:\n",
+         "Cannot find the PostgreSQL Lua Binding library: pgsql.so\n",
+         "Mako sure the library is in one of the following directories:\n",
+         package.cpath,"\n\n")
+   return
+end
+
+
+
+local conf=require"loadconf" -- mako.conf
+local cinfo=conf.cinfo
+trace("Loading connection info: ",ba.json.encode(cinfo))
+
+
+-- Makes require"pg" work, see: https://realtimelogic.com/ba/doc/?url=Mako.html#mako_createloader
+mako.createloader(io)
+-- Create a 'pg' object using DB info from mako.conf -> cinfo
+pg=require"pg".create(cinfo, function(conn)
+      trace("DB connected:",conn:status() == 0 and "yes" or "no")
+   end)
+-- Object 'pg' is used by index.lsp
+
+function onunload()
+   trace"Closing DB conn"
+   pg.close()
+end
