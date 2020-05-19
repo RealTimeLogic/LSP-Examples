@@ -2,6 +2,7 @@
  [Lua and LSP](https://realtimelogic.com/products/lua-server-pages/) examples, including IoT/Cloud connectivity.
 
 
+* [Lua and LSP debugging example](Lua-Debug) - A ready to use debugging example 
 * [Basic HTML form](html-form) - The tutorial: HTML Forms and LSP for Beginners
 * [Authentication](authentication) - Introduction to the Barracuda App Server's authentication mechanism
 * [AJAX For Beginners](AJAX)

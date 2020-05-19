@@ -1,0 +1,24 @@
+
+-- The following makes it possible to use function 'require' for the
+-- module .lua/Markow-Chain.lua
+mako.createloader(io)
+
+-- Load the module
+local mc = require"Markow-Chain"
+
+-- Load the Lua Debugger Monitor "ldbgmon" and call the connect() method
+require"ldbgmon".connect{
+   -- host="192.168.1.100", -- Default value: "localhost"
+   -- port = 8888,  -- Default value: 4711
+   -- stop=true, -- Default value: false. Can also stop via launch.json: "stopOnEntry": true,
+   -- retry=10, -- Default value: infinite. Try connecting to debugger this many times
+   restartonmod=true, -- Default value: false. Auto restart server on file change
+}
+
+
+trace"The debugger should stop the program on this line"
+
+--Step into the following function by pressing F11.
+-- Make sure to read the comments in the file
+
+mc.run()
