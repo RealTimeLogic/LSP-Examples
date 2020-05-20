@@ -44,7 +44,7 @@ you start VS; open the www directory in VS; and click the Run
 button. VS uses the configuration information in .vscode/launch.json
 and starts VS as a debug server as soon as you click the Run button
 (F5). The Mako Server should then connect and the debug session
-start.
+starts.
 
 ### Configuring VS
 
