@@ -28,13 +28,15 @@ command line guide for additional instructions.
 ### Initial Test Instructions
 
 1. Start Mako Server as instructed above
-2. You should see the Mako Server continually printing "cannot
-   connect to debugger" messages in the console window
+2. You should see the Mako Server print the message "LDbgMon waiting
+   for connection on port 4711" in the console window
 3. Using VS, Select File -> Open Folder -> navigate to the
    Lua-Debug/www directory, and select this directory
-4. Click the Run button (F5) to start VS as a debug server
-5. Mako Server now connects to VS, and the debugger should at this
-   point halt the execution in the application's .preload script
+4. Click the Run button (F5) to connect the debugger (operating as a
+   client) to the debug monitor (server).
+5. The debugger now connects to the Mako Server, and the debugger
+   should, at this point, halt the execution in the application's
+   .preload script
 
 The Mako Server's integrated debug monitor will immediately attempt to
 connect to Visual Studio Code (VS) as soon as the 'www' Lua
@@ -73,7 +75,7 @@ as Lua scripts, perform the following steps:
 ### Debugging LSP files
 
 The Mako Server will be idle after you have run through the initial
-Lua startup code using VS. When the server idles click the pause
+Lua startup code using VS. When the server idles, click the pause
 button in VS, open a browser, and navigate to http://localhost. VS
 will then halt the LSP page at the top of the file. See the comments
 in index.lsp for additional debugging tips.
@@ -94,6 +96,11 @@ construction makes it super fast to restart the server after Lua code
 has been modified.
 
 #### Restart a debug session as follows:
+
+The following instructions apply to using the debugger as a
+TCP client. You may also use the instructions when the debugger operates
+as a TCP server, but see the Gotchas section below for issues you
+may run into.
 
 1. Click the restart button in VS
 2. The Mako Server's internal state restarts
@@ -152,3 +159,82 @@ The "sourceMaps" attribute must be constructed as follows:
 
 See the source mapping example in Lua-Debug/www/.vscode/launch.json
 for more information.
+
+### Auto Creating launch.json for remote debugging
+
+The included FileServer app simplifies remote debugging as it sets up
+a NetIo file server and auto creates the required Visual Studio Code
+configuration file 'launch.json'. Open a command window on your host
+computer (Windows/Linux/Mac) and start the File Server as follows:
+
+``` shell
+mako -l::FileServer
+```
+
+The File Server app should automatically open your browser and
+navigate to the File Server. Using the File Server, navigate to the
+application (sub directory) you want to debug, and copy the URL. Connect a
+remote shell to the computer you want to run the Mako Server on. Type
+the following in the shell and then paste in the URL.
+
+``` shell
+mako -l::<PASTE URL>
+```
+
+The following 1 minute video illustrates the complete remote debug setup:
+
+[![IMAGE ALT TEXT HERE](http://img.youtube.com/vi/bSdwW58GcJ0/0.jpg)](http://www.youtube.com/watch?v=bSdwW58GcJ0)
+
+The NetIo must be used when setting up a remote debug session as it
+enables the remote Mako Server and Visual Studio code to work on the
+same directory. See the
+[NetIo section](https://realtimelogic.com/ba/examples/lspappmgr/readme.html#netio)
+in the LSP Application Manager documentation for more information on
+how the NetIo works.
+
+## Gotchas
+
+The debug monitor embedded in the Mako Server implements the
+[Debug Adapter Protocol](https://microsoft.github.io/debug-adapter-protocol/
+) and can be used by any debugger implementing this protocol. Visual
+Studio Code includes a Lua Debug plugin that you may use. We refer to
+this combination as the debugger. This debugger has some gotchas and
+minor incompatibilities with the debug monitor (server) as listed
+below:
+
+* The debugger provides a restart button (Ctrl-Shift-F5). Clicking
+  this button makes the server restart the internal state of the
+  program without restarting the process. The server's debugger
+  connection will, for this reason, be closed and must be
+  re-established. The debugger, when operating as a TCP network client
+  auto reconnects, but a bug in the debugger makes the connection
+  establishment fail. For this reason, if you plan on using the
+  restart button, make sure to quickly click the Disconnect button
+  after clicking the Restart button and then click the Continue
+  button. You may also want to delay calling ldbgmon.connect() in your
+  Lua code by using a timer or put the ldbgmon.connect() call in an
+  LSP page that must be initiated by a browser.
+* The exception breakpoints listed in the debugger will have no effect
+  if enabled. These breakpoints require non standard modifications to
+  the Lua VM.
+* LSP files include both HTML and Lua code, which are not understood by
+  the debugger and the debugger will show compilation errors when you
+  open an LSP file. You can simply ignore these errors. However, you
+  can set breakpoints in LSP files and step through code in LSP files.
+* Are you debugging the correct file? The Barracuda App Server library
+  (powering the Mako Server) provides an IO interface for each loaded
+  app. The IO provides a relative path from the base for applications
+  and the Lua VM. The debug monitor must, for this reason, search for
+  the debugged file in all registered IOs and you may end up with the
+  wrong file if you have the same file name in multiple apps. In
+  particular, watch out for confusion in regards to debugging the
+  app's .preload script.
+* The server will be in run mode after the server has run through its
+  initial startup code, including loading and running any startup code
+  for your app such as the .preload script. You may then click the
+  pause button in the debugger to halt the server, but note that the
+  server is idling until a browser makes an LSP page execute or
+  another event is triggered, such as a socket event or timer
+  event. The server will halt as soon as an event triggers the
+  execution of Lua code. In other words, loading static assets such as
+  HTML files, images, etc., will not halt the server.

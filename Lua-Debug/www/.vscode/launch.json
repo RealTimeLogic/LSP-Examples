@@ -1,29 +1,19 @@
 {
-    // Use IntelliSense to learn about possible attributes.
-    // Hover to view descriptions of existing attributes.
-    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
         {
             "name": "attach",
             "type": "lua",
             "request": "attach",
-            "stopOnEntry": true,  // Stop on line after: require"ldbgmon".connect()
-            "address": "127.0.0.1:4711", // Must be IP address, not hostname
-            "client":false, // MUST BE SERVER -- i.e. set to false !!!!
+            "stopOnEntry": true,
+            "address": "127.0.0.1:4711",
+            "client":true,
             "sourceMaps": [
-                /*
-                  You do not need to configure "sourceMaps" when the
-                  server and debugger run on the same computer. The
-                  following example shows how to map the NET IO.
-                 */
-                /*
                 [
-                    "c:\\develop\\LSP-Examples\\Lua-Debug\\www\\",
-                    "http://192.168.1.100/fs/c/develop/LSP-Examples/Lua-Debug/www/"
+                    "c:\\Users\\wini\\develop\\GIT-repos\\LSP-Examples\\Lua-Debug\\www\\",
+                    "http://127.0.0.1:80/fs/www/"
                 ]
-                */
-    	    ]            
+    	    ]
          }
     ]
 }

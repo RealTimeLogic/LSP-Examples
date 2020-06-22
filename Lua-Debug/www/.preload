@@ -1,24 +1,49 @@
 
--- The following makes it possible to use function 'require' for the
--- module .lua/Markow-Chain.lua
-mako.createloader(io)
+local mc -- Markov Chain module (Lua code you will debug).
 
--- Load the module
-local mc = require"Markow-Chain"
-
--- Load the Lua Debugger Monitor "ldbgmon" and call the connect() method
-require"ldbgmon".connect{
-   -- host="192.168.1.100", -- Default value: "localhost"
-   -- port = 8888,  -- Default value: 4711
-   -- stop=true, -- Default value: false. Can also stop via launch.json: "stopOnEntry": true,
-   -- retry=10, -- Default value: infinite. Try connecting to debugger this many times
-   restartonmod=true, -- Default value: false. Auto restart server on file change
-}
+if mako then
+   -- Function mako.createloader() makes it possible to use function
+   -- 'require()' for the module .lua/Markow-Chain.lua.
+   -- See: https://realtimelogic.com/ba/doc/?url=en/Mako.html#mako_createloader
+   mako.createloader(io)
+   -- Load the module
+   mc = require("Markow-Chain")
+else
+   -- Not a Mako Server. Load module using 'io:dofile'
+   mc=io:dofile".lua/Markow-Chain.lua"
+end
 
 
-trace"The debugger should stop the program on this line"
+-- This function freezes (blocks) the server until a debugger connects
+-- to the listening port 4711
+local function waitForDebugger()
+   
+   -- Load the Lua Debug Monitor "ldbgmon" and call the connect() method
+   -- client=false -> bind (act as server). Default is to act as client.
+   if require"ldbgmon".connect{client=false} then
 
---Step into the following function by pressing F11.
--- Make sure to read the comments in the file
+      trace"The debugger should stop the program on this line"
 
-mc.run()
+      --Step into the following function by pressing F11. Make sure
+      -- to read the comments in the file, starting at the top of the file.
+      mc.run()
+
+   else
+      trace"Debugger connection failed"
+   end
+   
+end -- waitForDebugger
+
+-- You may directly call waitForDebugger() and block the Mako Server
+-- when starting this app. You will then be able to inspect the Mako
+-- Server's internal code in mako.zip and "Step Out" and into the Mako
+-- Server's internal Lua code. Alternatively comment out the first
+-- code line below and enable the second code line. Mako Server will
+-- then complete the loading of this app before halting execution.
+-- The third code line below provides a start option that gives you
+-- time to click the Restart -> Disconnect button in the debugger. See
+-- the section Gotchas in the example's GitHub documentation.
+
+waitForDebugger()
+--ba.thread.run(waitForDebugger)
+--ba.timer(waitForDebugger):set(5000,true)

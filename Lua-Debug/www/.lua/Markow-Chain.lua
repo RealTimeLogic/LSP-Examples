@@ -3,7 +3,7 @@
 The following Lua code is a copy of:
 https://embedded-app-server.info/Lua-Coroutines.lsp#MarkovChain
 
-Set a breakpoint on line 46 and resume (F5). See comments below
+Set a breakpoint on line 50 and resume (F5). See comments below
 for more information.
 
 --]]
@@ -17,7 +17,11 @@ function allwords() -- Modified: fetches data from 'url'
    -- Server's Lua startup code. You can step into this function, but you
    -- cannot change the code since the code is inside mako.zip.
 
-   local http = require"httpc".create{shark=mako.sharkclient()}
+   local http = require"httpc".create{
+      shark = mako and
+         mako.sharkclient() or -- If running on Mako
+         ba.create.sharkssl(ba.create.certstore())
+   }
    http:request{url=url,method="GET"}
    local data,err=http:read"*a"
    if not data then
@@ -36,7 +40,7 @@ function allwords() -- Modified: fetches data from 'url'
    end
    local nextword = coroutine.create(words)
    return function()
-       -- 1: Set a breakpoint on the line below.
+       -- 1: Set a breakpoint on the code line below.
        -- 2: Resume (F5)
        -- 3: Remove the breakpoint when the line is hit
        -- 4: Take note of the "CALL STACK" before stepping in. The
