@@ -38,16 +38,6 @@ command line guide for additional instructions.
    should, at this point, halt the execution in the application's
    .preload script
 
-The Mako Server's integrated debug monitor will immediately attempt to
-connect to Visual Studio Code (VS) as soon as the 'www' Lua
-application is loaded by the Mako Server. You will see a number of
-failed connection attempts. These error messages will print until
-you start VS; open the www directory in VS; and click the Run
-button. VS uses the configuration information in .vscode/launch.json
-and starts VS as a debug server as soon as you click the Run button
-(F5). The Mako Server should then connect and the debug session
-starts.
-
 ### Configuring VS
 
 At this point, you can step through the code, but you cannot set
