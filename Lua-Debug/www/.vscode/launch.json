@@ -8,12 +8,23 @@
             "stopOnEntry": true,
             "address": "127.0.0.1:4711",
             "client":true,
+
+            /*
+              You do not need to configure "sourceMaps" when the
+              server and debugger run on the same computer. The
+              following example shows how to map the NET IO.
+            */
+
+/*
             "sourceMaps": [
                 [
-                    "c:\\Users\\wini\\develop\\GIT-repos\\LSP-Examples\\Lua-Debug\\www\\",
+                    "c:\\LSP-Examples\\Lua-Debug\\www\\",
                     "http://127.0.0.1:80/fs/www/"
                 ]
     	    ]
+*/
+
+
          }
     ]
 }
