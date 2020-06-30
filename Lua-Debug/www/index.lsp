@@ -38,12 +38,8 @@ local function listprint(elem)
    response:write('<li class="list-group-item">',elem,'</li>')
 end
 
--- Load the module
-local mc = require"Markow-Chain"
-
-
-
-mc.run(listprint)
+-- The Markov Chain module loaded by the .preload script
+app.mc.run(listprint)
 
 
 response:write'</ul>'

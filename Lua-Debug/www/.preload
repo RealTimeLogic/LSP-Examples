@@ -1,6 +1,5 @@
 
-local mc -- Markov Chain module (Lua code you will debug).
-
+-- Load the Markov Chain module (Lua code you will debug).
 if mako then
    -- Function mako.createloader() makes it possible to use function
    -- 'require()' for the module .lua/Markow-Chain.lua.
@@ -12,6 +11,9 @@ else
    -- Not a Mako Server. Load module using 'io:dofile'
    mc=io:dofile".lua/Markow-Chain.lua"
 end
+
+-- We can now use app.mc in index.lsp
+assert(app.mc == mc) -- This is just to show how it works. This will not fail.
 
 
 -- This function freezes (blocks) the server until a debugger connects
