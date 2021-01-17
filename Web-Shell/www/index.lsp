@@ -42,14 +42,15 @@ $(function() {
     var serverTid; // Server's ephemeral tid
 
     var smq = SMQ.Client(); // No args: connect back to 'origin'.
-
+    var lastSize;
     function pubsize(size) {
+        lastSize=size;
         smq.pubjson({cols:size.cols, rows:size.rows}, serverTid, "resize");
     };
 
     smq.onconnect=function() {
         setTimeout(function() {
-            pubsize(term);
+            if(lastSize) pubsize(lastSize);
         }, 2000);
     };
 

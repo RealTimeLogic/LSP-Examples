@@ -5,6 +5,7 @@
 * [Lua and LSP debugging example](Lua-Debug) - A ready to use debugging example 
 * [Basic HTML form](html-form) - The tutorial: HTML Forms and LSP for Beginners
 * [Authentication](authentication) - Introduction to the Barracuda App Server's authentication mechanism
+* [Single Sign On](fs-sso) - Authenticating using [OpenID Connect](https://openid.net/connect/) and [Microsoft Azure AD](https://portal.azure.com/)
 * [AJAX For Beginners](AJAX)
 * [AJAX Over WebSockets](AJAX-Over-WebSockets)
 * [Dynamic Navigation Menu](Dynamic-Nav-Menu)
@@ -17,6 +18,7 @@
 * [Sockets and webSockets examples](socket-examples)
 * [Web Shell](Web-Shell) - web based alternative to SSH
 * [The ephemeral request/response environment](command-env) - using response:include() and response:forward()
+* [OAuth 2.0](oauth) - Shows how to access Github using OAuth 2.0
 
 ## Linux Users
 

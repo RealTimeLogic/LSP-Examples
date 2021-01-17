@@ -1,0 +1,29 @@
+
+local dio=ba.openio("disk")
+
+-- The following should work for both Windows and Linux
+local lockDir = mako.dos2unix(os.getenv"TEMP" or os.getenv"TMP" or "/tmp").."/.LOCK"
+if not dio:stat(lockDir) and not dio:mkdir(lockDir) then
+   trace("Error, cannot create:",lockDir)
+end
+
+-- Create a file server instance and insert into this app's directory.
+require"wfs"
+local fs=ba.create.wfs("fs", dio, lockDir)
+dir:insert(fs,true)
+local base=dir:baseuri() -- Where it is installed
+
+-- Create an authenticator that simply redirects the user to the base
+-- URL if not authenticated
+local function authresp(_ENV, authinfo) response:sendredirect(base) end
+local auth=ba.create.authenticator(
+   ba.create.authuser(function() end),{type="auth",response=authresp})
+-- Prevent non authenticated users from using the file server
+fs:setauth(auth)
+fs:configure{tmo=2*60*60,helpuri=base.."help.lsp",logouturi=base.."logout.lsp"}
+
+-- Load the Microsoft Single Sign On Module
+mako.createloader(io)
+local sso=require"ms-sso".init(require"loadconf".openid)
+OpenIdCallback=sso.login
+OpenIdLogin=sso.sendredirect
