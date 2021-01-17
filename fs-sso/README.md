@@ -10,12 +10,14 @@ server as a network drive.
 To use the example, create a mako.conf file with the following
 settings:
 
+```
 openid={
    tenant="your tenant id",
    client_id="your client id",
    client_secret="your client secret",
    redirect_uri="https://localhost/"
 }
+```
 
 For testing on 'localhost', use the redirect_uri as shown above.
 
