@@ -5,6 +5,7 @@ local dbname=ba.openio"home":realpath"test-database.db"
 local env = luasql.sqlite()
 local conn = assert(env:connect(dbname)) -- DB connection used for write operations
 assert(conn:setautocommit"EXCLUSIVE") -- EXCLUSIVE for first DB operation only
+conn:setbusytimeout(2000)
 function onunload() -- auto run when app terminates
    trace"closing DB"
    conn:close()
@@ -40,6 +41,7 @@ end
 -- be used for read operations
 function openconn()
    local conn = assert(env:connect(dbname))
+   if conn then conn:setbusytimeout(2000) end
    return conn,env
 end
 

@@ -1,6 +1,6 @@
 # SQLite Shared Connection Example
 
-This is the companion example for the [Lua-SQLite and LSP Considerations](http://realtimelogic.com/ba/doc/?url=luasql-lsp-considerations.html) tutorial.
+This is the companion example for the [Lua-SQLite and LSP Considerations](http://realtimelogic.com/ba/doc/?url=luasql-lsp-considerations.html) tutorial. See the tutorial [Understanding SQLITE_BUSY](https://activesphere.com/blog/2018/12/24/understanding-sqlite-busy) for a detailed explanation on SQLite locking.
 
 Run the example, using the Mako Server, as follows:
 
