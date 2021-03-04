@@ -1,0 +1,4 @@
+
+-- Load the Mini Content Management System (CMS)
+io:dofile(".lua/cms.lua",app)
+

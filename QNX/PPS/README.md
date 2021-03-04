@@ -1,4 +1,4 @@
-#QNX PPS SMQ Bridge
+# QNX PPS SMQ Bridge
 
 Module pps extends the [QNX Persistent Publish Subscribe](http://www.qnx.com/developers/docs/7.0.0/#com.qnx.doc.pps.developer/topic/about.html) (PPS) service and enables HTML5/JavaScript powered apps to directly subscribe to and publish PPS messages.
 
