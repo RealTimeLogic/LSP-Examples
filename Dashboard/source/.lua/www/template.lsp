@@ -239,6 +239,7 @@ end
         <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
           <!-- Add icons to the links using the .nav-icon class
                with font-awesome or any other icon font library -->
+
 <?lsp emitMenu(menuL) ?>
 
         </ul>
@@ -262,7 +263,6 @@ end
            <li class="breadcrumb-item"><a href="/">Home</a></li>
 <?lsp
 local breadcrumbL = breadcrumbT[relpath]
-trace(relpath,breadcrumbL)
 if breadcrumbL then
    for _,bc in ipairs(breadcrumbL) do
       if bc.href then

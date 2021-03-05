@@ -1,13 +1,13 @@
 # LSP-Examples
  [Lua and LSP](https://realtimelogic.com/products/lua-server-pages/) examples, including IoT/Cloud connectivity.
 
-
 * [Lua and LSP debugging example](Lua-Debug) - A ready to use debugging example 
 * [Basic HTML form](html-form) - The tutorial: HTML Forms and LSP for Beginners
 * [Authentication](authentication) - Introduction to the Barracuda App Server's authentication mechanism
 * [Single Sign On](fs-sso) - Authenticating using [OpenID Connect](https://openid.net/connect/) and [Microsoft Azure AD](https://portal.azure.com/)
 * [AJAX For Beginners](AJAX)
 * [AJAX Over WebSockets](AJAX-Over-WebSockets)
+* [Create an Awesome Interactive Dashboard App using AdminLTE](Dashboard)
 * [Dynamic Navigation Menu](Dynamic-Nav-Menu)
 * [File Upload, including drag and drop](upload)
 * [Google IoT Cloud](Cloud-IoT-Core) - Connecting to the Google MQTT Bridge
