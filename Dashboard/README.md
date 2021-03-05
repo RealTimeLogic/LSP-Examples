@@ -16,8 +16,8 @@ dashboard version.
 3. Download the LSP examples: git clone https://github.com/RealTimeLogic/LSP-Examples
 4. Download [xlua for your platform](https://makoserver.net/download/overview/)
 5. Run:
-    Win:   xlua LSP-Examples\Dashboard\build.lua AdminLTE
-    Linux: ./xlua LSP-Examples/Dashboard/build.lua AdminLTE
+   - Win:   xlua LSP-Examples\Dashboard\build.lua AdminLTE
+   - Linux: ./xlua LSP-Examples/Dashboard/build.lua AdminLTE
 6. Copy all files in LSP-Examples/Dashboard/source/ to AdminLTE.new/ e.g.: cp -r LSP-Examples/Dashboard/source/. AdminLTE.new
 7. Copy the two directories 'dist' and 'plugins' from AdminLTE/ to AdminLTE.new/
 
