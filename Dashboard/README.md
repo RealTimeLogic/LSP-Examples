@@ -61,7 +61,7 @@ AdminLTE pages for details.
 The page content extracted from the AdminLTE example pages are copied
 to the AdminLTE.new/.lua/www/ directory with the extension ".html",
 however, each page is executed as an LSP page thus LSP tags
-(e.g. <?lsp Lua code ?>) can be inserted into any of these pages.
+(e.g. &lt;?lsp Lua code ?&gt;) can be inserted into any of these pages.
 
 The Lua code in cms.lua reads and parses 'menu.json' at startup, and
 creates two utility Lua tables used by the 'AdminLTE theme page'
@@ -114,7 +114,7 @@ menu-element: // directory
 {
     "name": "link name",
     "class": "nav-icon", // And additional AdminLTE classes
-    "href": "relative path" // or "#" if no page is associated with the directory
+    "href": "relative path", // or "#" if no page is associated with the directory
     "sub": menu-list
 }
 ```
