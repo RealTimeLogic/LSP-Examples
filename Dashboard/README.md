@@ -15,11 +15,20 @@ dashboard version.
 2. Download AdminLTE: git clone https://github.com/ColorlibHQ/AdminLTE.git
 3. Download the LSP examples: git clone https://github.com/RealTimeLogic/LSP-Examples
 4. Download [xlua for your platform](https://makoserver.net/download/overview/)
-5. Run:
+5. Run: (See the Notes section below for details on the script 'build.lua')
    - Win:   xlua LSP-Examples\Dashboard\build.lua AdminLTE
    - Linux: ./xlua LSP-Examples/Dashboard/build.lua AdminLTE
 6. Copy all files in LSP-Examples/Dashboard/source/ to AdminLTE.new/ e.g.: cp -r LSP-Examples/Dashboard/source/. AdminLTE.new
 7. Copy the two directories 'dist' and 'plugins' from AdminLTE/ to AdminLTE.new/
+
+You should have the following file and directories in the root of AdminLTE.new/ after performing the above steps:
+
+```
+.preload  -- file
+.lua      -- directory
+dist      -- directory
+plugins   -- directory
+```
 
 ## Run the example, using the Mako Server, as follows:
 
@@ -39,12 +48,12 @@ the Mako Server (printed in the console).
 |   build.lua -- Initial script used for extracting data from AdminLTE and inserting into AdminLTE.new
 |
 \---source -- Everything below should be copied to AdminLTE.new such that the directory includes AdminLTE.new/.preload
-    |   .preload -- Loads cms.lua when server starts
+    |   .preload -- Loads cms.lua when server starts (copy to: AdminLTE.new/.preload)
     |
-    \---.lua
+    \---.lua (copy to: AdminLTE.new/.lua/)
         |   cms.lua -- Mini Content Management System (CMS engine)
         |
-        \---www
+        \---www (copy to: AdminLTE.new/.lua/www/)
                 template.lsp -- AdminLTE page converted to a template page and used by CMS engine
 ```
 

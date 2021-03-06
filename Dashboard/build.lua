@@ -1,3 +1,32 @@
+--[[
+
+This Lua script recursively iterates and finds all html files in the
+AdminLTE directory. All HTML files that include the following start
+and end comments have the "page content" extracted and copied to the
+same directory in AdminLTE.new
+
+<!-- Main content -->
+page content
+<!-- /.content -->
+
+See Figure 2 in the tutorial for additional details:
+https://makoserver.net/articles/How-to-Build-an-Interactive-Dashboard-App
+
+In addition, the script also extracts the left side HTML menu. (See
+"content framed in green" in Figure 1 in the tutorial).
+
+The complete HTML code for the menu is XML compliant and we can use an
+XML parser to parse the HTML and create an XML tree out of it. We use
+this tree to create a Lua table that represents the content put into
+menu.json. The Lua table is converted to JSON and saved as
+AdminLTE.new/.lua/menu.json
+
+Note: this script uses extended features not found in stock Lua and
+requires the eXtended xlua: https://makoserver.net/download/overview/
+
+--]]
+
+
 local dirname=arg and arg[1] or "AdminLTE"
 local newdir=dirname..".new"
 local io=ba.openio"home"
@@ -39,7 +68,7 @@ function recDirIter(dirname)
 end
 
 
--- Read or write file. Write if data
+-- Read or write file. Write if 'data'
 local function file(io,name,data)
    local fp,ret,err
    if data then
