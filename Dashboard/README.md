@@ -2,7 +2,27 @@
 
 This is the companion example for the [How to Build an Interactive Dashboard App](https://makoserver.net/articles/How-to-Build-an-Interactive-Dashboard-App) tutorial.
 
-## Prepare the Example
+## Prepare (Install) the Example
+
+You may install the required components using the automatic option or
+the manual option. The manual installation option can be used on any
+platform, including Windows.
+
+### Automatic Installation
+
+The script install.sh can automatically download and prepare the
+example on the following platforms: Mac, Linux (Intel type CPU), and
+Windows Subsystem for Linux (WSL).
+
+1. Make sure 'curl' and 'git' are installed on your machine.
+2. Run the following in a terminal window:
+   bash <(curl -s https://github.com/RealTimeLogic/LSP-Examples/blob/master/Dashboard/install.sh)
+3. Navigate to http://localhost:port-number when the installation
+   script starts the Mako Server. The port-number is the port number
+   printed in the terminal window when the Mako Server starts.
+
+
+### Manual Installation
 
 You do not need to run the git commands below in a command window, but
 you must make sure you create the same structure. The example requires
