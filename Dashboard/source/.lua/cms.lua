@@ -133,7 +133,9 @@ local function cmsfunc(_ENV,relpath)
    end
 
    -- Make the following available to template.lsp
-   -- Note, we explicitly use the _ENV tab for readability.
+   -- Note, we explicitly use the _ENV tab for code readability.
+   -- Details: https://realtimelogic.com/ba/doc/en/lua/man/manual.html#2.2
+   --          https://realtimelogic.com/ba/doc/?url=lua.html#CMDE
    _ENV.parentRefT=parentRefT
    _ENV.breadcrumbT=breadcrumbT
    _ENV.menuL=menuL
@@ -152,7 +154,7 @@ end
 -- install the callback function. A directory with no name is in
 -- effect a sibling when installed as a sub-directory. The following
 -- construction makes sure we do not trigger the callback for any
--- static assets. In other words, static assets takes precedence. The
+-- static assets. In other words, static assets take precedence. The
 -- callback is called when no static asset is found.
 -- Ref dir: https://realtimelogic.com/ba/doc/?url=lua.html#ba_create_dir
 local cmsdir = ba.create.dir()
