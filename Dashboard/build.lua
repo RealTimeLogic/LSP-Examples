@@ -48,14 +48,16 @@ function recDirIter(dirname)
    -- Recursive directory iterator
    local function doDir(dirname)
       for file,isdir in io:files(dirname, true) do
-         if isdir then
-            -- Recurse into directory
-            if not file:find"docs$" then
-               doDir(fmt("%s/%s",dirname,file))
+         if file ~= "." and file ~= ".." then
+            if isdir then
+               -- Recurse into directory
+               if not file:find"docs$" then
+                  doDir(fmt("%s/%s",dirname,file))
+               end
+            else
+               retVal=fmt("%s/%s",dirname,file)
+               coroutine.yield() -- Yield to (A) 
             end
-         else
-            retVal=fmt("%s/%s",dirname,file)
-            coroutine.yield() -- Yield to (A) 
          end
       end
       retVal=nil
@@ -150,8 +152,8 @@ local function buildPage(fn,data)
       local dir=""
       for n in path:gmatch"(.-)/" do
          dir=dir.."/"..n
+         assert(wwwIo:stat(dir) or wwwIo:mkdir(dir), fmt("Cannot create %s",wwwIo:realpath(dir)))
       end
-      assert(wwwIo:stat(dir) or wwwIo:mkdir(dir))
    end
    assert(file(wwwIo,fn,data))
    return fn

@@ -109,7 +109,7 @@ local pagesT={}
 -- request/response environment table and relpath is the relative path.
 -- See the following for details on the request/response environment:
 -- https://realtimelogic.com/ba/doc/?url=lua.html#CMDE
-local function cmsfunc(env,relpath)
+local function cmsfunc(_ENV,relpath)
 
    -- Translate to (path/)index.html if only directory name is provided.
    if #relpath == 0 or relpath:find"/$" then
@@ -120,6 +120,7 @@ local function cmsfunc(env,relpath)
    -- lookup results in nil if the requested page does not exist. Set
    -- the relative path to the 404 page if not found.
    if not parentRefT[relpath] then
+      response:setstatus(404)
       relpath = "pages/examples/404.html"
    end
    
@@ -132,17 +133,18 @@ local function cmsfunc(env,relpath)
    end
 
    -- Make the following available to template.lsp
-   env.parentRefT=parentRefT
-   env.breadcrumbT=breadcrumbT
-   env.menuL=menuL
-   env.relpath=relpath
+   -- Note, we explicitly use the _ENV tab for readability.
+   _ENV.parentRefT=parentRefT
+   _ENV.breadcrumbT=breadcrumbT
+   _ENV.menuL=menuL
+   _ENV.relpath=relpath
    -- lspPage is the parsed page (function as explained in parseLspPage above)
-   env.lspPage=parseLspPage(".lua/www/"..relpath)
+   _ENV.lspPage=parseLspPage(".lua/www/"..relpath)
    -- Call the template page and pass in the required arguments.
    -- Arg details: https://realtimelogic.com/ba/doc/?url=lua.html#ba_parselsp
-   templatePage(env,relpath,io,pageT,app)
+   templatePage(_ENV,relpath,io,pageT,app)
    -- non cached version of above. Use if testing new template.
-   --parseLspPage(".lua/www/template.lsp")(env,relpath,io,pageT,app)
+   --parseLspPage(".lua/www/template.lsp")(_ENV,relpath,io,pageT,app)
    return true
 end
 
