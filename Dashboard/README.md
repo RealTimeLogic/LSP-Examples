@@ -16,7 +16,7 @@ Windows Subsystem for Linux (WSL).
 
 1. Make sure 'curl' and 'git' are installed on your machine.
 2. Run the following in a terminal window:
-   bash <(curl -s https://github.com/RealTimeLogic/LSP-Examples/blob/master/Dashboard/install.sh)
+   bash <(curl -s https://raw.githubusercontent.com/RealTimeLogic/LSP-Examples/master/Dashboard/install.sh)
 3. Navigate to http://localhost:port-number when the installation
    script starts the Mako Server. The port-number is the port number
    printed in the terminal window when the Mako Server starts.
