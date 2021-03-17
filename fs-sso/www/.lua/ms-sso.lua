@@ -45,7 +45,7 @@ local function jwtDecode(token,msKeysT,verify)
                   err="Invalid JWT signature"
                end
             else
-               err="Unknown JWT kid"
+               err=(fmt("Unknown JWT kid %s",header.kid))
             end
          else
             return header,payload
@@ -85,7 +85,7 @@ local function init(opT)
          local rspT = jdecode(data)
          if status == 200 and rspT and rspT.id_token and rspT.access_token then
             -- id_token: https://docs.microsoft.com/en-us/azure/active-directory/develop/id-tokens
-            local header,payload=jwtDecode(rspT.id_token,msKeysT,true)
+            local header,payload=jwtDecode(rspT.id_token,msKeysT,openidT.tenant ~= "common")
             if header then
                local now=ba.datetime"NOW"
                local dt = ba.datetime(aesdecode(payload.nonce or "") or "MIN")
@@ -112,7 +112,7 @@ local function init(opT)
    end
 
    function sendLoginRedirect(cmd)
-      local state="state" -- not used
+      local state= openidT.state == "url" and ba.b64urlencode(cmd:url()) or "local"
       local nonce=aesencode(ba.datetime"NOW":tostring())
       cmd:sendredirect(fmt("%s%s%s%s%s%s%s%s%s%s%s%s%s%s",
                            "https://login.microsoftonline.com/",openidT.tenant,"/oauth2/v2.0/authorize?",
