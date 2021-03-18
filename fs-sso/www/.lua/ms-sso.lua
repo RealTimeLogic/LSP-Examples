@@ -56,18 +56,17 @@ local function jwtDecode(token,msKeysT,verify)
 end
 
 
-local function init(opT)
-   assert(type(opT.tenant) == "string","tenant")
-   assert(type(opT.client_id) == "string","client_id")
-   assert(type(opT.client_secret) == "string","client_secret")
-   assert(type(opT.redirect_uri) == "string","redirect_uri")
+local function init(openidT)
+   assert(type(openidT.tenant) == "string","tenant")
+   assert(type(openidT.client_id) == "string","client_id")
+   assert(type(openidT.client_secret) == "string","client_secret")
+   assert(type(openidT.redirect_uri) == "string","redirect_uri")
 
-   local openidT = opT
    local http = require"httpm".create{trusted=true}
    local msKeysT={}
    ba.thread.run(function () downloadKeys(msKeysT,openidT,http) end)
 
-   function loginCallback(cmd)
+   local function loginCallback(cmd)
       local err
       local data=cmd:data()
       local code,state=data.code,data.state
@@ -90,7 +89,7 @@ local function init(opT)
                local now=ba.datetime"NOW"
                local dt = ba.datetime(aesdecode(payload.nonce or "") or "MIN")
                if (dt + {mins=10}) > now and ba.datetime(payload.nbf) <= now and ba.datetime(payload.exp) >= now then
-                  if payload.aud == opT.client_id then
+                  if payload.aud == openidT.client_id then
                      return header,payload,rspT.access_token
                   end
                   err='Invalid "aud" (Application ID)'
@@ -111,7 +110,7 @@ local function init(opT)
       return nil,err
    end
 
-   function sendLoginRedirect(cmd)
+   local function sendLoginRedirect(cmd)
       local state= openidT.state == "url" and ba.b64urlencode(cmd:url()) or "local"
       local nonce=aesencode(ba.datetime"NOW":tostring())
       cmd:sendredirect(fmt("%s%s%s%s%s%s%s%s%s%s%s%s%s%s",
