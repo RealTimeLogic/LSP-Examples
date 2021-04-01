@@ -23,10 +23,10 @@ for more information on how to start the Mako Server.
 After starting the Mako Server, use a browser and navigate to
 http://localhost:portno, where portno is the HTTP port number used by
 the Mako Server (printed in the console). You should be redirected to
-http://localhost/cgi/sh.cgi. The file 'sh.cgi' is a very basic CGI
-shell scripts.
+http://localhost/cgi/sh.cgi. The file 'sh.cgi' is a basic CGI
+shell script.
 
-A basic Python script is also included. Execute the Python script as follows:
+A Python script is also included. Execute the Python script as follows:
 
 http://localhost/cgi/python.cgi?textcontent=Hello%20World
 
