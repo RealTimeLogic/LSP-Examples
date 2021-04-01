@@ -1,0 +1,13 @@
+
+-- Makes require"cgi" below work
+-- Details: https://realtimelogic.com/ba/doc/?url=Mako.html#mako_createloader
+mako.createloader(io)
+
+-- Load the CGI plugin ".lua/cgi.lua"
+local cgi=require"cgi"
+
+-- Create a CGI directory
+-- See the following for more on directories:
+-- https://realtimelogic.com/ba/doc/?url=GettingStarted.html#directory
+local cgidir=cgi.create("/tmp/cgi-test/","cgi")
+dir:insert(cgidir,true) -- Insert as sibling

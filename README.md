@@ -8,6 +8,7 @@
 * [AJAX For Beginners](AJAX)
 * [AJAX Over WebSockets](AJAX-Over-WebSockets)
 * [Create an Awesome Interactive Dashboard App using AdminLTE](Dashboard)
+* [CGI Plugin and Examples](CGI)
 * [Dynamic Navigation Menu](Dynamic-Nav-Menu)
 * [File Upload, including drag and drop](upload)
 * [Google IoT Cloud](Cloud-IoT-Core) - Connecting to the Google MQTT Bridge
