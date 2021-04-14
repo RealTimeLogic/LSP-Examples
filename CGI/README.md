@@ -44,6 +44,41 @@ http://localhost/cgi/python.cgi?textcontent=Hello%20World
 * scripts/sh.cgi - Basic shell based script
 * scripts/python.cgi - Python script accepting 'form data'
 
+### Details:
+
+The .preload script, which is executed when the application is loaded, initializes the CGI plugin as follows:
+
+``` lua
+local cgidir=cgi.create("/tmp/cgi-test/","cgi")
+dir:insert(cgidir,true) -- Insert as sibling
+```
+
+The above code creates a CGI directory with the base path
+"/tmp/cgi-test/". You should change this path to a path suitable for
+your application.
+
+All Mako server applications have a pre-defined
+[LSP directory object](https://realtimelogic.com/ba/doc/?url=ua.html#ba_create_resrdr)
+called 'dir' and the last line above inserts the CGI directory as a
+sub directory of the application's directory. See the
+[Virtual File System Documentation](https://realtimelogic.com/ba/doc/?url=GettingStarted.html#VFS)
+for details.
+
+## Security
+
+All forms of parent directory lookup such as '..' are removed by the
+server prior to searching the virtual file system for a directory
+object matching the URL pathname. For example,
+http://address/cgi/../somexec will be translated to
+http://address/somexec and the CGI directory object will not be called
+since the pathname does not match the CGI directory path name. In any
+event, CGI directories should preferably be protected by an
+[authentication object](https://realtimelogic.com/ba/doc/?url=lua.html#auth_overview).
+
+
+
+
+
 
 
 

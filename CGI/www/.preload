@@ -10,4 +10,4 @@ local cgi=require"cgi"
 -- See the following for more on directories:
 -- https://realtimelogic.com/ba/doc/?url=GettingStarted.html#directory
 local cgidir=cgi.create("/tmp/cgi-test/","cgi")
-dir:insert(cgidir,true) -- Insert as sibling
+dir:insert(cgidir,true) -- Insert as child directory
