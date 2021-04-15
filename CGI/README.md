@@ -10,7 +10,10 @@ only available on the following platforms: Linux, Mac, and QNX.
 ## Instructions:
 
 1. Copy the CGI scripts in the 'scripts' directory to /tmp/cgi-test/
-   mkdir -p /tmp/cgi-test/; cp scripts/* /tmp/cgi-test/
+```console
+   mkdir -p /tmp/cgi-test/
+   cp scripts/* /tmp/cgi-test/
+```
 2. Make sure the scripts are 'executable'
    chmod +x /tmp/cgi-test/*
 3. Start the Mako Server and load the 'www' directory
@@ -50,7 +53,7 @@ The .preload script, which is executed when the application is loaded, initializ
 
 ``` lua
 local cgidir=cgi.create("/tmp/cgi-test/","cgi")
-dir:insert(cgidir,true) -- Insert as sibling
+dir:insert(cgidir,true) -- Insert cgi directory as child object
 ```
 
 The above code creates a CGI directory with the base path
@@ -74,12 +77,3 @@ http://address/somexec and the CGI directory object will not be called
 since the pathname does not match the CGI directory path name. In any
 event, CGI directories should preferably be protected by an
 [authentication object](https://realtimelogic.com/ba/doc/?url=lua.html#auth_overview).
-
-
-
-
-
-
-
-
-
