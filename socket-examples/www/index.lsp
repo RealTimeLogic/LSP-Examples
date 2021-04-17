@@ -55,7 +55,7 @@ margin-bottom:0;
 
 <p>Cosockets are recommended for any implementation using several sockets simultaneously. A cosocket appears to be blocking, but is under the hood using non blocking sockets. The following example is a modified version of the above Blocking Web Socket Server. </p>
 
-<p><b>Cosocket Web Socket Server Example: <a href="Blocking-WS-Server/">Cosockets-WS-Server/</a></b>
+<p><b>Cosocket Web Socket Server Example: <a href="Cosocket-WS-Server/">Cosockets-WS-Server/</a></b>
 
 <p>Compare the two files Blocking-WS-Server/ws.lsp and Cosocket-WS-Server/ws.lsp</p>
 

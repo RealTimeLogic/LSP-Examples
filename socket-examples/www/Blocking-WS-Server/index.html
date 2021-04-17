@@ -7,7 +7,8 @@ $(function() {
         $("#console").append(txt+"\n");
     };
     let l=window.location
-    let wsurl="ws://"+l.host+l.pathname+"ws.lsp"
+    let protocol = l.protocol === 'https:' ? "wss://" : "ws://" 
+    let wsurl=protocol+l.host+l.pathname+"ws.lsp"
     print("Connecting to: "+wsurl);
     let s = new WebSocket(wsurl);
     if( ! s ) {
