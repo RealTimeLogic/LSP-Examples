@@ -40,7 +40,7 @@ margin-bottom:0;
 
 <h2>Blocking Web Socket Server</h2>
 
-<p>The Blocking Web Socket Server example is similar to the example included in the Lua Tutorials. You may try the online copy of the <a href="https://embedded-app-server.info/WebSockets.lsp">Lua Tutorials : Web Socket Server</a> prior to running this example.</p>
+<p>The Blocking Web Socket Server example is similar to the example included in the Lua Tutorials. You may try the online copy of the <a href="https://tutorial.realtimelogic.com/WebSockets.lsp">Lua Tutorials : Web Socket Server</a> prior to running this example.</p>
 
 <p><b>Blocking Web Socket Server Example: <a href="Blocking-WS-Server/">Blocking-WS-Server/</a></b>
 
@@ -97,7 +97,7 @@ margin-bottom:0;
 </table>
 
 
-<p>Example 13 (non blocking proxy) shows how flow control is managed when using cosockets. In order to test this, we need a service that enables us to send and receive large files. The destination server for the proxy is set to the online Barracuda App Server's Web File Manager (<a href="https://embedded-app-server.info/fs/tmp/">http://embedded-app-server.info/fs/tmp/</a>). When you click the proxy address <a href="<?lsp=proxyAddr?>/fs/tmp/"><?lsp=proxyAddr?>/fs/tmp/</a>, the proxy tunnels your request to the online server's <a href="https://realtimelogic.com/ba/doc/?url=lua.html#ba_create_wfs">Web File Manager</a>. Note that the proxy fails if you attempt to use or switch to a secure connection. Use a browser that supports drag and drop, such as Chrome, and drop a file into the Web File Manager's web interface. The file dropped into your browser window uploads via your local proxy. The proxy prints out the data usage to the console window when actively working.</p>
+<p>Example 13 (non blocking proxy) shows how flow control is managed when using cosockets. In order to test this, we need a service that enables us to send and receive large files. The destination server for the proxy is set to the online Barracuda App Server's Web File Manager (<a href="https://tutorial.realtimelogic.com/fs/tmp/">http://tutorial.realtimelogic.com/fs/tmp/</a>). When you click the proxy address <a href="<?lsp=proxyAddr?>/fs/tmp/"><?lsp=proxyAddr?>/fs/tmp/</a>, the proxy tunnels your request to the online server's <a href="https://realtimelogic.com/ba/doc/?url=lua.html#ba_create_wfs">Web File Manager</a>. Note that the proxy fails if you attempt to use or switch to a secure connection. Use a browser that supports drag and drop, such as Chrome, and drop a file into the Web File Manager's web interface. The file dropped into your browser window uploads via your local proxy. The proxy prints out the data usage to the console window when actively working.</p>
 
 </body>
 </html>

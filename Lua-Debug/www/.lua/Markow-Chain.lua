@@ -1,7 +1,7 @@
 --[[
 
 The following Lua code is a copy of:
-https://embedded-app-server.info/Lua-Coroutines.lsp#MarkovChain
+https://tutorial.realtimelogic.com/Lua-Coroutines.lsp#MarkovChain
 
 Set a breakpoint on line 50 and resume (F5). See comments below
 for more information.

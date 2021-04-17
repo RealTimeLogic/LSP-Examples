@@ -19,7 +19,7 @@ the HTTP port number used by the Mako Server (printed in the console).
 
 You can test the shell using the online tutorial/testing server:
 
-https://embedded-app-server.info/shell/
+https://tutorial.realtimelogic.com/shell/
 
 The testing server includes a few ASCII powered games and apps you may
 run in the shell:

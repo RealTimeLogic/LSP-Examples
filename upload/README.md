@@ -11,7 +11,7 @@ template for uploading any type of data.
 The asynchronous upload example uses a more complex API and should
 only be used if a large number of concurrent uploads is required.
 
-Note that you may also consider using the ready to use [Web File Manager](https://realtimelogic.com/ba/doc/?url=lua.html#ba_create_wfs). You may test the Web File Manager using the [online tutorial](https://embedded-app-server.info/fs/).
+Note that you may also consider using the ready to use [Web File Manager](https://realtimelogic.com/ba/doc/?url=lua.html#ba_create_wfs). You may test the Web File Manager using the [online tutorial](https://tutorial.realtimelogic.com/fs/).
 
 Navigate to one of the two sub-directories:
 

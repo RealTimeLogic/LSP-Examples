@@ -1,6 +1,6 @@
 
 
-local webServerName="embedded-app-server.info"
+local webServerName="tutorial.realtimelogic.com"
 local fmt=string.format
 
 local clientcnt,servercnt=0,0
