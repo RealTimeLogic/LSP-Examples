@@ -17,7 +17,7 @@ end
     box-sizing: border-box;
 }
 
-html,body{
+html,body,#terminal{
     width: 100%;
     height: 100%;
     background:black;
@@ -25,33 +25,33 @@ html,body{
     </style>
     <script type="text/javascript" src="/rtl/jquery.js"></script>
     <script type="text/javascript" src="/rtl/smq.js"></script> 
-    <script src="xterm-compressed.js"></script>
+    <script src="xterm.js"></script>
   </head>
   <body>
     <div id="terminal"></div>
 <script>
 
 var term = new Terminal();
-term.open(document.getElementById('#terminal'), true);
-term.fit();
+const fitAddon = new FitAddon();
+term.loadAddon(fitAddon);
+term.open(document.getElementById('terminal'));
+fitAddon.fit();
 
-function r() {term.fit();}
+function r() {fitAddon.fit();}
 $(function() {
     $(window).resize(r);
 
     var serverTid; // Server's ephemeral tid
 
     var smq = SMQ.Client(); // No args: connect back to 'origin'.
-    var lastSize;
     function pubsize(size) {
-        lastSize=size;
         smq.pubjson({cols:size.cols, rows:size.rows}, serverTid, "resize");
     };
 
     smq.onconnect=function() {
         setTimeout(function() {
-            if(lastSize) pubsize(lastSize);
-        }, 2000);
+            pubsize({cols:term.cols,rows:term.rows});
+        }, 500);
     };
 
     smq.onclose=function(message,canreconnect) {
@@ -78,12 +78,12 @@ $(function() {
     };
     smq.subscribe("self", {onmsg:onmsg});
 
-    term.on('data', function(data) {
+    term.onData(function(data) {
         if(serverTid)
             smq.publish(data, serverTid, "data");
     });
 
-    term.on('resize',  pubsize);
+    term.onResize(pubsize);
 });
 </script>
   </body>

@@ -4,9 +4,9 @@ if not ba.forkpty then
 end
 
 local shell = os.getenv"SHELL"
-if not shell then
-   local dio = ba.openio"disk"
-   if not dio or dio:stat"/bin/bash" then
+local dio = ba.openio"disk"
+if not shell or not dio:stat(shell) then
+   if dio:stat"/bin/bash" then
       shell = "/bin/bash"
    elseif dio:stat"/bin/sh" then
       shell = "/bin/sh"

@@ -24,22 +24,32 @@ https://tutorial.realtimelogic.com/shell/
 The testing server includes a few ASCII powered games and apps you may
 run in the shell:
 
-| Command | What it is         | How to exit |
-| ------- |:------------------:| -----------:|
-|   sl    | Steam Locomotive   | N/A         |
-| cowsay  | [cowsay](https://en.wikipedia.org/wiki/Cowsay)| N/A         |
-| cmatrix | "The Matrix"       | CTRL-C      |
-| bastet  | Terminal Tetris    | CTRL-C      |
-| mc      | Midnight Commander | F10         |
+|   Command    | What it is         | How to exit |
+| ------------ |:------------------:| -----------:|
+|   sl         | Steam Locomotive   | N/A         |
+| cowsay       | [cowsay](https://en.wikipedia.org/wiki/Cowsay)| N/A         |
+| cmatrix      | "The Matrix"       | CTRL-C      |
+| bastet       | Terminal Tetris    | CTRL-C      |
+| mc           | Midnight Commander | F10         |
+| lynx         | The Lynx browser   | q           |
+| christmas.sh | Christmas tree     | CTRL-C      |
+| fireworks    | Fireworks          | CTRL-C      |
 
 Examples:
+```
 cowsay -f ghostbusters Who you Gonna Call
 fortune | cowsay
 fortune | cowsay -f tux
-toilet -f mono12 -F metal "Mako Server"
+toilet -t -f mono12 -F metal "Mako Server"
+lynx https://realtimelogic.com/articles/Embedded-Web-Server-Tutorials
+```
+
+The last command above uses the lynx textual browser for reading our
+Embedded Web Server tutorials
+
 More examples: https://www.binarytides.com/linux-fun-commands/
 
 ## Resources:
-* .preload: Manages a bash shell via ba.forkpty and manages the server side SMQ connection
-* index.lsp: Browser terminal uses the xterm.js lib and sets up an SMQ connection with server
-* xterm-compressed.js: Compressed version of xterm.js and fit.js: https://xtermjs.org/
+* .preload: Manages a bash shell via [ba.forkpty()](https://realtimelogic.com/ba/doc/?url=auxlua.html#forkptylib) and manages the server side SMQ connection
+* index.lsp: Browser terminal uses the xterm.js lib and sets up an [SMQ connection](https://realtimelogic.com/products/simplemq/) with server
+* xterm.js: Compressed version of xterm.js and fit.js: https://xtermjs.org/
