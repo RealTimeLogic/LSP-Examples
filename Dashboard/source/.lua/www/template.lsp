@@ -9,14 +9,16 @@ local activeMenuItem
 local function emitMenu(menuL)
    for _,m in ipairs(menuL) do
       if m.href == relpath then activeMenuItem = m end
-      response:write('<li class="nav-item', parentsT[m.sub] and  ' menu-open' or '','"><a href="/',m.href,
-                     '" class="nav-link',m.href == relpath and ' active' or '','"><i class="',m.class,'"></i><p>',m.name)
-      if m.sub then
-         response:write('<i class="right fas fa-angle-left"></i></p></a><ul class="nav nav-treeview">')
-         emitMenu(m.sub)
-         response:write('</ul></li>')
-      else
-         response:write('</p></a></li>')
+      if not m.hidden then
+         response:write('<li class="nav-item', parentsT[m.sub] and  ' menu-open' or '','"><a href="/',m.href,
+                        '" class="nav-link',m.href == relpath and ' active' or '','"><i class="',m.class,'"></i><p>',m.name)
+         if m.sub then
+            response:write('<i class="right fas fa-angle-left"></i></p></a><ul class="nav nav-treeview">')
+            emitMenu(m.sub)
+            response:write('</ul></li>')
+         else
+            response:write('</p></a></li>')
+         end
       end
    end
 end

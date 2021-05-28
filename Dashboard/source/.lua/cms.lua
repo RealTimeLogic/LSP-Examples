@@ -159,7 +159,81 @@ end
 -- Ref dir: https://realtimelogic.com/ba/doc/?url=lua.html#ba_create_dir
 local cmsdir = ba.create.dir()
 cmsdir:setfunc(cmsfunc)
--- All applications have a predefined 'dir' object, which is an resrdr instance.
+-- All applications have a predefined 'dir' object, which is a resrdr instance.
 -- Insert the cmsdir as a sibling.
 -- Ref resrdr: https://realtimelogic.com/ba/doc/?url=lua.html#ba_create_resrdr
 dir:insert(cmsdir,true)
+
+
+------------------- AUTHENTICATION ---------------------------------
+-- All code below is for setting up authentication and authorization
+
+-- Default realm used by the server (can be changed).
+local realm = "Barracuda Server"
+
+-- HA1 = MD5(username ":" realm ":" password)
+-- https://realtimelogic.com/ba/doc/en/lua/auth.html
+local function ha1(realm,username,password)
+   return ba.crypto.hash"md5"(username)":"(realm)":"(password)(true,"hex")
+end
+
+
+-- Hard coded user database, with the following users: admin,forms,tables,user
+-- All users have the same password: qwerty
+local userdb = {
+   user={ pwd={ha1(realm, "user", "qwerty")}, roles={"user"} },
+   forms={ pwd={ha1(realm, "forms", "qwerty")}, roles={"forms"} },
+   tables={ pwd={ha1(realm, "tables", "qwerty")}, roles={"tables"} },
+   admin={ pwd={ha1(realm, "admin", "qwerty")}, roles={"admin"} },
+}
+
+-- Hard coded constraints
+local constraints = {
+   user={
+      urls={'/*'},
+      methods={'GET'},
+      roles={'user'}
+   },
+   admin={
+      urls={'/*'},
+      methods={'GET','POST'},
+      roles={'admin'}
+   },
+   forms={
+      urls={'/*','/forms/*'},
+      methods={'GET','POST'},
+      roles={'forms','admin'}
+   },
+   tables={
+      urls={'/*','/tables/*'},
+      methods={'GET','POST'},
+      roles={'tables','admin'}
+   },
+}
+
+-- JSON User Database: https://realtimelogic.com/ba/doc/?url=lua.html#ba_create_jsonuser
+local ju=ba.create.jsonuser()
+assert(ju:set(userdb)) -- Insert JSON string or Lua table (We use Lua table)
+local ja=ju:authorizer()
+assert(ja:set(constraints)) -- Insert JSON string or Lua table (We use Lua table)
+
+-- ba.create.authenticator() callback function
+local function loginresponse(_ENV, authinfo)
+   -- How _ENV is used: https://realtimelogic.com/ba/doc/?url=lua.html#CMDE
+   _ENV.authinfo = authinfo -- Makes it possible for .login-form.lsp to use authinfo
+   authinfo.realm=realm -- Used by login.lsp
+   -- The following prints the content of the authinfo table
+   trace("loginresponse", ba.json.encode(authinfo))
+   cmsfunc(_ENV,"login.html") -- Let the CMS function emit the login page.
+end
+
+-- Create the authenticator that will be applied to the 'pages' directory.
+local authenticator=ba.create.authenticator(ju,{response=loginresponse, type="form", realm=realm})
+local authDir = ba.create.dir("pages") -- Name matches the 'pages' dir.
+authDir:setauth(authenticator,ja)
+authDir:p403("/.lua/www/no-access.html")
+-- Prolog dir executes first, thus triggering auth. for 'pages' dir.
+-- See: https://realtimelogic.com/ba/doc/?url=lua.html#ba_create_resrdr -> rsrdr:insertprolog
+dir:insertprolog(authDir,true)
+
+

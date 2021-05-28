@@ -139,6 +139,10 @@ local function buildNav(data)
    -- Iterate parsed XML elements and build menu
    local menuL=buildMenu(doc.elements.ul,"")
    assert(#menuL > 0)
+
+   -- Add entry for login page
+   table.insert(menuL,{name="",href="login.html",hidden=true})
+
    -- Save as menu.json
    local json = "//Pretty format this file by using: https://jsonformatter.org/\n\n"
    assert(file(io,newdir.."/.lua/menu.json",json..ba.json.encode(menuL)))

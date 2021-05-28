@@ -136,7 +136,8 @@ menu-element: // Leaf node
 {
     "name": "link name",
     "class": "nav-icon", // And additional AdminLTE classes
-    "href": "path"
+    "href": "path",
+    "hiddend": true // Set this attribute if the page should not be in the menu
 }
 
 menu-element: // directory
@@ -144,6 +145,18 @@ menu-element: // directory
     "name": "link name",
     "class": "nav-icon", // And additional AdminLTE classes
     "href": "relative path", // or "#" if no page is associated with the directory
-    "sub": menu-list
+    "sub": menu-list,
+    "hiddend": true // Set this attribute if the directory should not be in the menu
 }
 ```
+
+## Authentication and Authorization
+
+An authenticator is installed for all URLs including /pages/* in the
+path component. You have access to all resources if you log in as the
+user 'admin' and password 'qwerty'. See the hard coded values in
+source/.lua/cms.lua for additional users and the constraints set for
+the users. We use hard coded values for simplicity. A real application
+would store the users and the optional constraints as JSON data in two
+files.
+

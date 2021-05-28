@@ -1,0 +1,44 @@
+<div style="align-items:center;display:flex;flex-direction:column;">
+<div class="login-box">
+  <!-- /.login-logo -->
+  <div class="card">
+    <div class="card-body login-card-body">
+      <p class="login-box-msg">Login</p>
+      <form method="post">
+        <div class="input-group mb-3">
+          <input class="form-control" type="text" name="ba_username" class="form-control" id="Username" placeholder="Enter your E-Mail address" autofocus required tabindex="1">
+          <div class="input-group-append">
+            <div class="input-group-text">
+              <span class="fas fa-user"></span>
+            </div>
+          </div>
+        </div>
+        <div class="input-group mb-3">
+          <input class="form-control" type="password" name="ba_password" id="Password" placeholder="Enter your password" required tabindex="2">
+          <div class="input-group-append">
+            <div class="input-group-text">
+              <span class="fas fa-lock"></span>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-8">
+          </div>
+          <!-- /.col -->
+          <div class="col-4">
+            <button type="submit" class="btn btn-primary btn-block" tabindex="3">Sign In</button>
+          </div>
+          <!-- /.col -->
+        </div>
+      </form>
+      <?lsp if request:method() == "POST" then ?>
+      <br/>
+      <div class="alert alert-danger">
+        <strong>Incorrect Credentials!</strong>
+      </div>
+      <?lsp end ?>
+   </div>
+    <!-- /.login-card-body -->
+  </div>
+</div>
+</div>
