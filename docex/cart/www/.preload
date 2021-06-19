@@ -1,0 +1,9 @@
+
+local function cart(_ENV,path)
+   category,color=string.match(path, "(%w+)/(%w+)")
+   response:forward("/.cart.lsp")
+end
+
+local cartdir = ba.create.dir("cart")
+cartdir:setfunc(cart)
+dir:insert(cartdir, true)

@@ -1,0 +1,2 @@
+<?lsp response:sendredirect"cart/" ?>
+
