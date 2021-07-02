@@ -169,7 +169,7 @@ for name in recDirIter(dirname) do
       local data = file(io,name)
       local page=data:match"<!%-%- Main content %-%->(.-)<!%-%- /.content %-%->"
       if page then
-         if not navData then
+         if "AdminLTE/index.html" == name then
             navData=data:match'<nav class="mt%-2">(.-)</nav>'
             assert(navData, "Cannot extract left navigation menu data")
          end
@@ -185,6 +185,9 @@ for name in recDirIter(dirname) do
       end
    end
 end
-
-print("\nBuilding", "menu.json")
-buildNav(navData)
+if navData then
+   print("\nBuilding", "menu.json")
+   buildNav(navData)
+else
+   print'Build failed; "AdminLTE/index.html" not found'
+end
