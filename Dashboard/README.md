@@ -110,8 +110,9 @@ additional complexity since the code must keep track of parent(s) for
 sub-menus. The parent(s) must be expanded such that the selected
 sub-menu is shown.
 
-See the [Light-Dashboard template](../Light-Dashboard) for a high
-level explanation on how the CMS engine (cms.lua) works.
+See the
+[Light-Dashboard template](../Light-Dashboard#the-server-side-code-works-as-follows)
+for a high level explanation on how the CMS engine (cms.lua) works.
 
 We use camel case naming convention in the example code. The Lua table
 type implements associative arrays. An associative array is an array
