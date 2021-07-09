@@ -2,7 +2,11 @@
 
 This example shows how to implement a dashboard (device management
 app) suitable for constrained devices such as RTOS/firmware type
-devices. We provide two dashboard templates, this light version and a more
+devices.
+
+![Light Dashboard Template](https://makoserver.net/blogmedia/dashboard/Light-Dashboard.gif)
+
+We provide two dashboard templates, this light version and a more
 advanced dashboard based on the
 [Bootstrap powered AdminLTE dashboard](../Dashboard). We recommend
 testing both dashboards on your host computer to get a solid
