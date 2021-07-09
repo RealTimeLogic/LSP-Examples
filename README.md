@@ -8,6 +8,7 @@
 * [AJAX For Beginners](AJAX)
 * [AJAX Over WebSockets](AJAX-Over-WebSockets)
 * [Create an Awesome Interactive Dashboard App using AdminLTE](Dashboard)
+* [Create a light Interactive Dashboard App using Pure.css](Light-Dashboard)
 * [CGI Plugin and Examples](CGI)
 * [Dynamic Navigation Menu](Dynamic-Nav-Menu)
 * [File Upload, including drag and drop](upload)

@@ -2,6 +2,11 @@
 
 This is the companion example for the [How to Build an Interactive Dashboard App](https://makoserver.net/articles/How-to-Build-an-Interactive-Dashboard-App) tutorial.
 
+Note that the AdminLTE dashboard must be assembled by following the
+instructions below. We also provide a
+[simpler and lighter dashboard template](../Light-Dashboard) that you can
+simply clone and run on the command line.
+
 ## Prepare (Install) the Example
 
 You may install the required components using the automatic option or
@@ -12,15 +17,16 @@ platform, including Windows.
 
 The script install.sh can automatically download and prepare the
 example on the following platforms: Mac, Linux (Intel type CPU), and
-Windows Subsystem for Linux (WSL).
+[Windows Subsystem for Linux](https://docs.microsoft.com/en-us/windows/wsl/install-win10)
+(WSL).
 
-1. Make sure 'curl' and 'git' are installed on your machine.
+1. Make sure 'curl' and 'git' are installed on your machine: sudo apt
+   install git curl
 2. Run the following in a terminal window:
    bash <(curl -s https://raw.githubusercontent.com/RealTimeLogic/LSP-Examples/master/Dashboard/install.sh)
 3. Navigate to http://localhost:port-number when the installation
    script starts the Mako Server. The port-number is the port number
    printed in the terminal window when the Mako Server starts.
-
 
 ### Manual Installation
 
@@ -74,7 +80,7 @@ the Mako Server (printed in the console).
         |   cms.lua -- Mini Content Management System (CMS engine)
         |
         \---www (copy to: AdminLTE.new/.lua/www/)
-                template.lsp -- AdminLTE page converted to a template page and used by CMS engine
+                template.lsp -- AdminLTE page converted to a template page and used by the CMS engine
 ```
 
 ## Notes:
@@ -84,15 +90,15 @@ AdminLTE.new/.lua/menu.json, a file that should normally be hand
 crafted. We create this file automatically for the purpose of this
 demo; creating the file automatically enables us to dynamically
 extract and use most of the pages in the AdminLTE directory. The
-extraction process is not perfect and you should consult the original
+extraction process is not perfect so you should consult the original
 AdminLTE pages for details.
 
 The page content extracted from the AdminLTE example pages are copied
-to the AdminLTE.new/.lua/www/ directory with the extension ".html",
-however, each page is executed as an LSP page thus LSP tags
+to the AdminLTE.new/.lua/www/ directory with the extension ".html".
+However, each page is executed as an LSP page; thus LSP tags
 (e.g. &lt;?lsp Lua code ?&gt;) can be inserted into any of these pages.
 
-The Lua code in cms.lua reads and parses 'menu.json' at startup, and
+The Lua code in cms.lua reads and parses 'menu.json' at startup and
 creates two utility Lua tables used by the 'AdminLTE theme page'
 template.lsp. The utility tables 'parentRefT' and 'breadcrumbT' are used
 when dynamically generating the left side menu and the breadcrumb in
@@ -103,6 +109,9 @@ template.lsp, but note that the menu generation for AdminLTE requires
 additional complexity since the code must keep track of parent(s) for
 sub-menus. The parent(s) must be expanded such that the selected
 sub-menu is shown.
+
+See the [Light-Dashboard template](../Light-Dashboard) for a high
+level explanation on how the CMS engine (cms.lua) works.
 
 We use camel case naming convention in the example code. The Lua table
 type implements associative arrays. An associative array is an array
@@ -159,4 +168,3 @@ source/.lua/cms.lua for additional users and the constraints set for
 the users. We use hard coded values for simplicity. A real application
 would store the users and the optional constraints as JSON data in two
 files.
-
