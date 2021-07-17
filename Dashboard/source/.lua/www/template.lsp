@@ -1,10 +1,19 @@
-<?lsp 
+<?lsp
 
+-- This LSP page is parsed and executed as a Lua function by the
+-- directory callback function in cms.lua. Take a look at the light
+-- dashboard app to get a quick understanding of how the more complex
+-- AdminLTE (this theme) is rendered:
+-- https://github.com/RealTimeLogic/LSP-Examples/blob/master/Light-Dashboard/www/.lua/www/template.lsp
+
+-- All of below: local XXX = _ENV.xxx (set local vars from vars
+-- saved in the environment by directory callback function in cms.lua)
 local response=response
 local parentRefT=parentRefT
 local relpath=relpath
 local emptyT={}
 local parentsT = parentRefT[relpath]
+
 local activeMenuItem
 local function emitMenu(menuL)
    for _,m in ipairs(menuL) do

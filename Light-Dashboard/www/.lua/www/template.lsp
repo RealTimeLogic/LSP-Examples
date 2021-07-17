@@ -1,7 +1,17 @@
 <?lsp
+
+-- This LSP page is parsed and executed as a Lua function by the
+-- directory callback function in cms.lua. The content rendered by
+-- this page is the left side content as shown in Figure 3 ->
+-- https://makoserver.net/articles/How-to-Build-an-Interactive-Dashboard-App
+-- See the lspPage() call below for how the right side is injected.
+
+-- _ENV.menuT saved in request/resp. env. by directory callback
 local activeMenuItem = menuT[relpath] or {href="",name=""}
 local authenticated = request:user() and true or false
 
+-- This function creates the navigation menu. Notice how we use the
+-- class 'pure-menu-selected' for the active page.
 local function emitMenu()
    for _,m in ipairs(menuL) do
       if not m.auth or authenticated then
@@ -37,7 +47,11 @@ end
         </div>
     </div>
     <div id="main">
-        <?lsp lspPage(_ENV,relpath,io,page,app) ?>
+        <?lsp
+             -- Call _ENV.lspPage (set by directory callback in cms.lua) and
+             -- inject page content.
+             lspPage(_ENV,relpath,io,page,app)
+        ?>
     </div>
 </div>
 
