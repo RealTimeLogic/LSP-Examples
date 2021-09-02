@@ -69,6 +69,9 @@ local function cmsfunc(_ENV, relpath, notInMenuOK)
 
    -- Do we have the requested page (must be in file menu.json)
    if not menuT[relpath] and not notInMenuOK then
+      if not relpath:find(".html",-5,true) then
+         return false -- Not a html page. Let default 404 handle this
+      end
       trace("Not found",relpath) -- For debug purposes
       response:setstatus(404)
       relpath = "404.html"
