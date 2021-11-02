@@ -1,0 +1,63 @@
+
+local awsBroker = ""
+local certName = "Demo_Thing.cert.pem"
+local keyName = "Demo_Thing.private.key"
+
+local fmt=string.format
+
+ -- MQTT callback function
+local function onpub(topic, msg)
+   trace(fmt("topic: %s, msg: %s", topic,msg))
+end
+
+
+local certstore = ba.create.certstore()
+if certstore:addcert(io,"AmazonRootCA1.pem") then
+   local shark = ba.create.sharkssl(certstore)
+   local sharkcert = ba.create.sharkcert(io, certName, keyName)
+   if sharkcert and shark:addcert(sharkcert) then
+      ba.socket.event(function()
+         local mqtt,err = require"mqttc".connect(
+            awsBroker, -- broker name
+            onpub, -- Our MQTT callback function (above)
+            { -- The option (op) table
+               shark = shark,
+               id = "basicPubSub",
+               port = 443,
+               alpn = "x-amzn-mqtt-ca"
+            })
+         if mqtt  then
+            trace(fmt("MQTT client connected to %s",awsBroker))
+            mqtt:subscribe("topic_1")
+            mqtt:subscribe("topic_2")
+            -- Publish a message to "topic_1" every second.
+            local timer=ba.timer(function()
+               local seq=1
+               while true do
+                  mqtt:publish("topic_1",ba.json.encode{message="Hello World",sequence=seq})
+                  coroutine.yield(true)
+                  seq=seq+1
+               end
+            end)
+            timer:set(1000)
+            mqtt:run() -- blocks in this cosocket
+            timer:cancel()
+            trace"MQTT connection closed"
+            return
+         else
+            trace(fmt("Cannot connect to %s, err: %s",awsBroker,err))
+         end
+      end)
+   else
+      trace(fmt("Creating the SharkSSL certificate using %s and %s failed",certName,keyName))
+   end
+else
+   trace(fmt("Cannot open %s", io:realpath"AmazonRootCA1.pem"))
+end
+
+
+-- This server side app should not expose the private key saved in the
+-- directory. Another solution would be to create a hidden directory
+-- (dir that starts with a dot). Details:
+-- https://realtimelogic.com/ba/doc/?url=GettingStarted.html#VFSTree
+dir:unlink()
