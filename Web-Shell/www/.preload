@@ -3,18 +3,32 @@ if not ba.forkpty then
    error("\n\nThis server does not include ba.forkpty!!!\nDetails: https://realtimelogic.com/ba/doc/?url=auxlua.html#forkptylib\n\n")
 end
 
-local shell = os.getenv"SHELL"
 local dio = ba.openio"disk"
-if not shell or not dio:stat(shell) then
-   if dio:stat"/bin/bash" then
-      shell = "/bin/bash"
-   elseif dio:stat"/bin/sh" then
-      shell = "/bin/sh"
+local shell="/bin/sh"
+local env={TERM="xterm-color",HOME=os.getenv"HOME"}
+
+ba.thread.run(function()
+   local envStr=ba.exec"printenv"
+   if envStr then
+      for k,v in string.gmatch(envStr, "(.-)=(.-)\n") do
+         env[k]=v
+      end
+      shell = env["SHELL"]
    else
-      error"\n\nWebshell: cannot find /bin/sh!!!\n\n"
+      shell=os.getenv"SHELL"
    end
-end
-tracep(false,5,"Webshell using:",shell)
+   if not shell or not dio:stat(shell) then
+      if dio:stat"/bin/bash" then
+         shell = "/bin/bash"
+      elseif dio:stat"/bin/sh" then
+         shell = "/bin/sh"
+      else
+         error"\n\nWebshell: cannot find /bin/sh!!!\n\n"
+      end
+   end
+   tracep(false,5,"Webshell using:",shell)
+end)
+
 
 local fmt=string.format
 local smq -- broker instance
@@ -42,26 +56,15 @@ end
 local function onconnect(etid, info, peer)
    -- username set if authenticated.
    local uname = info.uname
-   -- The PTY callback function receives pty as arg, but we also need the etid.
-   -- We solve this problem by using the etid as a closure
-   local pty,err
-   if not pcall(function()
-         local conf ={
-            async=function(pty) ptyRead(pty,etid) end,
-            stty="sane",
-            arg0="-"..(shell:match".-([^/]+)$" or shell),
-         env={TERM="xterm-color",HOME=os.getenv"HOME"}
-         }
-         pty,err=ba.forkpty(conf, shell,"-l","-i")
-   end) then
-      print"Using old API"
-      pty,err=ba.forkpty(function(pty) ptyRead(pty,etid) end,
-                            shell,"-l","-i") 
-      if pty then
-         pty:write"export TERM=xterm-256color\nstty sane\n\n"
-      end
-   end
-   --local pty,err=ba.forkpty(conf, shell)
+   --The PTY callback function receives pty as arg, but we also need the 'etid'.
+   --We solve this problem by using 'etid' as a closure'
+   local conf ={
+      async=function(pty) ptyRead(pty,etid) end,
+      stty="sane",
+      arg0="-"..(shell:match".-([^/]+)$" or shell),
+      env=env
+   }
+   local pty,err=ba.forkpty(conf, shell,"-l","-i")
    if pty then
       ptys[etid]=pty
    else
