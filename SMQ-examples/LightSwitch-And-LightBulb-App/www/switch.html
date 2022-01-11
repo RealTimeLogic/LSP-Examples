@@ -10,6 +10,15 @@
     </div>
     <script>
 
+
+/* We use a secure connection when connecting to the online server and
+ * a non secure connection when connecting to a local server with a self
+ * signed certificate.
+*/
+var smq = SMQ.Client("wss://simplemq.com/smq.lsp");
+//var smq = SMQ.Client("ws://localhost/smq.lsp");
+
+
 Vue.component('switchcomp',{
     template: 
     '<div class="switch"><div>\
@@ -39,7 +48,6 @@ var app=new Vue({
     }
 });
 
-var smq = SMQ.Client("wss://simplemq.com/smq.lsp");
 
 function onSet(msg, ptid) {
     var bulb = app.bulbs[ptid];
@@ -55,7 +63,10 @@ function onSet(msg, ptid) {
     }
 };
 
+// 1) Open: https://realtimelogic.com/ba/doc/?url=SMQ.html#publish
+// 2) Search for "self"
 smq.subscribe("self", "/switch/set", {datatype:"json", onmsg:onSet});
+
 smq.subscribe("/switch/set", {datatype:"json", onmsg:onSet});
 smq.publish("", "/switchui/hello");
 

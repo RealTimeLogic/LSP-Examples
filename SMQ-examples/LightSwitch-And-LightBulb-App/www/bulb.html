@@ -8,15 +8,22 @@
   <script src='https://simplemq.com/rtl/smq.js'></script>
   <script>
     $(function() {
- 
-        var on = false;
+         /* We use a secure connection when connecting to the online server and
+         * a non secure connection when connecting to a local server with a self
+         * signed certificate.
+         */
         var smq = SMQ.Client("wss://simplemq.com/smq.lsp");
+        //var smq = SMQ.Client("ws://localhost/smq.lsp");
+
+        var on = false;
 
         smq.subscribe("/switchui/hello", {
             onmsg:function(msg,ptid) {
                 smq.pubjson({on:on}, ptid, "/switch/set");
             }
         });
+        // 1) Open: https://realtimelogic.com/ba/doc/?url=SMQ.html#publish
+        // 2) Search for "self"
         smq.subscribe("self", "/switch/set", {
             datatype:"json",
             onmsg:function(msg,ptid) {
