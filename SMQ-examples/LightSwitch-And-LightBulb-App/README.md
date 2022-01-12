@@ -23,7 +23,7 @@ with:
 
 Start Mako Server as follows in this directory:
 ```
-mako -l::broker
+mako -l::www
 ```
 
 See the

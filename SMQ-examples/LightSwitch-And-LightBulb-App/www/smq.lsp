@@ -1,17 +1,18 @@
-
 <?lsp
 
--- Designed for 'local server' use. See README.txt for howto.
+-- Designed for 'local server' use. See ../README.md for details.
 
--- Note that the following code should normally be in a .preload script.
--- The code is copied "as is" from the following tutorial:
--- https://makoserver.net/blog/2014/12/Designing-a-browser-based-Chat-Client-using-SimpleMQ
-
-  local smq = page.smq -- fetch from 'page' table
-  if not smq then -- first time accessed
-     smq = require"smq.broker".create() -- Create one broker instance
-     page.smq = smq -- Store (reference) broker instance
-  end
-  smq.connect(request) -- Upgrade HTTP(S) request to an SMQ connection
-
+-- The following code would normally be put in a .preload/.config
+-- script.
+if not page.smq then
+   page.smq = require"smq.hub".create()
+   trace"SMQ broker installed."
+end
+if require"smq.hub".isSMQ(request) then
+   -- Upgrade HTTP(S) request to SMQ connection
+   page.smq:connect(request)
+else -- Not an SMQ client
+   response:senderror(400, "Not an SMQ Connection Request!")
+end
 ?>
+
