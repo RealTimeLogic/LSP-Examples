@@ -11,16 +11,33 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\..\JSON\src\AllocatorIntf.c" />
-    <ClCompile Include="..\..\..\..\..\JSON\src\BaAtoi.c" />
-    <ClCompile Include="..\..\..\..\..\JSON\src\BufPrint.c" />
-    <ClCompile Include="..\..\..\..\..\JSON\src\JDecoder.c" />
-    <ClCompile Include="..\..\..\..\..\JSON\src\JEncoder.c" />
-    <ClCompile Include="..\..\..\..\..\JSON\src\JParser.c" />
-    <ClCompile Include="..\..\..\..\..\JSON\src\JVal.c" />
+    <ClCompile Include="..\..\..\..\..\JSON\src\AllocatorIntf.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\JSON\src\BaAtoi.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\JSON\src\BufPrint.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\JSON\src\JDecoder.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\JSON\src\JEncoder.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\JSON\src\JParser.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\JSON\src\JVal.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="..\..\..\..\..\SMQ\src\selib.c" />
     <ClCompile Include="..\..\..\..\..\SMQ\src\SMQClient.c" />
-    <ClCompile Include="..\bulb.c" />
+    <ClCompile Include="..\bulb.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\bulb.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{C4B14467-0786-4860-96E3-C0EBD21AEC47}</ProjectGuid>
