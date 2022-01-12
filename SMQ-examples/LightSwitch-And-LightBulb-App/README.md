@@ -63,7 +63,7 @@ See the C code comments for additional details.
 Linux build:
 
 ``` shell
-cd C
+cd LSP-Examples/SMQ-examples/LightSwitch-And-LightBulb-App/C/
 make
 ./bulb
 ```

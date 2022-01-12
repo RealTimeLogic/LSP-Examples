@@ -235,7 +235,7 @@ int main()
 #endif
 
    printf("%s",
-           "The following must be opened prior to running this program:\n"
+           "Control the bulb using:\n"
            "https://realtimelogic.com/blogmedia/ModernApproachEmbeddedWebServer/switch.html\n");
 
 
