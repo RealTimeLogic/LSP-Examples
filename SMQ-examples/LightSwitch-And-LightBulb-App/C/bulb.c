@@ -63,22 +63,6 @@ static const char* getUniqueID()
 
 #if USE_JSON
 
-/* Used by JEncoder -> BufPrint in function "pubSwitchOnOff" below.
-   This function would normally send the message, but in this example,
-   the callback is used exclusively for error checking. Variable
-   sizeRequired will be greater than zero if "char buf[15]" below is
-   too small. See the Minnow Server Reference Example for how to send
-   data using this callback.
-   https://github.com/RealTimeLogic/MinnowServer/blob/master/example/src/MinnowRefPlatMain.c
-*/
-static int checkBufOverflow(BufPrint* bp, int sizeRequired)
-{
-   (void)bp;
-   assert(sizeRequired == 0);
-   return 0;
-}
-
-
 /* Publish switch on/off JSON message using JEncoder.
    JEncoder: https://realtimelogic.com/ba/doc/en/C/reference/html/structJEncoder.html
    SMQ: https://realtimelogic.com/ba/doc/en/C/reference/html/structSMQ.html
@@ -90,11 +74,9 @@ static void pubSwitchOnOff(SMQ* smq, BaBool bulbOn, U32 tid, U32 subtid)
    BufPrint bp;
    char buf[15];
    JErr_constructor(&err);
-   BufPrint_constructor(&bp, 0, checkBufOverflow);
-   BufPrint_setBuf(&bp, buf, sizeof(buf));
+   BufPrint_constructor2(&bp, buf, sizeof(buf), 0, 0);
    JEncoder_constructor(&encoder, &err, &bp);
    JEncoder_set(&encoder, "{b}", "on", bulbOn);
-   JEncoder_flush(&encoder); /* Function checkBufOverflow gets called */
    SMQ_publish(smq,bp.buf,bp.cursor,tid,subtid);
 }
 
