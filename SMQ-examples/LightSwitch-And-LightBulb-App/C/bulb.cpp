@@ -159,7 +159,7 @@ static void bulb()
       int len =  smq.getMessage(&msg);
       if(len < 0) /* We received a control message or an error code */
       {
-         if(len == SMQE_TIMEOUT)
+         if(len == SMQ_TIMEOUT)
             continue; /* Timeout not used */
          /* We are not expecting any control messages */
          printf("Rec Error: %d.\n",smq.status);
