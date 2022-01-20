@@ -42,30 +42,6 @@ window to connect to your local broker.
 
 # Light Bulb C Code
 
-The directory "C" includes a C and C++ light bulb implementation. The
-C code requires the
-[SMQ C library](https://github.com/RealTimeLogic/SMQ) and optionally
-the [JSON library](https://github.com/RealTimeLogic/JSON). The GitHub
-repositories must be adjacent to each other when compiling the C code
-using the included Linux Makefile or Visual Studio C++ build file;
-e.g.:
-
-
-``` shell
-git clone https://github.com/RealTimeLogic/LSP-Examples.git
-git clone https://github.com/RealTimeLogic/SMQ.git
-#JSON is optional
-git clone https://github.com/RealTimeLogic/JSON.git
-```
-
-See the C code comments for additional details.
-
-Linux build:
-
-``` shell
-cd LSP-Examples/SMQ-examples/LightSwitch-And-LightBulb-App/C/
-make
-./bulb
-```
-
-
+The
+[SMQ repository includes a C and C++ light bulb implementation](https://github.com/RealTimeLogic/SMQ#2-light-bulb-example).
+The C code can be controlled via switch.html.
