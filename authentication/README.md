@@ -114,3 +114,7 @@ thus protecting the credentials should the server's file system be
 compromised.
 
 https://makoserver.net/articles/Dynamic-Navigation-Menu
+
+# Additional Examples
+
+- [Single Sign On using OpenID Connect](../fs-sso/README.md)
