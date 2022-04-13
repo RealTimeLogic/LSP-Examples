@@ -2,3 +2,28 @@
 -- Load the Mini Content Management System (CMS)
 io:dofile(".lua/cms.lua",app)
 
+
+-- The following SMQ broker 'smq' is used by .lua/www/WebSockets.html
+trace"Starting SMQ broker for the slider example"
+
+local smq -- Broker set below
+local angle=0 -- 0 to 180
+local function newClient(tid)
+   trace"New SMQ client"
+   -- Update new client with current angle pos.
+   smq:publish({angle=angle},tid,"slider")
+end
+local function slider(d)
+   angle=d.angle
+   trace("Slider angle",angle)
+end
+smq = require"smq.hub".create{onconnect=newClient}
+smq:subscribe("slider",{json=true,onmsg=slider})
+
+-- .lua/www/WebSockets.html calls this function when new client
+-- connects.
+function connectClientSlider(cmd)
+   smq:connect(cmd)
+end
+
+

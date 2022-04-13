@@ -1,30 +1,10 @@
 <?lsp
 
--- The following code manages persistent SMQ (WebSocket) connections
--- on the server side.
-if page.smq then
-   -- If a persistent SMQ connection request
-   if require"smq.hub".isSMQ(request) then
-      -- Upgrade HTTP(S) request to SMQ connection
-      page.smq:connect(request)
-      response:abort() -- stop executing page
-   end
-else -- Create a persistent SMQ object (store in page table)
-   -- The following code can only execute one time
-   local smq,angle -- used as closures (persistent data)
-   local function newClient(tid)
-      trace"New SMQ client"
-      -- Update new client with current angle pos.
-      smq:publish({angle=angle},tid,"slider")
-   end
-   local function slider(d)
-      angle=d.angle
-      trace("Slider angle",angle)
-   end
-   smq = require"smq.hub".create{onconnect=newClient}
-   smq:subscribe("slider",{json=true,onmsg=slider})
-   page.smq=smq
-   trace"Starting SMQ slider example"
+if require"smq.hub".isSMQ(request) then
+   -- Upgrade HTTP(S) request to SMQ connection
+   -- See code in the .preload script (the app).
+   app.connectClientSlider(request)
+   response:abort() -- stop executing page
 end
 ?>
 
