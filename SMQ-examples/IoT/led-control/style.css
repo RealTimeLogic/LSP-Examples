@@ -1,0 +1,200 @@
+html,body{
+  min-height: 100%; /* real browsers */
+height: auto !important; /* real browsers */
+}
+
+body{
+  color:white;
+   font-weight:bold;
+background: rgb(0,0,0); /* Old browsers */
+background: -moz-linear-gradient(top,  rgba(0,0,0,1) 0%, rgba(69,72,77,1) 100%); /* FF3.6+ */
+background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(0,0,0,1)), color-stop(100%,rgba(69,72,77,1))); /* Chrome,Safari4+ */
+background: -webkit-linear-gradient(top,  rgba(0,0,0,1) 0%,rgba(69,72,77,1) 100%); /* Chrome10+,Safari5.1+ */
+background: -o-linear-gradient(top,  rgba(0,0,0,1) 0%,rgba(69,72,77,1) 100%); /* Opera 11.10+ */
+background: -ms-linear-gradient(top,  rgba(0,0,0,1) 0%,rgba(69,72,77,1) 100%); /* IE10+ */
+background: linear-gradient(to bottom,  rgba(0,0,0,1) 0%,rgba(69,72,77,1) 100%); /* W3C */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#000000', endColorstr='#45484d',GradientType=0 ); /* IE6-9 */
+}
+
+table div span a {
+  color:white;
+ font-size:120%;
+}
+
+#nav { position: relative; margin:0 30px 0 0;padding: 0px;}
+
+#nav li {list-style-type: none;margin-bottom:5px}
+
+#nav a {
+
+width:100px;
+border:1px solid #5b2500;
+border-radius: 14px;font-size:14px;font-weight:bold;font-family:arial, helvetica, sans-serif; padding: 10px; text-decoration:none; display:inline-block;text-shadow: -1px -1px 0 rgba(0,0,0,0.3);font-weight:bold; color: #FFFFFF;
+
+ background-color: #45484d; background-image: -webkit-gradient(linear, left top, left bottom, from(#45484d), to(#000000));
+ background-image: -webkit-linear-gradient(top, #45484d, #000000);
+ background-image: -moz-linear-gradient(top, #45484d, #000000);
+ background-image: -ms-linear-gradient(top, #45484d, #000000);
+ background-image: -o-linear-gradient(top, #45484d, #000000);
+ background-image: linear-gradient(to bottom, #45484d, #000000);filter:progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#45484d, endColorstr=#000000);
+
+}
+
+#nav a:hover {
+background-image: -webkit-linear-gradient(top, #2d2f32, #1a1a1a);
+ background-image: -moz-linear-gradient(top, #2d2f32, #1a1a1a);
+ background-image: -ms-linear-gradient(top, #2d2f32, #1a1a1a);
+ background-image: -o-linear-gradient(top, #2d2f32, #1a1a1a);
+ background-image: linear-gradient(to bottom, #2d2f32, #1a1a1a);filter:progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#2d2f32, endColorstr=#1a1a1a);
+}
+
+#nav a.selected {
+ background-color: #933C00; background-image: -webkit-gradient(linear, left top, left bottom, from(#933C00), to(#6d0019));
+ background-image: -webkit-linear-gradient(top, #933C00, #6d0019);
+ background-image: -moz-linear-gradient(top, #933C00, #6d0019);
+ background-image: -ms-linear-gradient(top, #933C00, #6d0019);
+ background-image: -o-linear-gradient(top, #933C00, #6d0019);
+ background-image: linear-gradient(to bottom, #933C00, #6d0019);filter:progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#933C00, endColorstr=#6d0019);
+}
+
+
+#nav a span {
+    background: #FFFFcc; 
+    border-radius: 10px;
+    box-shadow: 5px 5px 5px #444;  
+    display:block;
+    position:absolute;
+    z-index: 999;
+    top:5px;
+    width:200px;
+    border:1px solid #ccc;
+    padding: 5px;
+    color:gray;
+    text-align:left;
+    left:150px;
+    top:20px;
+    display: none;
+}
+
+#nav a:hover span{
+    display: block;
+}
+
+#nav a:focus span {
+    display: none;
+}
+
+#devices > div{display: none;}
+
+
+#nodev {
+width:300px;
+height:120px;
+margin:auto;
+position: absolute;
+  top: 0; left: 0; bottom: 0; right: 0;
+background-color: #933C00; background-image: -webkit-gradient(linear, left top, left bottom, from(#933C00), to(#6d0019));
+padding:20px;
+border-radius: 35px;
+}
+
+#nodev h2,#nodev p { text-align:center }
+#nodev a { color:white; }
+
+/* LED : http://cssdeck.com/labs/css-leds */
+
+.led-red, .led-yellow, .led-green, .led-blue, .led-off {
+margin:20px;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+}
+
+.led-red {
+    background-color: #940;
+    box-shadow: #000 0 -1px 7px 1px, inset #600 0 -1px 9px, #F00 0 2px 12px;
+}
+
+.led-yellow {
+    background-color: #A90;
+    box-shadow: #000 0 -1px 7px 1px, inset #660 0 -1px 9px, #DD0 0 2px 12px;
+}
+
+.led-green {
+    background-color: #690;
+    box-shadow: #000 0 -1px 7px 1px, inset #460 0 -1px 9px, #7D0 0 2px 12px;
+}
+
+.led-blue {
+    background-color: #4AB;
+    box-shadow: #000 0 -1px 7px 1px, inset #006 0 -1px 9px, #06F 0 2px 14px;
+}
+
+.led-off {
+    background-color: gray;
+    box-shadow: #000 0 -1px 7px 1px, inset #4B4B4B 0 -1px 9px, #878787 0 2px 14px;
+}
+
+/* End LED */
+
+/* ON OFF Switch: http://proto.io/freebies/onoff/ */
+
+.onoffswitch {
+    position: relative; width: 72px;
+    -webkit-user-select:none; -moz-user-select:none; -ms-user-select: none;
+}
+.onoffswitch-checkbox {
+    display: none;
+}
+.onoffswitch-label {
+    display: block; overflow: hidden; cursor: pointer;
+    border: 2px solid #999999; border-radius: 23px;
+}
+.onoffswitch-inner {
+    display: block; width: 200%; margin-left: -100%;
+    -moz-transition: margin 0.3s ease-in 0s; -webkit-transition: margin 0.3s ease-in 0s;
+    -o-transition: margin 0.3s ease-in 0s; transition: margin 0.3s ease-in 0s;
+}
+.onoffswitch-inner:before, .onoffswitch-inner:after {
+    display: block; float: left; width: 50%; height: 23px; padding: 0; line-height: 23px;
+    font-size: 14px; color: white; font-family: Trebuchet, Arial, sans-serif; font-weight: bold;
+    -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
+    border-radius: 23px;
+    box-shadow: 0px 11.5px 0px rgba(0,0,0,0.08) inset;
+}
+.onoffswitch-inner:before {
+    content: "ON";
+    padding-left: 10px;
+    background-color: #933C00; color: #FFFFFF;
+    border-radius: 23px 0 0 23px;
+}
+.onoffswitch-inner:after {
+    content: "OFF";
+    padding-right: 10px;
+    background-color: #000000; color: #FFFFFF;
+    text-align: right;
+    border-radius: 0 23px 23px 0;
+}
+.onoffswitch-switch {
+    display: block; width: 23px; margin: 0px;
+    background: #FFFFFF;
+    border: 2px solid #999999; border-radius: 23px;
+    position: absolute; top: 0; bottom: 0; right: 45px;
+    -moz-transition: all 0.3s ease-in 0s; -webkit-transition: all 0.3s ease-in 0s;
+    -o-transition: all 0.3s ease-in 0s; transition: all 0.3s ease-in 0s; 
+    background-image: -moz-linear-gradient(center top, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0) 80%); 
+    background-image: -webkit-linear-gradient(center top, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0) 80%); 
+    background-image: -o-linear-gradient(center top, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0) 80%); 
+    background-image: linear-gradient(center top, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0) 80%);
+    box-shadow: 0 1px 1px white inset;
+}
+.onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-inner {
+    margin-left: 0;
+}
+.onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-switch {
+    right: 0px; 
+}
+
+#dev-0 a { color:yellow }
+
+.temperature span { font-size:70%;}

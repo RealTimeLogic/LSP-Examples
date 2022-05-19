@@ -2,6 +2,10 @@
 
 Simple Message Queue (SMQ) is an "Internet of Things" IoT / M2M "Machine-to-Machine" publish subscribe (pub/sub) connectivity protocol specifically designed for easy and secure device management. See the [online SMQ documentation](https://realtimelogic.com/ba/doc/?url=SMQ.html) for a detailed introduction.
 
+## IoT Collection
+
+Examples for the tutorials found at makoserver.net. See the [IoT directory](IoT/README.md) for details.
+
 ## Lua and JavaScript Examples
 
 * [a light bulb app and a light switch app](LightSwitch-And-LightBulb-App)

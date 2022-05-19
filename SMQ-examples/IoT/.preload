@@ -1,0 +1,31 @@
+
+local fmt=string.format
+
+-- Callback for dropped messages
+local function ondrop(data, ptid, tid, subtid, peer)
+   trace(fmt("--SMQ DROP--, ptid: %u, tid: %u, subtid: %u",ptid,tid,subtid))
+end
+
+local function onconnect(etid, infoT, peerT)
+   trace(fmt("SMQ client connecting, etid: %u, info: %s",etid,infoT.info))
+end
+
+local function onclose(etid, sock, peer, err)
+   trace(fmt("SMQ client disconnecting, etid: %u, err: %s",etid,err))
+end
+
+local smq=require"smq.hub".create{
+   ondrop=ondrop,
+   onconnect=onconnect,
+   onclose=onclose
+}
+
+-- Called by smq.lsp
+function smqConnect(request)
+   smq:connect(request) -- Upgrade HTTP(S) request to SMQ connection
+end
+
+-- Called when app terminates
+function onunload()
+   smq:shutdown"Broker app shutting down!"
+end

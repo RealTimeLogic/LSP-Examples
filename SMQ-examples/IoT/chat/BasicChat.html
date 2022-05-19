@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>SimpleMQ Basic Chat Demo</title>
+    <link rel="stylesheet" type="text/css" href="style.css"/> 
+      <script src="/rtl/jquery.js"></script>
+      <script src="/rtl/smq.js"></script>
+      <script>
+
+        function escapeHtml(unsafe) {
+            return unsafe
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        };
+
+
+        $(function() {
+            var smq = SMQ.Client(SMQ.wsURL("/smq.lsp"),{info:"I am the basic chat client"});
+            function onChatMsg(msg,ftid) {
+                $('#messages ul').append("<li>"+escapeHtml(msg)+"</li>");
+            };
+            function sendChatMsg() {
+                smq.publish($('#msg').val(), "BasicChatMsg");
+                $('#msg').val(''); // Clear input
+                $('#msg').focus();
+                return false;
+            };
+            smq.subscribe("BasicChatMsg", {onmsg:onChatMsg, datatype:"text"});
+            $('form').submit(sendChatMsg);
+        });
+      </script>
+  </head>
+  <body>
+    <table class="BasicChat">
+      <tr>
+      <td>
+        <div id="messages">
+          <div><ul></ul></div> <!-- Messages will be injected by JavaScript here -->
+          <form>
+            <input placeholder="Write your message..." id="msg" autocomplete="off"/>
+          </form>
+        </div>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

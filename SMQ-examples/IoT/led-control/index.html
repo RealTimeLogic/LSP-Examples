@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8" />
+<title>SMQ LED Demo</title>
+<meta name=viewport content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" type="text/css" href="style.css"/>
+<script src="/rtl/jquery.js"></script>
+<script src="/rtl/smq.js"></script>
+<script>
+
+function escapeHtml(unsafe) {
+    return unsafe
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+};
+
+
+/* Each LED is wrapped in a Table Row (TR) element (Ref-TR). Each TR
+   element contains 3 TD elements and the 3 'mk..' (for make) functions
+   below create the HTML that goes into these 3 TD elements.
+*/
+
+/* TD 1: the LED name */
+function mkLedName(name) {
+    return '<td>'+name+'</td>';
+}
+
+/* TD 2: the LED is simply a DIV element styled by using the CSS from
+   the following page: http://cssdeck.com/labs/css-leds
+*/
+function mkLed(ptid,ledId,color,on) {
+    return '<td><div id="led-'+ptid+ledId+'" class="led-'+
+        color+(on ? '' : ' led-off')+'"></div></td>';
+}
+
+
+/* TD 3: the LED on/off switch is a standard HTML checkbox that is
+   styled using CSS3 and by using CSS3 transformation. We used the
+   on/off FlipSwitch generator on the following page for generating
+   the CSS: https://proto.io/freebies/onoff/
+*/
+function mkLedSwitch(ptid,ledId,on) {
+    var x =
+        '<td>'+
+        '<div class="onoffswitch">'+
+        '<input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="switch-'+
+        ptid+'-'+ledId+'" '+(on ? "checked" : "")+'/>'+
+        '<label class="onoffswitch-label" for="switch-'+ptid+'-'+ledId+'">'+
+        '<span class="onoffswitch-inner"></span>'+
+        '<span class="onoffswitch-switch"></span>'+
+        '</label>'+
+        '</div>'+
+        '</td>';
+    return x;
+}
+
+/* temp is in celcius x 10 */
+function temp2html(temp) {
+    temp /= 10;
+    return "Temperature: " + temp + "  &#x2103; <span>(" + 
+        Math.round(temp*9/5+32) + " &#x2109;)</span>";
+}
+
+
+/* The div with ID 'nodev' is used for displaying information when no
+   devices are connected.
+*/
+function printNoDevs() {
+    $("#nodev").html('<h2>No Devices Connected</h2><p>Download the <a href="https://realtimelogic.com/products/simplemq/src/">SMQ source code</a>, compile the C code, and connect a device client to this broker!</p>').show();
+}
+
+
+/* The complete LED manager is created in this function when JQuery
+   calls our anonymous function at startup.
+*/
+$(function() {
+    var connectedDevs=0;
+    if(window.location.search.search("nointro") == 1) {
+        $("#dev-0").hide();
+        $("#nav-0").hide();
+    }
+
+    /* Check if the browser supports WebSockets */
+    if(! SMQ.websocket() ) {
+        $('#nodev').html('<h2>Your browser stinks!</h2>');
+        return; /* Stop: no support */
+    }
+
+    // Create a SimpleMQ instance and connect to the broker.
+    var smq = SMQ.Client(SMQ.wsURL("/smq.lsp"));
+
+    /* We use the onmsg as a "catch all" for non managed messages we
+       receive. This function should not be called since we install
+       callbacks for all subscribed events. The onmsg is typically
+       used for error checking during development.
+    */
+    smq.onmsg=function(data,ptid,tid,subtid) {
+        console.log("Received unexpected data:", data,", from",ptid,", tid=",tid,
+                    ", subtid=",subtid);
+        console.log("  data string:",SMQ.utf8.decode(data))
+    };
+
+    /* The disconnect callback function removes all devices and
+       LEDS. A disconnect message is shown. The function instructs the
+       SimpleMQ client stack to attempt to reconnect after 3
+       seconds. This function will be called repeatedly if the
+       SimpleMQ client stack is unable to reconnect.
+     */
+    smq.onclose=function(message,canreconnect) {
+        connectedDevs=0;
+        $("#nav").empty();
+        $("#devices").empty();
+        $('#nodev').html('<h2>Disconnected!</h2><p>'+(message ? message : '')+'</p>').show();
+        if(canreconnect) return 3000;
+    };
+
+
+    /* We redirect the onconnect event to our function for printing
+       "no devices connected". The function replaces the initial
+       "Connecting..." message.
+     */
+    smq.onconnect=printNoDevs;
+
+    /* Called after a disconnect (smq.onclose) and after a re-connect
+       attempt succeeded.
+       Re-discover all devices by publishing a "hello" message to the
+       "/m2m/led/display" topic. The devices will then respond by
+       publishing the devices capabilities to our ephemeral topic ID.
+    */
+    smq.onreconnect=function() {
+        //Broadcast to all connected devices.
+        //Device will then send info to our ptid ("self"), sub-tid: "devinfo".
+        printNoDevs(); // State "not connected" to "no devices"
+        smq.publish("Hello", "/m2m/led/display");
+    };
+
+    /* Function devInfo is installed as a SimpleMQ callback for the
+       events we receive on the [topic "self" and sub topic "devinfo"]
+       and on the [topic "/m2m/led/display" and sub topic
+       "devinfo"]. The function creates the HTML for the device based
+       on the capabilities presented in the info object. The info
+       object is the parsed JSON received from the device.
+    */
+    function devInfo(info, ptid) {
+        /* HTML for device information (displayed at top). We give the
+         DIV the ID "dev-'+ptid+'". The ID is used when we install
+         click event callbacks for the on/off switches (Ref-switch).
+        */
+        var html='<div id="dev-'+ptid+'"><span>'+escapeHtml(info.devname)+'</span><div>';
+        if(typeof info.temp != 'undefined') {
+            html+='<div class="temperature" id="temp-'+ptid+'">'+temp2html(info.temp)+'</div>'
+        }
+        html += '</div><table>'
+        //Loop over all LEDS and create a TR element for each LED (Ref-TR)
+        var leds=info.leds;
+        for(var i=0 ; i < leds.length; i++) {
+            // TR contains: TD for name + TD for LED + TD for LED on/off switch
+            html += ('<tr>' +
+                     mkLedName(leds[i].name) +
+                     mkLed(ptid, leds[i].id, leds[i].color,leds[i].on) +
+                     mkLedSwitch(ptid, leds[i].id, leds[i].on) +
+                     '</tr>');
+        }
+        html += '</table></div>';
+        //Add the complete HTML for this device to the "devices" DIV element
+        $("#devices").append(html);
+
+        /* Install a 'clickCallback' function for each checkbox
+           (on/off switch) element in our new HTML for this device
+           (Ref-switch).
+           The callback, which is explained in the online tutorial,
+           extracts the publisher's ephemeral topic id (ptid) and the
+           LED ID from the information embedded in the HTML. We then
+           create a two byte binary packet for sending the LedId and
+           the button's on/off state to the device. Publishing to the
+           "ptid" sends a message to the device.
+        */
+        $('#dev-'+ptid+' :checkbox').click(function(ev) {
+            var id = $(this).prop('id').match(/(\d+)-(\d+)/);
+            var ptid = parseInt(id[1]);
+            var ledId = parseInt(id[2]);
+            var data = new Uint8Array(2);
+            data[0] = ledId;
+            data[1] = this.checked ? 1 : 0;
+            smq.publish(data,ptid);
+        });
+
+        /* Install a "change event" callback for the publisher's
+           ephemeral topic ID (ptid). Receiving a change event for a
+           ptid means the device disconnected. See the SimpleMQ
+           documentation for details on "change events".
+         */
+        smq.observe(ptid, function() {
+            $('#dev-'+ptid).remove(); /* Remove HTML for this device */
+            $('#nav-'+ptid).remove(); /* Remove the tab in the left pane */
+            if(--connectedDevs == 0)
+                printNoDevs();
+            $("#pong")[0].play();
+        });
+
+        /* Create a tab in the left pane for this device. We can have
+           multiple devices connected and the tab in the left pane
+           enables us to click on a tab and manage the device
+           associated with this tab.
+        */
+        $('#nav').append('<li><a id="nav-'+ptid+'" href="#">'+escapeHtml(info.ipaddr)+'<span>'+
+                         escapeHtml(info.devname)+'</a></span></li>');
+
+        if(++connectedDevs == 1) { // State change: no devices to at least one device.
+            $("#nodev").hide(); // Hide message: no devices connected ...
+            $("#dev-"+ptid).show(); // Show our new HTML
+            $("#nav-"+ptid).addClass("selected"); // Make the tabe in the left pane "selected"
+        }
+        $("#ping")[0].play();
+    } // End function devInfo
+
+    /* Function 'led' is installed as a SimpleMQ callback for the
+       events we receive on [topic "/m2m/led/device" and sub topic
+       "led"].  The device publishes to this topic/sub-topic when
+       either the device internally switches an LED or when it
+       receives a command from a browser.
+
+       Argument 'data' is a binary array of length two, where byte 1
+       contains the LED ID and byte two contains the on/off state.
+
+       * The LED's on/off switch is toggled by setting the checkbox's
+         "checked" attribute.
+       * The LED on/off state is changed by either adding or
+         removing the CSS class led-off.
+*/
+    function onLED(data, ptid) {
+        var ledId='#switch-'+ptid+'-'+data[0];
+        var checked = data[1] ? true : false;
+        $(ledId).prop('checked',checked);
+        ledId ='#led-'+ptid+data[0];
+        if(checked)
+            $(ledId).removeClass('led-off')
+        else
+            $(ledId).addClass('led-off');
+        $("#switch")[0].play();
+    };
+
+    function onTemp(data, ptid) {
+        var b = new Uint8Array(data,0,2);
+        var temp = (new DataView(b.buffer)).getInt16(0);
+        var tempId='#temp-'+ptid;
+        $(tempId).html(temp2html(temp));
+    };
+
+    //When a new device broadcasts to all connected "display" units.
+    smq.subscribe("/m2m/led/device", "devinfo", {"datatype":"json", "onmsg":devInfo});
+
+    //When a device responds to our "/m2m/led/display" published message.
+    smq.subscribe("self", "devinfo", {"datatype":"json", "onmsg":devInfo});
+
+    //When a device publishes LED state change.
+    smq.subscribe("/m2m/led/device", "led", {"onmsg":onLED});
+
+    //When a device publishes a new temperature.
+    smq.subscribe("/m2m/temp", {"onmsg":onTemp});
+ 
+    //Broadcast to all connected devices.
+    //Device will then send 'info' to our ptid ("self"), sub-tid: "devinfo".
+    smq.publish("Hello", "/m2m/led/display");
+
+    /* Click event for managing the tabs in the left pane when we have
+       multiple devices connected. Clicking on a tab hides all
+       devices and then shows the HTML for the device we clicked on.
+       See the following for a 'tab' tutorial:
+       http://htmldog.com/articles/tabs/
+    */
+    $("#nav").on("click", "a", function() {
+        var ptid = $(this).prop('id').match(/(\d+)/)[0]; // Extract ptid from HTML ID element
+        $("#nav a").removeClass("selected"); // Remove 'selected' from all tabs
+        $(this).addClass("selected"); // Set 'selected' for the tab we clicked on
+        $("#devices > div").hide(); // Hide all devices
+        $("#dev-"+ptid).show(); //Show the device associated with the 'tab' we clicked on
+        return false;
+    });
+
+});
+
+</script>
+</head>
+
+<body>
+  <table>
+    <tr>
+      <td valign="top">
+        <ul id="nav">
+          <li><a id="nav-0" href="#">Introduction<span>SMQ LED Demo Introduction</span></a></li>
+        </ul>
+      </td>
+      <td valign="top" id="devices">
+        <div id="dev-0" style="max-width:600px">
+<h3>SMQ LED Demo Introduction</h3>
+<p> The SMQ LED Demo shows how to design an IoT solution for controlling LEDs in devices connected to an SMQ broker. The demo uses the <a href="https://realtimelogic.com/products/simplemq/" target="_blank"> SMQ protocol</a> and enables GUI clients to control all LEDs in each connected device. See the <a href="https://makoserver.net/articles/Browser-to-Device-LED-Control-using-SimpleMQ" target="_blank"> Browser to Device LED Control using SMQ</a> tutorial for more information on how this demo functions.</p>
+
+<h2>Connect Your Own Device</h2>
+
+<p>By downloading a ready to use demo or compiling and running the source code, you will be able to control your own (simulated) device from your computer or from your own device. The (simulated) device will show up as a new tab on this page with the IP address of your network.</p>
+
+<b>Download:</b>
+<p>The SMQ device C source code can be downloaded from the <a href="https://realtimelogic.com/products/simplemq/src/">SMQ source code page</a>.</p>
+
+
+
+        </div>
+      </td>
+    </tr>
+  </table>
+  <div id="nodev">
+    <h2>Connecting....</h2>
+  </div>
+  <audio id="switch"><source src="switch.mp3" type="audio/mp3" /></audio>
+  <audio id="ping"><source src="ping.mp3" type="audio/mp3" /></audio>
+  <audio id="pong"><source src="pong.mp3" type="audio/mp3" /></audio>
+</body>
+</html>

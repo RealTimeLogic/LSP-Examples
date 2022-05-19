@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8" />
+
+<title>SimpleMQ Chat Demo</title>
+<script src="/rtl/jquery.js"></script>
+<script src="/rtl/smq.js"></script>
+<link rel="stylesheet" type="text/css" href="style.css">
+
+<script>
+
+function escapeHtml(unsafe) {
+    return unsafe
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+};
+
+$(function() {
+
+    var nickname;
+    var users={}; //List of all users: key=ftid, val = name
+    var timers={}; // List of users actively typing: key=ftid, val = timer handle
+    var smq = SMQ.Client(SMQ.wsURL("/smq.lsp"),{info:"I am the improved chat client"});
+    
+    /*
+      Build list of users shown in the left pane. This function is
+      called when a new user publishes "Hello" and when a user
+      disconnects.
+     */
+    function buildUserList() {
+       var html="";
+       for (var ftid in users) {
+          html+="<li id='"+ftid+"'>"+users[ftid]+"</li>";
+       }
+       $("#users ul").html(html);
+    };
+
+    /*
+      Scroll the text window and keep last text entered visible.
+     */
+    function scrollMsg() {
+        $('#messages div').animate({scrollTop: $('#messages ul').height()}, 1000);
+    };
+
+    /*
+      Print message to console. The console is an ul element where we add li elements.
+    */
+    function userInfo(info, classname) {
+        $('#messages ul').append('<li class="'+classname+'">'+info);
+    };
+
+
+    /*
+      All other connected users are supervised. We use the information
+      to print a "signing off" message in the console if the user
+      should disconnect.
+    */
+    function superviseUser(ftid) {
+        smq.observe(ftid, function() {
+            var name = users[ftid];
+            delete users[ftid];
+            buildUserList();
+            userInfo(name+" <span style='color:#fff'>signing off</span>","leave top-mk");
+            scrollMsg();
+        });
+    };
+
+
+    /*
+      Called when a user publishes "Hello".
+    */
+    function onHello(name,ftid) {
+        name=escapeHtml(name);
+        users[ftid] = name;
+        if(smq.gettid() == ftid) { /* Our own hello message */
+            userInfo("<span style='color:#fff'>Welcome</span> "+name,"enter top-mk");
+        }
+        else /* Another user publishes "Hello" */
+        {
+            if(nickname) { /* If we are signed in */
+                /* Respond by publishing a "Hello" to the publisher's ephemeral tid */
+                smq.publish(nickname,ftid,"Hello");
+            }
+            superviseUser(ftid);
+            userInfo(name+"<span style='color:#fff'> signing on</span>","enter top-mk");
+            buildUserList();
+            scrollMsg();
+            $("#joined")[0].play();
+        }
+    };
+
+    /*
+      Called when another user sends a message to our ephemeral ID.
+    */
+    function selfOnHello(name,ftid) {
+        users[ftid] = escapeHtml(name);
+        superviseUser(ftid);
+        buildUserList();
+    };
+
+
+    /*
+      Called when we or another user publishes a "ChatMsg"
+    */
+    function onChatMsg(msg,ftid) {
+        var mk = "<li class='message-board'><span class='green'>"+users[ftid]+"</span>"+escapeHtml(msg)+"</li>";
+        $('#messages ul').append(mk);
+        scrollMsg();
+        var thndl = timers[ftid];
+        if(thndl) {
+            clearTimeout(thndl);
+            delete timers[ftid];
+            $("#"+ftid).removeClass("writing");
+        }
+        if(smq.gettid() != ftid)
+            $("#notify")[0].play();
+    };
+
+    /*
+      Called when we receive a "TypeEvent" when another user is typing
+      a message.  We use this information to set the user's info pane
+      green while the user is typing.  A timeout is used, and if
+      triggered, the pane goes back to the default color red.
+     */
+    function onTypeEvent(data,ftid) {
+        if(smq.gettid() != ftid) {
+            var thndl = timers[ftid];
+            if(thndl) {
+                /* New type event received before timeout: remove old timer */
+                clearTimeout(thndl);
+                delete timers[ftid];
+            }
+            else {
+                /* Set pane green */
+                $("#"+ftid).addClass("writing");
+            }
+            timers[ftid] = setTimeout(function() {
+                /* Timeout: set color back to red */
+                delete timers[ftid];
+                $("#"+ftid).removeClass("writing");
+            }, 2500);
+        }
+    };
+
+    /*
+      Called when we send a complete message (ENTER pressed).
+      Fetch the message from the input field and publish the message.
+    */
+    function sendChatMsg() {
+        smq.publish($('#msg').val(), "ChatMsg");
+        $('#msg').val(''); /* Clear input field */
+        $('#msg').focus(); /* Keep field focused */
+        return false;
+    };
+
+    /*
+      Called when the SimpleMQ connection is established.
+    */
+    smq.onconnect=function() {
+        /* Subscribe to "Hello" from new users */
+        smq.subscribe("Hello", {onmsg:onHello, datatype:"text"});
+        /* Subscribe to our own ephemeral ID. We need this when
+         * another user sends us info directly.
+         */
+        smq.subscribe("self", "Hello", {onmsg:selfOnHello, datatype:"text"});
+        /* Chat text messages. */
+        smq.subscribe("ChatMsg", {onmsg:onChatMsg, datatype:"text"});
+        /* "typing text" events */
+        smq.subscribe("TypeEvent", {onmsg:onTypeEvent});
+        /* Send a complete message when ENTER is pressed */
+        $('form').submit(sendChatMsg);
+        var nextTime = 0;
+        /* Send "typing text" events when user types text into the
+         * text field.
+         */
+        $('#msg').keydown(function(ev){
+            var time = (new Date()).getTime();
+            if(ev.which === 13) {
+                nextTime=0;
+            }
+            else if(nextTime < time) { /* Limit the number of events. */
+                smq.publish('', "TypeEvent");
+                nextTime = time + 1000;
+            }
+        });
+        $("#dialog p").html('<b> Enter your nickname</b> <input id="nickname"/>');
+        $('#nickname').focus();
+        /* Events for our "nickname" dialog */
+        $('#nickname').keydown(function(ev){
+            var time = (new Date()).getTime();
+            if(ev.which === 13) { /* When we have the nickname */
+                nickname = $(this).val();
+                /* Publish "Hello" to all other connected users */
+                smq.publish(nickname,"Hello");
+                $("#dialog").hide();
+                $('#msg').focus();
+                
+            }
+        });
+    };
+
+    /* 
+       1: Empty list of connected clients.
+       2: Show the dialog and inform user we are offline.
+    */
+    smq.onclose=function(message,canreconnect) {
+        if(nickname) {
+            $("#dialog p").html("<b>Disconnected!</b>" + (message ? "<br>"+escapeHtml(message) : ""));
+            $("#dialog").show();  
+            $("#users ul").empty();
+            if(canreconnect) return 3000; // Attempt to reconnect after 3 sec.
+        }
+    };
+
+
+    /* Called after a disconnect (smq.onclose) and after a re-connect
+       attempt succeeded.  Re-discover all other connected users by
+       publishing a "Hello". The browsers receiving our Hello message
+       will then respond by publishing a Hello message to our
+       ephemeral topic ID.
+    */
+    smq.onreconnect=function() {
+        if(nickname) {
+            users={};
+            $("#dialog").hide();
+            /* Publish "Hello" to all other connected users */
+            smq.publish(nickname,"Hello");
+            $('#msg').focus();
+        };
+    };
+
+
+});
+
+</script>
+
+
+</head>
+<body>
+  <table>
+    <tr >
+      <td id="users">
+        <div>
+          <span class="user-header">Online Users</span>
+          <ul></ul> <!-- Connected users will be injected by JavaScript here -->
+      </div>
+      </td>
+      <td>
+        <div id="messages">
+          <div><ul></ul></div> <!-- Messages will be injected by JavaScript here -->
+          <form>
+            <input placeholder="Write your message..." id="msg" autocomplete="off" />
+          </form>
+        </div>
+      </td>
+    </tr>
+  </table>
+  <div id="dialog">
+    <p class="dp">
+      <b>Connecting....</b>
+    </p>
+  </div>
+    <audio id="notify"><source src="notify.wav" type="audio/wav" /></audio>
+    <audio id="joined"><source src="joined.wav" type="audio/wav" /></audio>
+</body>
+</html>
+
