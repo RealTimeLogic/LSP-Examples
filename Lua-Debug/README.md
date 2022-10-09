@@ -182,6 +182,10 @@ same directory. See the
 in the LSP Application Manager documentation for more information on
 how the NetIo works.
 
+### RTOS Example:
+
+See the [Lua debug instructions for NXP's RT 1020 development board](https://realtimelogic.com/downloads/bas/rt1020/#LuaDebug) for information on how to debug Lua on an embedded RTOS powered board.
+
 ## Gotchas
 
 The debug monitor embedded in the Mako Server implements the
