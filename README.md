@@ -3,24 +3,29 @@
 
 * [Lua and LSP debugging example](Lua-Debug) - A ready to use debugging example 
 * [Basic HTML form](html-form) - The tutorial: HTML Forms and LSP for Beginners
-* [Authentication](authentication) - Introduction to the Barracuda App Server's authentication mechanism
-* [Single Sign On](fs-sso) - Authenticating using [OpenID Connect](https://openid.net/connect/) and [Microsoft Azure AD](https://portal.azure.com/)
-* [AJAX For Beginners](AJAX)
-* [AJAX Over WebSockets](AJAX-Over-WebSockets)
+* [Authentication: General](authentication) - Introduction to the Barracuda App Server's authentication mechanism
+* [Authentication: OAuth 2.0](oauth) - Shows how to access Github using OAuth 2.0
+* [Authentication: Single Sign On](fs-sso) - Authenticating using [OpenID Connect](https://openid.net/connect/) and [Microsoft Azure AD](https://portal.azure.com/)
+* [AJAX: For Beginners](AJAX)
+* [AJAX: Over WebSockets](AJAX-Over-WebSockets)
 * [Create an Awesome Interactive Dashboard App using AdminLTE](Dashboard)
 * [Create a light Interactive Dashboard App using Pure.css](Light-Dashboard)
-* [CGI Plugin and Examples](CGI)
 * [Dynamic Navigation Menu](Dynamic-Nav-Menu)
-* [File Upload, including drag and drop](upload)
-* [Google IoT Cloud](Cloud-IoT-Core) - Connecting to the Google MQTT Bridge
+* [Debug Lua](Lua-Debug) - How to Debug Lua Code Using Visual Studio Code
+* [IoT: SMQ Examples](SMQ-examples) - Easy and secure device management using [SMQ](https://realtimelogic.com/ba/doc/?url=SMQ.html)
+* [IoT: MQTT and AWS](AWS-MQTT) - How to Connect to AWS IoT Core using MQTT & ALPN
+* [IoT: MQTT Sparkplug](Sparkplug) - How to use the MQTT Sparkplug library
+* [IoT: MQTT Google Cloud](Cloud-IoT-Core) - Connecting to the Google MQTT Bridge
+* [SQL: SQLite Examples](SQLite) - Database examples
+* [SQL: PostgreSQL Example](PostgreSQL) - Database example
+* [File Upload, including drag and drop](upload) - HTML based file upload
+* [WebDAV and Web-File-Server](File-Server) - Network drive and secure file sharing
 * [How to add 'require' search path to an app](require-test)
-* [SMQ IoT Examples](SMQ-examples) - Easy and secure device management
-* [SQLite Examples](SQLite) - Database examples
-* [PostgreSQL Example](PostgreSQL) - Database example
 * [Sockets and webSockets examples](socket-examples)
 * [Web Shell](Web-Shell) - web based alternative to SSH
 * [The ephemeral request/response environment](command-env) - using response:include() and response:forward()
-* [OAuth 2.0](oauth) - Shows how to access Github using OAuth 2.0
+* [CGI Plugin and Examples](CGI) - For old apps using [Common Gateway Interface](https://realtimelogic.com/articles/Barracuda-Server-versus-CGI)
+* [QNX: PPS to SMQ Bridge](QNX/PPS) -  How to extend QNX Persistent Publish Subscribe
 
 ## Linux Users
 

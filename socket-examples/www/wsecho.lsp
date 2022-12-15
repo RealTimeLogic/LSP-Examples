@@ -8,7 +8,7 @@
 local msg=request:data"msg"
 if msg then
    local h = require"httpc".create()
-   h:request{url="ws://echo.websocket.org"}
+   h:request{url="wss://ws.postman-echo.com/raw"}
    if h:status() == 101 then -- 101 switching protocol
       local s = ba.socket.http2sock(h)
       if s then

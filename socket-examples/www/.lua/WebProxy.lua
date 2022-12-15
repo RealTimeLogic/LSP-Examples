@@ -1,6 +1,5 @@
 
-
-local webServerName="tutorial.realtimelogic.com"
+local webServerName="simplemq.com"
 local fmt=string.format
 
 local clientcnt,servercnt=0,0
@@ -28,25 +27,26 @@ local function webProxy(source,sink,isclient)
 end
 
 -- Proxy client for the WEB server
-local function webProxyClient(client)
-   local server,err = ba.socket.connect(webServerName,80);
-   if server then
-      client:enable(server) -- (Ref-p)
-      webProxy(server, client, true)
+local function webProxyClient(client, server)
+   local s,err = ba.socket.connect(webServerName,80);
+   if s then
+      assert(s == client) -- Just to show that this is always true
+      server:enable(client) -- (Ref-p)
+      webProxy(client, server, true)
    else
       trace(fmt("Cannot connect to %s: %s",webServerName,err))
-      client:enable() -- (Ref-p)
+      server:enable() -- (Ref-p)
    end
 end
 
 
 -- Proxy server for the WEB client
-local function webProxyServer(client)
+local function webProxyServer(server)
    trace"Creating WEB proxy connection"
-   ba.socket.event(function() webProxyClient(client) end)
-   local server=client:disable() -- pause (Ref-p)
-   if server then
-      webProxy(client, server, false)
+   ba.socket.event(webProxyClient,server)
+   local client=server:disable() -- pause (Ref-p)
+   if client then
+      webProxy(server, client, false)
    end
 end
 
@@ -62,16 +62,17 @@ end
 
 
 -- Open listen port in range 8080 to 8090
+local sock
 local tp=8080
 while tp < 8090 do
-   websock=ba.socket.bind(tp)
-   if websock then break end
+   sock=ba.socket.bind(tp)
+   if sock then break end
    tp=tp+1
 end
 proxyPort=tp -- Global in app table
 
-if websock then
-   websock:event(accept,"r")
+if sock then
+   sock:event(accept,"r")
    trace(fmt("Web Proxy Server listening on port %d.", tp))
 else
    trace"Web Proxy Server: Cannot open listen port!"

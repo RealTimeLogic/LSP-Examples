@@ -45,7 +45,7 @@ margin-bottom:0;
 <p><b>Blocking Web Socket Server Example: <a href="Blocking-WS-Server/">Blocking-WS-Server/</a></b>
 
 <p>The above example (link) runs in the context of an LSP page, which in turn uses one of the threads from the Barracuda Server Pool, as illustrated in the following diagram:</p>
-<img src="https://realtimelogic.com/ba/doc/en/img/BaEventContainer.png" alt=""/>
+<img src="https://realtimelogic.com/ba/doc/en/img/BaEventContainer.svg" alt=""/>
 
 <p>When you run the above example, pay attention to the text "New WebSocket connection" and the text "End of Request/Response" being printed in the console. The server side WebSocket example runs until the browser closes the connection. Click the above link and let it run for a while, then click the back button in the browser.</p>
 
@@ -86,7 +86,7 @@ margin-bottom:0;
 </tr>
 <tr>
 <td><a href="https://realtimelogic.com/ba/doc/en/lua/SockLib.html#example13">Example 13</a></td>
-<td><a href="<?lsp=proxyAddr?>/fs/tmp/"><?lsp=proxyAddr?>/fs/tmp/</a></td>
+<td><a href="<?lsp=proxyAddr?>"><?lsp=proxyAddr?></a></td>
 <td>A non blocking proxy implemented in Lua</td>
 </tr>
 <tr>
@@ -97,7 +97,7 @@ margin-bottom:0;
 </table>
 
 
-<p>Example 13 (non blocking proxy) shows how flow control is managed when using cosockets. In order to test this, we need a service that enables us to send and receive large files. The destination server for the proxy is set to the online Barracuda App Server's Web File Manager (<a href="https://tutorial.realtimelogic.com/fs/tmp/">http://tutorial.realtimelogic.com/fs/tmp/</a>). When you click the proxy address <a href="<?lsp=proxyAddr?>/fs/tmp/"><?lsp=proxyAddr?>/fs/tmp/</a>, the proxy tunnels your request to the online server's <a href="https://realtimelogic.com/ba/doc/?url=lua.html#ba_create_wfs">Web File Manager</a>. Note that the proxy fails if you attempt to use or switch to a secure connection. Use a browser that supports drag and drop, such as Chrome, and drop a file into the Web File Manager's web interface. The file dropped into your browser window uploads via your local proxy. The proxy prints out the data usage to the console window when actively working.</p>
+<p>Example 13 (non blocking proxy) shows how flow control is managed when using cosockets. In order to test this, we need a service that enables us to send and receive large files. The destination server for the proxy is set to the <a href="https://simplemq.com">SMQ demo portal</a>). When you click the proxy address, the proxy tunnels your request to the online SMQ demo portal.</p>
 
 </body>
 </html>
