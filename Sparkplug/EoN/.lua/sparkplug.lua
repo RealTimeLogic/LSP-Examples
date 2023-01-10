@@ -14,7 +14,11 @@
 
 local io = ba.openio"vm"
 local function openSchema()
-   return io and io:open".lua/sparkplug_b.proto"
+   local p=".lua/sparkplug_b.proto"
+   local fp = io and io:open(p)
+   if fp then return fp end
+   local dio = ba.openio"disk"
+   return dio and dio:open(p)
 end
 local fp = openSchema()
 if not fp then -- Not in VM IO, let's try to find it using the app IO.
@@ -264,6 +268,9 @@ function SP:ndata(table) -- Publish NDATA, SP 17.3
    self.mqtt:publish(self._fmtTopic"NDATA",spEncode(self, table))
 end
 
+function SP:disconnect(reason)
+   self.mqtt:disconnect(reason)
+end
 
 local function create(addr, onstatus, ondata, groupId, nodeName, nbirth, op, ndeath)
    ndeath = ndeath or payload()

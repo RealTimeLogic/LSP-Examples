@@ -7,11 +7,12 @@ local fmt=string.format
 
 local function onstatus(type,code,status)
    if "mqtt" == type and "connect" == code and 0 == status.reasoncode then
+      mqtt:subscribe"spBv1.0/#"
       tracep(false,0,"MQTT connection established; Waiting for messages")
       return true -- Accept connection
    end
    tracep(false,0,"MQTT broker disconnected or connect failed:",type,code)
-   return true -- reconnect
+   return 0 -- reconnect with zero timeout
 end
 
 local function onpublish(topic,payload,prop)
@@ -32,7 +33,6 @@ local function runSniffer()
    serpent=require"serpent"
    tracep(false,0,fmt("\nConnecting to broker %s",mqttServer))
    mqtt=require("mqttc").create(mqttServer,onstatus,onpublish,{recbta=false})
-   mqtt:subscribe"spBv1.0/#"
    tracep(false,0,"Sparkplug sniffer started")
 end
 

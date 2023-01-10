@@ -6,7 +6,7 @@ can be used by included and/or forwarded pages.
 
 
 
-![Request/Response Environment](https://realtimelogic.com/ba/doc/en/img/RequestResponseEnv.png "Request/Response Environment")
+![Request/Response Environment](https://realtimelogic.com/ba/doc/en/img/RequestResponseEnv.svg "Request/Response Environment")
 
 
 Run the examples as follows:

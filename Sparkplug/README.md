@@ -2,7 +2,16 @@
 
 # Lua Sparkplug Library and Example
 
-The Sparkplug specification is a set of instructions designed to standardize MQTT pub/sub interoperability in the Industrial Internet of things arena. The specification does so by specifying a unified MQTT topic name space and specifying how metrics are encoded/decoded using Google's protocol buffers. See [Steve's Sparkplug introduction](http://www.steves-internet-guide.com/introduction-to-mqtt-sparkplug-for-iiot/) for a more detailed introduction.
+The Sparkplug specification is a set of guidelines for standardizing MQTT pub/sub communication in the Industrial Internet of Things (IIoT) industry. It does this by defining a unified MQTT topic namespace and outlining how metrics are encoded and decoded using Google's Protocol Buffers. For a more in-depth introduction to Sparkplug, you can check out [Steve's Sparkplug introduction](http://www.steves-internet-guide.com/introduction-to-mqtt-sparkplug-for-iiot/). By following the Sparkplug specification and using this easy to use Sparkplug library, you can ensure that your MQTT-based IIoT applications are interoperable and able to seamlessly communicate with other systems.
+
+- [Introduction](#introduction)
+- [The Sparkplug Lua API](#the-sparkplug-lua-api)
+- [Running the Provided Example "as is" using the Mako Server](#running-the-provided-example-as-is-using-the-mako-server)
+- [Adding the Sparkplug module to the Mako Server's resource file](#adding-the-sparkplug-module-to-the-mako-servers-resource-file)
+- [Compiling your own Sparkplug enables BAS server](#compiling-your-own-sparkplug-enables-bas-server)
+- [RTOS example: Compiling and integrating with ESP32 firmware](#rtos-example-compiling-and-integrating-with-esp32-firmware)
+
+## Introduction
 
 The following components are required in order to design a so-called Sparkplug compatible Edge of Network Node (EoN):
 
@@ -240,3 +249,10 @@ If you are building the LSP Application Manager for a monolithic RTOS system, fo
 bin2c -z getLspZipReader lsp.zip LspZip.c
 ```
 
+## RTOS example: Compiling and integrating with ESP32 firmware
+
+![Barracuda App Server ESP32 port](https://realtimelogic.com/images/bas-esp32.png)
+
+If you've been keeping up with the latest developments in technology, you've likely heard about the [ESP32](https://realtimelogic.com/downloads/bas/ESP32/). This powerful WiFi device, powered by FreeRTOS and equipped with a wide range of GPIO and other peripherals, is an excellent platform for learning and creating low-cost sensors in mass quantities. Now, with the help of the Barracuda App Server, you can program the ESP32 using the easy-to-learn Lua programming language, even if you don't have any experience with C code. Whether you're a seasoned developer or just starting out, the ESP32 and the Barracuda App Server make it easy to bring your ideas to life.
+
+TBD

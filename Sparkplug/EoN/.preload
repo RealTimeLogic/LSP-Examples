@@ -1,14 +1,26 @@
-
 -- The Sparkplug settings for this example.
 -- Tutorial: http://www.steves-internet-guide.com/introduction-to-mqtt-sparkplug-for-iiot/
+local mqttServer = "localhost"
 local groupId = "Sparkplug B Devices"
 local nodeName = "Lua Edge Node 1"
-local mqttServer = "localhost"
 
 -- The following code line makes it possible to load
 -- .lua/sparkplug.lua from this app using the function call
 -- require"sparkplug"
-mako.createloader(io)
+-- See: https://realtimelogic.com/ba/doc/?url=Mako.html#mako_createloader
+if mako then mako.createloader(io) end
+
+-- To reduce the amount of stack space required at startup and prevent
+-- stack overflows on RTOS systems, we wrap all code in a
+-- function. See the following for details:
+-- https://realtimelogic.com/ba/doc/?url=lspappmgr/readme.html#memory
+local function run()
+
+trace"Starting EoN"
+
+-- Preload 'protoc' to minimize stack usage on RTOS. This module is
+-- loaded by the 'sparkplug' module.
+require"protoc" -- Throws error if it is not installed
 
 local SP,sp -- SP: Sparkplug module, sp: Sparkplug instance
 SP=require"sparkplug" -- Load the module
@@ -176,6 +188,15 @@ local op={
    keepalive=3*60, -- PING every 3'rd minute
 }
 
+-- Function runs if app is closed
+function onunload()
+   trace"Closing EoN MQTT connection"
+   if metricsTimer then metricsTimer:cancel() end -- Stop sending data
+   sp:disconnect() -- Close MQTT connection
+end 
 
 -- Create and connect the Sparkplug instance.
 sp=SP.create(mqttServer,onstatus,ondata,groupId,nodeName,nbirth,op)
+
+end -- the run wrapper function
+ba.thread.run(run)
