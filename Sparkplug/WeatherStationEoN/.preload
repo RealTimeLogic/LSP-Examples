@@ -214,5 +214,5 @@ local op={
 -- Create and connect the Sparkplug instance.
 sp=SP.create(mqttServer,onstatus,ondata,groupId,nodeName,nbirth,op)
 
-end -- the run wrapper function
-ba.thread.run(run) -- Defer execution
+end -- the 'run' wrapper function
+ba.thread.run(run) -- Defer execution of 'run', the function starting at line 66
