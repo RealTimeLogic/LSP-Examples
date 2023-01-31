@@ -1,3 +1,5 @@
+-- MQTT 5 AWS IoT Core Example
+-- Doc: https://realtimelogic.com/ba/doc/?url=MQTT.html
 
 local awsBroker = ""
 local certName = "Demo_Thing.cert.pem"
@@ -5,33 +7,30 @@ local keyName = "Demo_Thing.private.key"
 
 local fmt=string.format
 
- -- MQTT callback function
-local function onpub(topic, msg)
-   trace(fmt("topic: %s, msg: %s", topic,msg))
-end
+-- Enable code line below to debug code
+-- Details: https://makoserver.net/articles/Lua-and-LSP-Debugging
+--require"ldbgmon".connect{client=false}
 
-
+-- https://realtimelogic.com/ba/doc/?url=auxlua.html#ba_create_certstore
 local certstore = ba.create.certstore()
+-- Certifcate store with one cert:
 if certstore:addcert(io,"AmazonRootCA1.pem") then
+   -- https://realtimelogic.com/ba/doc/?url=auxlua.html#ba_create_sharkssl
    local shark = ba.create.sharkssl(certstore)
+   -- https://realtimelogic.com/ba/doc/?url=auxlua.html#ba_create_sharkcert
    local sharkcert = ba.create.sharkcert(io, certName, keyName)
+   -- Add our certificate so AWS can authenticate the 'basicPubSub' client
    if sharkcert and shark:addcert(sharkcert) then
-      ba.socket.event(function()
-         local mqtt,err = require"mqttc".connect(
-            awsBroker, -- broker name
-            onpub, -- Our MQTT callback function (above)
-            { -- The option (op) table
-               shark = shark,
-               id = "basicPubSub",
-               port = 443,
-               alpn = "x-amzn-mqtt-ca"
-            })
-         if mqtt  then
-            trace(fmt("MQTT client connected to %s",awsBroker))
+      local timer, mqtt
+      -- MQTT connection status callback
+      local function onstatus(type,code,status)
+         trace("Server properties:", status and ba.json.encode(status) or 'nil')
+         if "mqtt" == type and "connect" == code and 0 == status.reasoncode then
+            trace"Successful new connection"
             mqtt:subscribe("topic_1")
             mqtt:subscribe("topic_2")
-            -- Publish a message to "topic_1" every second.
-            local timer=ba.timer(function()
+            -- Publish messages to "topic_1" every second.
+            timer=ba.timer(function()
                local seq=1
                while true do
                   mqtt:publish("topic_1",ba.json.encode{message="Hello World",sequence=seq})
@@ -40,14 +39,27 @@ if certstore:addcert(io,"AmazonRootCA1.pem") then
                end
             end)
             timer:set(1000)
-            mqtt:run() -- blocks in this cosocket
-            timer:cancel()
-            trace"MQTT connection closed"
-            return
-         else
-            trace(fmt("Cannot connect to %s, err: %s",awsBroker,err))
+            return true -- Accept connection
          end
-      end)
+         trace("Disconnect or connect failed",type,code)
+         if timer then
+            timer:cancel()
+            timer=nil
+         end
+         return true -- retry
+      end
+      -- MQTT PUBLISH callback (when we receive messages)
+      local function onpublish(topic,payload,prop)
+         trace("Received:",topic,payload)
+      end
+      local options = { -- ALPN and other required connection options
+         shark = shark,
+         port = 443,
+         alpn = "x-amzn-mqtt-ca",
+         clientidentifier = "basicPubSub",
+         secure=shark -- The shark object created above with AmazonRootCA1 store and cert.
+      }
+      mqtt=require("mqttc").create(awsBroker,onstatus,onpublish,options)
    else
       trace(fmt("Creating the SharkSSL certificate using %s and %s failed",certName,keyName))
    end

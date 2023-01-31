@@ -1,18 +1,19 @@
 -- The Sparkplug settings for this example.
--- Tutorial: http://www.steves-internet-guide.com/introduction-to-mqtt-sparkplug-for-iiot/
 local mqttServer = "localhost"
 local groupId = "Sparkplug B Devices"
 local nodeName = "Lua Edge Node 1"
 
--- The following code line makes it possible to load
--- .lua/sparkplug.lua from this app using the function call
--- require"sparkplug"
--- See: https://realtimelogic.com/ba/doc/?url=Mako.html#mako_createloader
+-- When using the Mako Server, the following code line makes it
+-- possible to load .lua/sparkplug.lua from this app using the
+-- function call 'require"sparkplug"'. Details:
+-- https://realtimelogic.com/ba/doc/?url=Mako.html#mako_createloader
 if mako then mako.createloader(io) end
 
 -- To reduce the amount of stack space required at startup and prevent
 -- stack overflows on RTOS systems, we wrap all code in a
--- function. See the following for details:
+-- function. This helps ensure that the stack remains within its
+-- allotted size and reduces the risk of errors due to insufficient
+-- stack space. See the following for details:
 -- https://realtimelogic.com/ba/doc/?url=lspappmgr/readme.html#memory
 local function run()
 
@@ -68,7 +69,8 @@ local function publishMetrics()
    while true do
       local pl = SP.payload()
       metricData.metric2 = metricData.metric3 % 2 == 0 and true or false
-      trace(string.format("Sending NDATA: metric2=%q, metric3=%d",metricData.metric2,metricData.metric3))
+      trace(string.format("Sending NDATA: metric2=%q, metric3=%d",
+                          metricData.metric2,metricData.metric3))
       pl:metric("Node Metric2", DataTypes.Boolean, metricData.metric2)
       pl:metric("Node Metric3",DataTypes.UInt64,metricData.metric3)
       sp:ndata(pl) -- publish
