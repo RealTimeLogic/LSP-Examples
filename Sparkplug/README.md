@@ -326,13 +326,13 @@ You must change `localhost` to a public broker or to a broker running on your ho
 
 Once you have set the correct broker name, click the `Save` button, then click the `Restart` button to start the MQTT Sparkplug example. To view the Sparkplug data being sent, you can connect the [MQTT Sparkplug sniffer](#the-sparkplug-sniffer) to the same broker.
 
-### Sparkplug Enabled Weather Station
+### Ready To Run Sparkplug Enabled Weather Station Example
 
 ![Sparkplug Enabled Weather Station](https://realtimelogic.com/images/ESP32WeatherStationEoN.jpg)
 
 There are many examples of ESP32 Weather Stations available online, however, this specific example stands out as it demonstrates how to send weather data as Sparkplug messages to a Primary Application. This allows for the weather data trend to be easily visualized and analyzed. It is a fun and practical example for those looking to send weather data from an ESP32 device to a primary application using the Sparkplug protocol.
 
-See the [Weather Station Lua Source Code](WeatherStationEoN/.preload) for additional information.
+See the [Weather Station Lua Source Code](WeatherStationEoN/.preload) for additional information. In additon, see the first part of the [Arduino BME280 Sensor Tutorial](https://randomnerdtutorials.com/esp32-bme280-arduino-ide-pressure-temperature-humidity/) for wiring instructions.
 
 
 
