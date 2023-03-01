@@ -1,6 +1,7 @@
 <?lsp
 
 -- function elizaSockCoroutine is in .lua/eliza.lua
+-- The function is loaded and stored in 'app' table by .preload
 assert(app.elizaSockCoroutine)
 
 local s = ba.socket.req2sock(request)
