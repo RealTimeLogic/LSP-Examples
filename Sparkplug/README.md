@@ -11,7 +11,7 @@ The Sparkplug specification is a set of guidelines for standardizing MQTT pub/su
 - [Adding the Sparkplug module to the Mako Server's resource file](#adding-the-sparkplug-module-to-the-mako-servers-resource-file)
 - [Compiling your own Sparkplug enabled BAS server](#compiling-your-own-sparkplug-enabled-bas-server)
 - [RTOS example: Compiling and integrating with ESP32 firmware](#rtos-example-compiling-and-integrating-with-esp32-firmware)
-  - [Sparkplug Enabled Weather Station](#sparkplug-enabled-weather-station)
+- [ESP32 Sparkplug Enabled Weather Station](#ready-to-run-sparkplug-enabled-weather-station-example)
 
 ## What is MQTT Sparkplug
 
@@ -326,15 +326,16 @@ You must change `localhost` to a public broker or to a broker running on your ho
 
 Once you have set the correct broker name, click the `Save` button, then click the `Restart` button to start the MQTT Sparkplug example. To view the Sparkplug data being sent, you can connect the [MQTT Sparkplug sniffer](#the-sparkplug-sniffer) to the same broker.
 
-### Ready To Run Sparkplug Enabled Weather Station Example
+## Ready To Run Sparkplug Enabled Weather Station Example
 
 ![Sparkplug Enabled Weather Station](https://realtimelogic.com/images/ESP32WeatherStationEoN.jpg)
 
 There are many examples of ESP32 Weather Stations available online, however, this specific example stands out as it demonstrates how to send weather data as Sparkplug messages to a Primary Application. This allows for the weather data trend to be easily visualized and analyzed. It is a fun and practical example for those looking to send weather data from an ESP32 device to a primary application using the Sparkplug protocol.
 
-See the [Weather Station Lua Source Code](WeatherStationEoN/.preload) for additional information. In additon, see the first part of the [Arduino BME280 Sensor Tutorial](https://randomnerdtutorials.com/esp32-bme280-arduino-ide-pressure-temperature-humidity/) for wiring instructions.
+### Get Started:
 
-
-
+1. [Purchase an ESP32-WROVER](https://www.amazon.com/s?k=esp32+wrover+development+board); note, all you need is a basic low cost board
+2. [Flash the ESP32 firmware](https://realtimelogic.com/ba/ESP32/source/GettingStarted.html)
+3. Follow the instructions in the [Weather Station Lua Source Code](https://github.com/RealTimeLogic/Xedge-ESP32/blob/master/Lua-Examples/WeatherStationEoN/.preload)
 
 

@@ -1,8 +1,13 @@
-print"\n\n#################################################################"
-print "In .preload..."
-for fn in io:files".lua" do
-   print("Loading:",fn)
-   local ok,err = pcall(function() io:dofile(".lua/"..fn,_ENV) end)
-   if not ok then print("\tFailed:", err) end
+
+local function run()
+   print"\n\n#################################################################"
+   print "In .preload..."
+   for fn in io:files".lua" do
+      print("Loading:",fn)
+      local ok,err = pcall(function() io:dofile(".lua/"..fn,_ENV) end)
+      if not ok then print("\tFailed:", err) end
+   end
+   print"#################################################################\n\n"
 end
-print"#################################################################\n\n"
+
+ba.thread.run(run) -- Defer until the server has completed the startup process.
