@@ -166,7 +166,7 @@ function PL:metric(name, type, value, alias, timestamp) -- Add metric
    m.name,m.alias=name,alias
    m.timestamp=timestamp or ba.datetime"NOW":ticks()
    tinsert(metrics,m)
-   return self
+   return m
 end
 
 
@@ -207,7 +207,7 @@ local function spEncode(self, t, info, level) -- Convert Lua table 't' to protob
    local seq=self._nextSeq
    t.seq=seq
    seq=seq+1
-   t._nextSeq = seq <= 255 and seq or 0
+   self._nextSeq = seq <= 255 and seq or 0
    local pb,err=pb.encode(PayloadNS, t)
    if not pb then error(fmt("Invalid %s table: %s",err),info or "PB", level or 3) end
    return pb
