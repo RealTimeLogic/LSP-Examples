@@ -10,8 +10,8 @@ The Sparkplug specification is a set of guidelines for standardizing MQTT pub/su
 - [Running the Provided Example "as is" using the Mako Server](#running-the-provided-example-as-is-using-the-mako-server)
 - [Adding the Sparkplug module to the Mako Server's resource file](#adding-the-sparkplug-module-to-the-mako-servers-resource-file)
 - [Compiling your own Sparkplug enabled BAS server](#compiling-your-own-sparkplug-enabled-bas-server)
-- [RTOS example: Compiling and integrating with ESP32 firmware](#rtos-example-compiling-and-integrating-with-esp32-firmware)
-- [ESP32 Sparkplug Enabled Weather Station](#ready-to-run-sparkplug-enabled-weather-station-example)
+- [RTOS Example: Ready to Run ESP32 Firmware](#rtos-example-ready-to-run-esp32-firmware)
+  - [ESP32 Sparkplug Enabled Weather Station](#ready-to-run-sparkplug-enabled-weather-station-example)
 
 ## What is MQTT Sparkplug
 
@@ -273,58 +273,21 @@ If you are building the LSP Application Manager for a monolithic RTOS system, fo
 bin2c -z getLspZipReader lsp.zip LspZip.c
 ```
 
-## RTOS example: Compiling and integrating with ESP32 firmware
+## RTOS Example: Ready to Run ESP32 Firmware
 
 While the tutorial below specifically uses an [ESP32](https://www.amazon.com/s?k=wrover), don't let that hold you back. The principles and setup can easily be adapted to your own RTOS device. And be sure to check out the [Barracuda App Servers GitHub repository](https://github.com/RealTimeLogic/BAS), where you will find detailed instructions on how to compile the software for other RTOS environments.
 
 ![Barracuda App Server ESP32 port](https://realtimelogic.com/images/bas-esp32.png)
 
-If you've been keeping up with the latest developments in technology, you've likely heard about the ESP32. This powerful WiFi device, powered by FreeRTOS and equipped with a wide range of GPIO and other peripherals, is an excellent platform for learning and creating low-cost sensors in mass quantities. Now, with the help of the Barracuda App Server, you can program the ESP32 using the easy-to-learn Lua programming language, even if you don't have any experience with C code. Whether you're a seasoned developer or just starting out, the ESP32 and the Barracuda App Server make it easy to bring your ideas to life.
+If you've been keeping up with the latest developments in technology, you've likely heard about the ESP32. This powerful WiFi device, powered by FreeRTOS and equipped with a wide range of GPIO and other peripherals, is an excellent platform for learning and creating low-cost sensors in mass quantities. Now, with the help of the Barracuda App Server, you can program the ESP32 using the easy-to-learn Lua programming language, even if you don't have any experience with C code.
 
-The first step is to download our [SharkSSL IDE](https://realtimelogic.com/downloads/sharkssl/ESP32/?bas=) and follow the installation instructions. This IDE lets you compile and upload the Barracuda App Server to an ESP32 WROVER. As part of the installation process, it's important to upgrade the software using the [GitPullAll.sh shell script](https://realtimelogic.com/downloads/sharkssl/ESP32/?bas=#ssh). This will ensure that you are using the latest version of the software.
+Our [ESP32 firmware](https://realtimelogic.com/ba/ESP32/) comes pre-installed with Sparkplug, making it easy to use. Simply create your Lua application and import the Sparkplug library using this command:
 
-After upgrading, you will need to continue working in the web based command line shell to complete the setup. The following screenshot provides a visual representation of the software upgrade process.
-
-![GitPullAll.sh Upgrade Script](https://realtimelogic.com/downloads/sharkssl/ESP32/GitPullAll.sh.png)
-
-Copy the following commands and paste the commands into the shell:
-
-```
-cd ~/LspAppMgr-ESP32/main/
-git clone https://github.com/surfskidude/lua-protobuf.git
+``` lua
+local SP=require"sparkplug" -- Load the module
 ```
 
-Once [lua-protobuf](https://github.com/surfskidude/lua-protobuf) has been cloned, navigate to the SharkSSL IDE by changing the browser URL from `http://ip-addr/shell/` to `http://ip-addr`. This will take you directly to the SharkSSL IDE interface.
-
-To begin configuring the Barracuda App Server with lua-protobuf support, access the `CMakeLists.txt` file for the [LSP Application Manager](https://realtimelogic.com/ba/doc/?url=lspappmgr/readme.html) build. Using the navigation tree in the left pane of the SharkSSL IDE, click on `LSP Application Manager` -> `main`, and then double click on `CMakeLists.txt` to open the file in the built-in web editor. This file is responsible for instructing the esp-idf build environment on which C files to include and what compile options to use. Thus, we will need to add the necessary requirements for compiling lua-protobuf to this file.
-
-1. In the `idf_component_register` macro, just after `SRCS`, add the following: `"lua-protobuf/pb.c"`
-2. In the first `target_compile_options` macro, just after `PRIVATE`, add the following: `-DBP_IO=0 -DUSE_PROTOBUF`
-
-The compile time macros disable the non compatible IO in lua-protobuf and registers the lua-protobuf installation hook in the LSP Application Manager (in ~/LspAppMgr-ESP32/main/BAS/examples/lspappmgr/src/LspAppMgr.c).
-
-
-1. Save `CMakeLists.txt` by clicking the `Save` button
-2. Double click on `main.c` in the left pane to open the C startup file
-3. Click the `Compile` button to compile Barracuda App Server, the LSP Application Manager, and lua-protobuf
-
-After making the necessary changes to the "CMakeLists.txt" file, you should be able to compile the firmware without any errors. The next step is to upload the firmware to the ESP32 board. To do this, follow the [firmware upload instructions](https://realtimelogic.com/downloads/sharkssl/ESP32/?bas=#upload) provided on the SharkSSL IDE page.
-
-After the firmware is uploaded, the ESP32 should boot and you should see the Web File Manager link (http://esp32-ip-addr/fs/) being printed in the console. Navigate to this URL using your browser. Click on the `.lua` directory to navigate into this directory. This empty directory requires the files as shown in the screenshot below.
-
-![Web File Manager showing the required Sparkplug modules](doc/wfm-sparkplug-modules.png)
-
-The files `protoc.lua` and `serpent.lua` comes from the lua-protobuf module and the files [sparkplug.lua](EoN/.lua/sparkplug.lua) and [sparkplug_b.proto](EoN/.lua/sparkplug_b.proto) comes from this example. Upload these 4 files to your ESP32 by dropping them on the Web File Manager browser window when in the .lua directory. These Lua modules and the protobuf schema file are required for the Sparkplug example to work. The LSP App Manager sets up the [Lua require path](https://realtimelogic.com/ba/doc/en/lua/man/manual.html#6.3) to include the .lua directory. Another option to include these files is explained in the above section [Compiling your own Sparkplug enabled BAS server](#compiling-your-own-sparkplug-enabled-bas-server), where the files are embedded in the firmware image (via lsp.zip). However, uploading them to the ESP32's file system is much easier.
-
-You are now ready to run the Sparkplug example. To begin, use the LSP Application Manager to create a new application and directory for the example. For example, you can create a directory called "sparkplug" and name the application "sparkplug". Next, activate the `Running` switch to start the Sparkplug application and click the `Edit` button to open the web IDE. In the web IDE, double click on the `.preload` script and clear its contents. Then, open the [.preload script from this example's EoN directory](EoN/.preload) in an editor and copy all of its contents. Finally, paste the copied code into the web editor. Within the code in the web editor, locate the following line:
-
-```
-local mqttServer = "localhost"
-```
-
-You must change `localhost` to a public broker or to a broker running on your host computer as explained in the section [Running the example using the Mako Server](#running-the-provided-example-as-is-using-the-mako-server) above.
-
-Once you have set the correct broker name, click the `Save` button, then click the `Restart` button to start the MQTT Sparkplug example. To view the Sparkplug data being sent, you can connect the [MQTT Sparkplug sniffer](#the-sparkplug-sniffer) to the same broker.
+One exciting project you can try with your ESP32 is building the Weather Station, as detailed below.
 
 ## Ready To Run Sparkplug Enabled Weather Station Example
 
