@@ -1,14 +1,4 @@
 <?lsp
-   response:setheader("Content-type","application/octet-stream")
-   response:setheader(
-     "Content-Disposition","attachment; filename=\"ajax.lsp\"")
-   response:setheader(
-     "Cache-Control","no-store, no-cache, no-transform, must-revalidate, private")
-   response:setheader("Pragma","private")
-   response:setheader("Expires","0")
-response:write[[
-
-<?lsp
 if request:header"x-requested-with" then
    local key=request:data"key"
    if key then
@@ -43,9 +33,3 @@ $(function() {
 <input id="in" type="text" />
 </body>
 </html>
-
-
-]]
-   
-
-?>
