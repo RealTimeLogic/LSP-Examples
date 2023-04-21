@@ -40,7 +40,25 @@ For testing on 'localhost', use the redirect_uri as shown above.
 15. Finally, copy the **client secret Value** immediately, as you will not be able to see this value again.
 16. Copy **Directory (tenant) ID**, **Application (client) ID**, and **client secret Value**, and insert into mako.conf
 
-See the Microsoft tutorial
+### Grant users access
+
+After completing the above instructions, you can grant individual users within the organization access to the application by following these steps:
+
+1. In the Azure portal, click on the **Azure Active Directory** icon.
+2. In the left pane, click on **Enterprise applications**.
+3. Search for and select the application you just registered in the application list.
+4. Click on the **Users and groups** tab in the application's Overview page.
+5. Click on the **+ Add user** button, located above the users list.
+6. In the **Add Assignment** panel, click on the **Users and groups** field.
+7. Search for and select the individual users you want to grant access to the application. You can select multiple users by clicking on the checkboxes next to their names.
+8. Once you've selected all the users you want to grant access to, click on the **Select** button at the bottom of the panel.
+9. Optionally, you can assign a specific role to the users by selecting it from the **Role** dropdown menu. If no roles are defined for the application, users will be assigned the default access.
+10. Click on the **Assign** button at the bottom of the panel to grant the selected users access to the application.
+
+The users you've granted access to will now be able to sign in and use the application based on the permissions and roles assigned to them.
+
+
+For additional details, see the Microsoft tutorial
 [Register an application with the Microsoft identity platform](https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-configure-app-expose-web-apis).
 
 Click next to continue with the [next tutorial](https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-configure-app-access-web-apis), including section
