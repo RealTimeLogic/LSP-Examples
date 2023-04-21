@@ -21,11 +21,29 @@ openid={
 
 For testing on 'localhost', use the redirect_uri as shown above.
 
+## Azure Instructions
+
+1. Open the [Azure portal](https://portal.azure.com/) and click on the **Azure Active Directory** icon.
+2. In the left pane, click on **App registrations**.
+3. At the top of the page, click on **+ New registration**.
+4. Enter a suitable name for your application.
+5. In most cases, the account type should be set to **Single tenant**.
+6. Click on **Select a platform** and choose **Web**.
+7. For the redirect URI, include all relevant sites, such as test sites. If you are setting this up for testing purposes, enter the URLs `http://localhost` and `https://localhost`.
+8. Click on **Register** at the bottom of the page.
+9. On the following page, make sure to copy and save both the **Application (client) ID** and **Directory (tenant) ID**.
+10. Navigate to **Client credentials** and click on **Add a certificate or secret**.
+11. Click on **+ New client secret**.
+12. Provide a name for your client secret.
+13. Choose a suitable expiration date for the secret.
+14. Click on **Add** at the bottom of the page.
+15. Finally, copy the **client secret Value** immediately, as you will not be able to see this value again.
+16. Copy **Directory (tenant) ID**, **Application (client) ID**, and **client secret Value**, and insert into mako.conf
+
 See the Microsoft tutorial
-[Register an application with the Microsoft identity platform](https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-configure-app-expose-web-apis)
-for how to obtain the above required settings. Platform settings must be
-"Web", under section Add credentials, select Add a client
-secret. Click next to continue with the [next tutorial](https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-configure-app-access-web-apis), including section
+[Register an application with the Microsoft identity platform](https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-configure-app-expose-web-apis).
+
+Click next to continue with the [next tutorial](https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-configure-app-access-web-apis), including section
 [Add permissions to access Microsoft Graph](https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-configure-app-access-web-apis#add-permissions-to-access-microsoft-graph).
 
 Run the example, using the Mako Server, as follows:
