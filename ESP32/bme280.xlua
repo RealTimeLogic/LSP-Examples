@@ -1,4 +1,6 @@
---To run this code:
+-- BME280 documentation: 
+-- A basic example designed to test your BME280 wiring.
+-- To run this code: https://realtimelogic.com/ba/ESP32/source/BME280.html
 
 -- Wire up a BME280 via I2C:
 -- https://learn.sparkfun.com/tutorials/sparkfun-bme280-breakout-hookup-guide/all

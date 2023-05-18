@@ -2,7 +2,7 @@
 -- to send temperature, humidity, and pressure data obtained via I2C
 -- from a BME280 sensor to an online MQTT broker.
 
--- Sparkplug: https://github.com/RealTimeLogic/LSP-Examples/tree/master/Sparkplug
+-- Sparkplug intro: https://github.com/RealTimeLogic/LSP-Examples/tree/master/Sparkplug
 -- Xedge32: https://realtimelogic.com/ba/ESP32/
 
 -- To start, the program sets the MQTT Sparkplug settings for the
@@ -26,9 +26,7 @@
 -- Sparkplug (Protocol Buffers) format to the online MQTT broker.
 
 -- NOTE: before running this example code, make sure to initially test
--- the BME280 chip and the I2C configuration using the following LSP
--- program:
--- https://github.com/RealTimeLogic/LspAppMgr-ESP32/blob/master/Lua-Examples/bme280.lsp
+-- the BME280 chip and the I2C configuration using the Lua program bme280.xlua.
 
 -- BME280 wiring instructions:
 -- https://randomnerdtutorials.com/esp32-bme280-arduino-ide-pressure-temperature-humidity/

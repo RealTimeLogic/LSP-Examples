@@ -8,8 +8,6 @@ The Sparkplug specification is a set of guidelines for standardizing MQTT pub/su
 - [Lua Sparkplug Introduction](#lua-sparkplug-introduction)
 - [The Sparkplug Lua API](#the-sparkplug-lua-api)
 - [Running the Provided Example "as is" using the Mako Server](#running-the-provided-example-as-is-using-the-mako-server)
-- [Adding the Sparkplug module to the Mako Server's resource file](#adding-the-sparkplug-module-to-the-mako-servers-resource-file)
-- [Compiling your own Sparkplug enabled BAS server](#compiling-your-own-sparkplug-enabled-bas-server)
 - [RTOS Example: Ready to Run ESP32 Firmware](#rtos-example-ready-to-run-esp32-firmware)
   - [ESP32 Sparkplug Enabled Weather Station](#ready-to-run-sparkplug-enabled-weather-station-example)
 
@@ -208,70 +206,6 @@ cd Sparkplug
 mako -l::SparkplugSniffer
 ```
 
-## Adding the Sparkplug module to the Mako Server's resource file
-
-The example code EoN/.preload includes the following code at the top of the file: [mako.createloader](https://realtimelogic.com/ba/doc/?url=Mako.html#mako_createloader)(io)
-
-The above code makes it possible to load the Sparkplug module
-EoN/.lua/sparkplug.lua from the application. However, for a more permanent
-solution, copy the files to the Mako Server's resource file mako.zip as
-follows:
-
-``` console
-mkdir .lua
-cp EoN/.lua/sparkplug.lua .lua/
-cp EoN/.lua/sparkplug_b.proto .lua/
-zip -r -u path/2/mako.zip .lua
-```
-
-
-The above commands copy the sparkplug.lua module and the Sparkplug Protobuf schema to mako.zip/.lua/, which is where all pre-integrated modules are stored.
-
-## Compiling your own Sparkplug enabled BAS server
-
-The example can be run on a server that has been assembled by using the [Barracuda App Server Source Code Library](https://github.com/RealTimeLogic/BAS) (BAS) such as the [LSP Application Manager](https://realtimelogic.com/ba/doc/?url=lspappmgr/readme.html) designed for RTOS and the [Mako Server](https://realtimelogic.com/ba/doc/?url=Mako.html) designed for HLOS. However, the Sparkplug module requires a [Lua Protobuf module](https://github.com/surfskidude/lua-protobuf) not included in the BAS library. This library includes both C code and Lua code that must be integrated into the build. The following example shows how to include the Protobuf module when compiling the Mako Server included in the BAS repo:
-
-``` console
-cd /mnt/a
-git clone https://github.com/RealTimeLogic/BAS.git
-cd BAS/src/
-git clone https://github.com/surfskidude/lua-protobuf.git
-cd ..
-make -f mako.mk
-```
-
-The makefile detects that we have the Protobuf module and includes the C file src/lua-protobuf/pb.c in the build. The makefile also adds the compile flag -DUSE_PROTOBUF=1, which enables the following code in examples/MakoServer/src/MakoMain.c:
-
-``` lua
-#if USE_PROTOBUF
-luaL_requiref(L, "pb", luaopen_pb, FALSE);
-lua_pop(L,1); /* Pop pb obj: statically loaded, not dynamically. */
-#endif
-```
-
-The above C code pre-loads the Lua C Protobuf module at startup, which is
-required when statically linking a module with the server.
-
-The Lua Protobuf module also includes two Lua modules that must be found by
-the Lua "require" function. The easiest way to deal with this is to add the
-Lua code to the Mako Server's resource file mako.zip as follows:
-
-``` console
-mkdir .lua
-cp src/lua-protobuf/protoc.lua .lua/
-cp src/lua-protobuf/serpent.lua .lua/
-cp ../Sparkplug/EoN/.lua/sparkplug.lua .lua/
-cp ../Sparkplug/EoN/.lua/sparkplug_b.proto .lua/
-zip -r -u mako.zip .lua
-```
-
-The above commands also copy the sparkplug.lua module and the Sparkplug Protobuf schema to mako.zip/.lua/
-
-If you are building the LSP Application Manager for a monolithic RTOS system, follow the same copy commands as above, but copy the files to the .lua directory inside the examples/lspappmgr/obj/lsp.zip ZIP file. After copying the files, convert lsp.zip to C code using [bin2c](https://realtimelogic.com/downloads/bin2c/) as follows:
-
-``` console
-bin2c -z getLspZipReader lsp.zip LspZip.c
-```
 
 ## RTOS Example: Ready to Run ESP32 Firmware
 
@@ -297,8 +231,9 @@ There are many examples of ESP32 Weather Stations available online, however, thi
 
 ### Get Started:
 
-1. [Purchase an ESP32-WROVER](https://www.amazon.com/s?k=esp32+wrover+development+board); note, all you need is a basic low cost board
-2. [Flash the ESP32 firmware](https://realtimelogic.com/ba/ESP32/source/GettingStarted.html)
-3. Follow the instructions in the [Weather Station Lua Source Code](https://github.com/RealTimeLogic/Xedge-ESP32/blob/master/Lua-Examples/WeatherStationEoN/.preload)
+1. [Purchase an ESP32-S3](https://www.amazon.com/s?k=esp32-S3); note, all you need is a basic low cost board
+2. [Purchase a BME280 chip](https://www.amazon.com/s?k=bme280)
+3. [Flash the ESP32 firmware](https://realtimelogic.com/ba/ESP32/source/GettingStarted.html)
+4. Follow the instructions in the [Weather Station Lua Source Code](../ESP32/WeatherStationEoN.xlua)
 
 

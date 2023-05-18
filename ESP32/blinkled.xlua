@@ -1,10 +1,14 @@
 --[[
-This LSP page creates a new blinking LED timer coroutine each time it runs.
+
+This Lua script creates a new blinking LED timer coroutine each time it runs.
 Click the refresh button to create a new.
 
 The timer object is free-floating since we are not referencing
 (anchoring) the object. The created timer(s) will eventually be
 collected by the Lua garbage collector.
+
+Online timer example with documentation: https://tutorial.realtimelogic.com/Lua-Coroutines.lsp
+Scroll down to Creating a Timer in Coroutine Mode
 
 Timer documentation:
 https://realtimelogic.com/ba/doc/?url=lua.html#ba_timer

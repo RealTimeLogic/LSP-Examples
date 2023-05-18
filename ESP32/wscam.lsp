@@ -11,10 +11,14 @@
 -- connected sockets. The WebSocket sendMessage() function iterates
 -- over all connected sockets, transmitting image data to each
 -- one. Note that this LSP page stores persistent data in the
--- persistent page table. For more information on the page object,
+-- persistent page table. For more information on the page table/object,
 -- refer to the following link:
 -- https://realtimelogic.com/ba/doc/?url=lua.html#CMDE
 
+-- Make sure to the test the simpler camread.lsp example prior to
+   running this example.
+
+-- Settings for Aideepen ESP32-CAM
 local cfg={
    d0=5,
    d1=18,
@@ -31,6 +35,8 @@ local cfg={
    sda=26,
    scl=27,
    pwdn=32,
+   reset=-1,
+   freq="20000000",
    frame="HD"
 }
 
@@ -55,7 +61,6 @@ if request:header"Sec-WebSocket-Key" then
             page.messages = page.messages + page.clients
             sendMessage(data)
          end
-         
          local cnt=0
          function page.sendImage()
             if not page.cam then return end
@@ -115,7 +120,7 @@ if request:header"Sec-WebSocket-Key" then
                  end
               end, "r")
    end
-   return -- Done WS
+   return -- Done with WS request
 end
 -- Else: standard HTTP GET -- i.e. load page below
 ?>
@@ -126,20 +131,23 @@ end
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Cam Images Over WebSockets</title>
   <style>
-    /* Add the following CSS */
-    #image-container {
+  body{
+      background:black;
+      color:white;
+  }
+  #image-container {
       display: flex;
       justify-content: center;
       align-items: center;
       width: 100%;
-    }
-    #image {
+  }
+  #image {
       max-width: 100%;
       height: auto;
-    }
-    h2, p {
-    text-align: center;
-    }
+  }
+  h2, p {
+      text-align: center;
+  }
   </style>
 </head>
 <body>

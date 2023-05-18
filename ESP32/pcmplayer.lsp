@@ -1,4 +1,12 @@
 <?lsp
+
+-- An example that shows how to sample a microphone or any other sound
+-- source and how to send the sampled data to the browser. We use a
+-- JavaScript PCM Player library to play the sampled data in the
+-- browser (https://github.com/samirkumardas/pcm-player). The example
+-- supports multiple browser clients by maintaining a list of
+-- connected WebSocket connections.
+
 if request:header"Sec-WebSocket-Key" then
    local s = ba.socket.req2sock(request)
    if s then
@@ -25,7 +33,7 @@ if request:header"Sec-WebSocket-Key" then
                  s:read()
                  sockets[s]=nil
                  if not next(sockets) then
-                    page.adc:close()
+                    page.adc:close()  -- Close ADC if no more clients
                     page.adc=nil
                  end
               end, "s")

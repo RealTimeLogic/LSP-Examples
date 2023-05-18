@@ -1,54 +1,15 @@
-### LSP Example Applications
+### ESP32 Examples
 
-Simply copy the content of these files into an LSP page created using
-the Web-IDE or copy the files directly to the directory for an
-application created using Xedge.
+Copy the files to an [Xedge-powered ESP32](https://realtimelogic.com/ba/ESP32/) by creating an LSP-enabled app and then uploading the files to the ESP32 by navigating to http://ip-address/rtl/apps/app-name/. Then drop the files into the Web File Manager window.
 
-### Blinking LED
-
-The LSP file blinkled.lsp includes a very simple example that shows
-how to blink an LED via the auto generated ESP-IDF Lua bindings.
-
-### Servo Control
-
-The LSP file servo.lsp shows how to control a servo by using the auto
-generated ESP-IDF Lua bindings.
-
-The LSP file uiservo.lsp extends servo.lsp and provides an HTML5 based
-real time user interface for controlling the servo.
-
-### WebSockets
-
-The following example shows how to use WebSockets via the SMQ
-protocol. The SMQ protocol is easier to use than WebSockets when
-communicating and updating several browsers in real time.
-
-**Run the example as follows:**
-
-1. Copy the example to an LSP page created with the Web-IDE. 
-2. When the example is in the Web-IDE, click the "Open" button to open
-   the page in a separate browser window.
-3. Copy the URL. The URL will be used for the ready to use SMQ
-   JavaScript client example (see below).
-4. Navigate to: https://simplemq.com/chat/
-5. Right click in the browser window and select "Save as.."
-6. Save the file in any location on your host computer.
-7. Open the saved file in an editor and search for the following line:
-       var smq = SMQ.Client(SMQ.wsURL("/smq.lsp"));
-8. Change the line to the following:
-       var smq = SMQ.Client("ws://URI");
-9. The URI is the URL copied in step 3 above without the initial http://
-10. Open the saved HTML file in a browser. The chat client now
-    connects to your embedded device.
-11. Repeat the above step using a second browser.
+New to Lua?
+Check out the online Lua tutorial: https://tutorial.realtimelogic.com/
 
 
-### Additional Tutorials
-
-We recommend using the Mako Server and the included tutorials for a
-deeper dive into using LSP. You may copy and run most of the Mako
-Server tutorials. The easiest way to copy the tutorials into the LSP
-App Manager's Web-IDE is to copy the examples directly from the online
-tutorial server:
-
-https://tutorial.realtimelogic.com/
+- [blinkled.xlua](blinkled.xlua): This file is an XLua script that controls the blinking of an LED. It's commonly used in IoT applications and microcontroller programming to test hardware and software interaction.
+- [camread.lsp](camread.lsp): This LSP (Lua Server Pages) file is a script that handles the reading of camera data. 
+- [wscam.lsp](wscam.lsp): This LSP WebSocket example streams captured images to the connected browser(s).
+- [pcmplayer.lsp](pcmplayer.lsp): This is an LSP script that playes PCM audio data in the browser.
+- [uiservo.lsp](uiservo.lsp): This LSP script controls a servo motor through a real time web user interface.
+- [bme280.xlua](bme280.xlua): XLua script for interacting with the BME280 sensor. The BME280 sensor is a digital pressure, temperature, and humidity sensor that is often used in weather station projects.
+- [WeatherStationEoN.xlua](WeatherStationEoN.xlua): A complete MQTT (Sparkplug) enabled weather station system. See the [Sparkplug tutorial](../Sparkplug/README.md) for details.
