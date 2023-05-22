@@ -108,6 +108,9 @@ local function publishMetrics()
             tMetric.double_value=temperature/10
             hMetric.double_value=humidity/10
             pMetric.double_value=pressure/100
+            -- In addition to sending via MQTT, use the email log if enabled in Xedge.
+            xedge.elog({ts=true}, "Temp=%.2f, Humidity=%.2f, Pressure=%.2f",
+                       tMetric.double_value,hMetric.double_value,pMetric.double_value)
          else
             --trace"No change"
          end
@@ -146,18 +149,18 @@ end
 -- NCMD with metrics defined in NBIRTH.
 
 local function nodeControlNextServer(metric)
-   trace("Next server command: not implemented", metric[metric.value])
+   tracep(10,"Next server command: not implemented", metric[metric.value])
 end
 
 local function nodeControlRebirth(metric)
-   trace("Node Control/Rebirth",metric[metric.value])
+   tracep(10,"Node Control/Rebirth",metric[metric.value])
    if true == metric[metric.value] then
       sp:nodebirth() -- Resend NBIRTH
    end
 end
 
 local function nodeControlReboot(metric)
-   trace("Reboot command: not implemented", metric[metric.value])
+   tracep(10,"Reboot command: not implemented", metric[metric.value])
 end
 
 -- The 3 above functions and their metric names as "key"
@@ -186,13 +189,13 @@ end
 -- MQTT/Sparkplug callback for 'NCMD' and 'STATE' commands
 -- Called when a Primary Application sends a command
 local function ondata(cmd,data,topic)
-   trace(cmd,data,topic)
+   tracep(11,cmd,data,topic)
    if "NCMD" == cmd then
       ncmd(data)
    elseif "STATE" == cmd then
       -- The Primary Application state
       -- data is the string 'ONLINE' or 'OFFLINE'.
-      trace("Sparkplug STATE",topic,data)
+      tracep(10,"Sparkplug STATE",topic,data)
    else
       error"Unknown command"
    end

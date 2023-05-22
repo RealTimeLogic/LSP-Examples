@@ -9,7 +9,7 @@ cd File-Server
 mako -l::www
 ```
 
-See the [Mako Server command line video tutorial](https://youtu.be/vwQ52ZC5RRg) for more information on how to start the Mako Server.
+For detailed instructions on starting the Mako Server, check out our [command line video tutorial](https://youtu.be/vwQ52ZC5RRg) and review the server's [command line options](https://realtimelogic.com/ba/doc/?url=Mako.html#loadapp) in our documentation.
 
 After starting the Mako Server, use a browser and navigate to
 http://localhost:portno/fs/, where portno is the HTTP port number used by

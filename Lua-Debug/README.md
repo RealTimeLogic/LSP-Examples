@@ -19,11 +19,7 @@ cd Lua-Debug
 mako -l::www
 ```
 
-See the
-[Mako Server command line video tutorial](https://youtu.be/vwQ52ZC5RRg)
-for more information on how to start the Mako Server. See the
-[Getting Started with the Mako Server](https://makoserver.net/documentation/getting-started/)
-command line guide for additional instructions.
+For detailed instructions on starting the Mako Server, check out our [command line video tutorial](https://youtu.be/vwQ52ZC5RRg) and review the server's [command line options](https://realtimelogic.com/ba/doc/?url=Mako.html#loadapp) in our documentation.
 
 ### Initial Test Instructions
 
