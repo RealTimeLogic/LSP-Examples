@@ -1,5 +1,5 @@
 
-local mqttServer = "localhost"
+local mqttServer = "broker.hivemq.com"
 
 local schema -- The complete Sparkplug schema (forward declaration)
 local mqtt,serpent,pb-- forward declarations

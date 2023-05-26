@@ -1,5 +1,5 @@
 -- The Sparkplug settings for this example.
-local mqttServer = "localhost"
+local mqttServer = "broker.hivemq.com"
 local groupId = "Sparkplug B Devices"
 local nodeName = "Lua Edge Node 1"
 
@@ -69,7 +69,7 @@ local function publishMetrics()
    while true do
       local pl = SP.payload()
       metricData.metric2 = metricData.metric3 % 2 == 0 and true or false
-      trace(string.format("Sending NDATA: metric2=%q, metric3=%d",
+      tracep(9,string.format("Sending NDATA: metric2=%q, metric3=%d",
                           metricData.metric2,metricData.metric3))
       pl:metric("Node Metric2", DataTypes.Boolean, metricData.metric2)
       pl:metric("Node Metric3",DataTypes.UInt64,metricData.metric3)
@@ -90,7 +90,7 @@ local function onstatus(type,code,status)
       metricsTimer=ba.timer(publishMetrics)
       metricsTimer:set(2000) -- Every two seconds
    else -- Failed connecting or a broker disconnect
-      trace(type,code,status)
+      tracep(9,type,code,status)
       if metricsTimer then
          metricsTimer:cancel() -- Stop sending data
          metricsTimer=nil
@@ -104,38 +104,38 @@ end
 -- metric[metric.value]
 
 local function nodeControlNextServer(metric)
-   trace("Next server command: not implemented", metric[metric.value])
+   tracep(9,"Next server command: not implemented", metric[metric.value])
 end
 
 local function nodeControlRebirth(metric)
-   trace("Node Control/Rebirth",metric[metric.value])
+   tracep(9,"Node Control/Rebirth",metric[metric.value])
    if true == metric[metric.value] then
       sp:nodebirth() -- Resend NBIRTH
    end
 end
 
 local function nodeControlReboot(metric)
-   trace("Reboot command: not implemented", metric[metric.value])
+   tracep(9,"Reboot command: not implemented", metric[metric.value])
 end
 
 local function nodeMetric1(metric)
    metricData.metric1=metric[metric.value]
-   trace("Node Metric1", metricData.metric1)
+   tracep(9,"Node Metric1", metricData.metric1)
 end
 
 local function nodeMetric2(metric)
    metricData.metric2=metric[metric.value]
-   trace("Node Metric2", metricData.metric2)
+   tracep(9,"Node Metric2", metricData.metric2)
 end
 
 local function nodeMetric3(metric)
    metricData.metric3=metric[metric.value]
-   trace("Node Metric3", metricData.metric3)
+   tracep(9,"Node Metric3", metricData.metric3)
 end
 
 local function nodeMetric4(metric)
    metricData.metric4=metric[metric.value]
-   trace("Node Metric4", metricData.metric4)
+   tracep(9,"Node Metric4", metricData.metric4)
 end
 
 -- All above functions and their metric names as "key"
@@ -159,7 +159,7 @@ local function ncmd(payload)
       if func then
          func(metric)
       else
-         trace("Received NCMD with unknown metric",metric.name)
+         tracep(9,"Received NCMD with unknown metric",metric.name)
       end
    end
 end
@@ -167,13 +167,13 @@ end
 
 -- MQTT/Sparkplug callback for 'NCMD' and 'STATE' commands
 local function ondata(cmd,data,topic)
-   trace(cmd,data,topic)
+   tracep(9,cmd,data,topic)
    if "NCMD" == cmd then
       ncmd(data)
    elseif "STATE" == cmd then
       -- The Primary Application state
       -- data is the string 'ONLINE' or 'OFFLINE'.
-      trace("Sparkplug STATE",topic,data)
+      tracep(9,"Sparkplug STATE",topic,data)
    else
       error"Unknown command"
    end
@@ -184,7 +184,7 @@ end
 -- https://realtimelogic.com/ba/doc/?url=MQTT.html#create
 -- and the 'options' argument.
 local op={
-   clientidentifier="Lua Sparkplug Client", -- Must be unique
+   --clientidentifier="Lua Sparkplug Client", -- Must be unique
    -- username="Sparkplug",
    -- password="123456",
    keepalive=3*60, -- PING every 3'rd minute

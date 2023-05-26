@@ -197,7 +197,7 @@ For detailed instructions on starting the Mako Server, check out our [command li
 
 See the [Mako Server command line video tutorial](https://youtu.be/vwQ52ZC5RRg) and the server's command line options documentation for more information on how to start the Mako Server.
 
-The example will attempt to connect to an MQTT broker at `localhost`. You can edit the example file EoN/.preload and change the URL to a public test broker, but we recommend that you use a local broker such as [Mosquitto](http://www.steves-internet-guide.com/install-mosquitto-linux/) or sign up for a free trial broker such as [HiveMQ Cloud](https://www.hivemq.com/mqtt-cloud-broker/). You also need a Sparkplug Primary Application; however, explaining this is beyond the scope of this tutorial. As a first step, connect the [MQTT Sparkplug sniffer](#the-sparkplug-sniffer) to the same broker.
+The example will attempt to connect to an MQTT broker at `broker.hivemq.com`. You can edit the example file EoN/.preload and change the URL to any public test broker, but we recommend that you use a local broker such as [Mosquitto](http://www.steves-internet-guide.com/install-mosquitto-linux/). You also need a Sparkplug Primary Application; however, explaining this is beyond the scope of this tutorial. As a first step, connect the [MQTT Sparkplug sniffer](#the-sparkplug-sniffer) to the same broker.
 
 #### The Sparkplug Sniffer
 
