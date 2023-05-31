@@ -16,7 +16,7 @@
 -- https://realtimelogic.com/ba/doc/?url=lua.html#CMDE
 
 -- Make sure to the test the simpler camread.lsp example prior to
-   running this example.
+-- running this example.
 
 -- Settings for Aideepen ESP32-CAM
 local cfg={
