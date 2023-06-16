@@ -1,0 +1,44 @@
+
+-- This code includes the 'app' public function verifyDomain(), which
+-- returns true if the referrer header includes a domain name list as
+-- the 'key' in table trustedDomains. The function is used by the form
+-- validation in myapp/index.lsp. You may hard code the values in
+-- trustedDomains, set the values by user configuration, or you may
+-- include the auto trust validation code implemented by the main
+-- index.lsp page and the two functions getCSRFToken() and
+-- addNewTrustedDomain(). See index.lsp for the browser handshaking.
+
+-- secret key used by ba.aesencode and ba.aesdecode below.
+local secret = ba.aeskey(32)
+
+local trustedDomains={} -- Populated by addNewTrustedDomain
+
+-- Used only by main index.lsp
+function getCSRFToken()
+   return ba.aesencode(secret, ba.json.encode{time=ba.datetime"NOW":tostring()})
+end
+
+-- cmd must be the request/response obj.
+function addNewTrustedDomain(cmd)
+   local h = cmd:header()
+   local domain = h["X-Domain"]
+   local t=ba.json.decode(ba.aesdecode(secret,h["X-Token"] or "") or "")
+   if domain and t then
+      local now=ba.datetime"NOW"
+      local time=ba.datetime(t.time)
+      -- if no more than one second elapsed; (now - time) is in nano secs.
+      if now >= time and (now - time) <= 1000000000 then
+         trace("Adding trusted domain ",domain)
+         trustedDomains[domain]=true
+      end
+   end
+end
+
+-- Check if the 'referer' header includes a trusted domain name. This
+-- code is safe and does not include the weaknesses discussed at the
+-- following page:
+-- https://portswigger.net/web-security/csrf/bypassing-referer-based-defenses
+function verifyDomain(cmd)
+   local domain = string.match(cmd:header"referer" or "", "^https?://([^/]+)")
+   return trustedDomains[domain] or false
+end
