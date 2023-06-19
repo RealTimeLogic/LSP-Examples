@@ -1,6 +1,6 @@
 
 -- This code includes the 'app' public function verifyDomain(), which
--- returns true if the referrer header includes a domain name list as
+-- returns true if the referrer header includes a domain name listed as
 -- the 'key' in table trustedDomains. The function is used by the form
 -- validation in myapp/index.lsp. You may hard code the values in
 -- trustedDomains, set the values by user configuration, or you may
