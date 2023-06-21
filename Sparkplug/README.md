@@ -8,6 +8,7 @@ The Sparkplug specification is a set of guidelines for standardizing MQTT pub/su
 - [Lua Sparkplug Introduction](#lua-sparkplug-introduction)
 - [The Sparkplug Lua API](#the-sparkplug-lua-api)
 - [Running the Provided Example "as is" using the Mako Server](#running-the-provided-example-as-is-using-the-mako-server)
+- [The Sparkplug Explorer](#the-sparkplug-explorer)
 - [RTOS Example: Ready to Run ESP32 Firmware](#rtos-example-ready-to-run-esp32-firmware)
   - [ESP32 Sparkplug Enabled Weather Station](#ready-to-run-sparkplug-enabled-weather-station-example)
 
@@ -197,15 +198,15 @@ For detailed instructions on starting the Mako Server, check out our [command li
 
 See the [Mako Server command line video tutorial](https://youtu.be/vwQ52ZC5RRg) and the server's command line options documentation for more information on how to start the Mako Server.
 
-The example will attempt to connect to an MQTT broker at `broker.hivemq.com`. You can edit the example file EoN/.preload and change the URL to any public test broker, but we recommend that you use a local broker such as [Mosquitto](http://www.steves-internet-guide.com/install-mosquitto-linux/). You also need a Sparkplug Primary Application; however, explaining this is beyond the scope of this tutorial. As a first step, connect the [MQTT Sparkplug sniffer](#the-sparkplug-sniffer) to the same broker.
+The example will attempt to connect to an MQTT broker at `broker.hivemq.com`. You can edit the example file EoN/.preload and change the URL to any public test broker, but we recommend that you use a local broker such as [Mosquitto](http://www.steves-internet-guide.com/install-mosquitto-linux/). You also need a Sparkplug Primary Application; however, explaining this is beyond the scope of this tutorial. As a first step, connect the [MQTT Sparkplug explorer](#the-sparkplug-explorer) to the same broker.
 
-#### The Sparkplug Sniffer
+## The Sparkplug Explorer
 
-The Sparkplug Sniffer is a simple example that listens for Sparkplug messages and prints all messages received to the console. Run the Sparkplug Sniffer as follows (run another Mako Server instance).
+The [Sparkplug Explorer](https://www.linkedin.com/posts/real-time-logic-llc_download-our-complimentary-sparkplug-explorer-activity-7077253326362329088-V0dl) is a simple example that listens for Sparkplug messages and prints all messages received to the console. Run the Sparkplug Explorer as follows (run another Mako Server instance).
 
 ``` console
 cd Sparkplug
-mako -l::SparkplugSniffer
+mako -l::SparkplugExplorer
 ```
 
 
