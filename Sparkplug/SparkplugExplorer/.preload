@@ -1,11 +1,17 @@
 
+-- A simple MQTT Sparkplug Explorer
+
+-- The broker. The public HiveMQ broker typically has many connected Sparkplug clients
 local mqttServer = "broker.hivemq.com"
 
-local mqtt,serpent,pb-- forward declarations
+local mqtt,serpent,pb -- forward declarations, see runExplorer()
 local fmt=string.format
 
+-- MQTT connect/disconnect callback
 local function onstatus(type,code,status)
+   -- If a successful MQTT connect
    if "mqtt" == type and "connect" == code and 0 == status.reasoncode then
+      -- Subscribe to the Sparkplug wildcard topic 'spBv1.0/#'
       mqtt:subscribe"spBv1.0/#"
       tracep(false,0,"MQTT connection established; Waiting for messages")
       return true -- Accept connection
@@ -14,32 +20,52 @@ local function onstatus(type,code,status)
    return 0 -- reconnect with zero timeout
 end
 
+-- MQTT on publish callback
 local function onpublish(topic,payload,prop)
    tracep(false,0,fmt("Sparkplug topic: %s",topic))
-   if not pcall(function() tracep(false,0,serpent.block(pb.decode(".org.eclipse.tahu.protobuf.Payload", payload),{comment=false}),"\n") end) then
+   if not pcall(function() -- Protected call
+      -- Attempt to decode the payload of the received MQTT message using
+      -- the protobuf (pb) library and the SparkPlug protocol buffer
+      -- definition (".org.eclipse.tahu.protobuf.Payload"). The payload is
+      -- then pretty printed using the Serpent library.
+      -- See function runExplorer() below for how the modules are loaded.
+      tracep(false,0,serpent.block(pb.decode(".org.eclipse.tahu.protobuf.Payload", payload),{comment=false}),"\n") end)
+   then
       trace"Decoding failed"
    end
 end
 
 
+-- Load the complete Sparkplug protobuf schema from the ZIP file mako.zip
 local function loadSchema()
+   -- Open the file mako.zip:.lua/sparkplug_b.proto
    local fp <close> = ba.openio"vm":open".lua/sparkplug_b.proto"
    assert(fp, "\nsparkplug_b.proto not found")
-   return fp:read"*a"
+   return fp:read"*a" -- Return schema
 end
 
-
+-- The runExplorer function is the core of the script that sets up and
+-- starts the Sparkplug Explorer.
 local function runExplorer()
    local ok
+   -- load the protobuf (pb) C module, which is used for encoding and
+   -- decoding protocol buffers.
    ok,pb = pcall(require,"pb")
    assert(ok, "\nThe lua protobuf C module is not included in the server")
+   -- Load the 'protoc' Lua module, which is used for parsing the protobuf
+   -- schema. If the module is not found, an error message is printed.
    local ok,protoc = pcall(require,"protoc")
    assert(ok, "\nThe Lua module 'protoc' is not included in the server's resource file")
    assert(protoc:load(loadSchema()), "Cannot parse schema")
+   -- Load the Serpent Lua module, a Lua serializer and pretty
+   -- printer. It is used for pretty printing Lua tables in
+   -- onpublish() above.
+   -- Docs: https://github.com/pkulchenko/serpent
    serpent=require"serpent"
    tracep(false,0,fmt("\nConnecting to broker %s",mqttServer))
+   -- Load and create instance: https://realtimelogic.com/ba/doc/?url=MQTT.html
    mqtt=require("mqttc").create(mqttServer,onstatus,onpublish,{recbta=false})
    tracep(false,0,"Sparkplug Explorer started")
 end
 
-ba.thread.run(runExplorer)
+ba.thread.run(runExplorer) -- Run after Mako completes the startup process
