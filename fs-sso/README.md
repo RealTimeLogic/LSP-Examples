@@ -21,6 +21,8 @@ openid={
 
 For testing on 'localhost', use the redirect_uri as shown above.
 
+**See also the [Xedge documentation](https://realtimelogic.com/ba/doc/?url=Xedge.html), which includes an easy-to-use web interface for enabling Active Directory Single Sign-On.**
+
 ## Azure Instructions
 
 1. Open the [Azure portal](https://portal.azure.com/) and click on the **Azure Active Directory** icon.
