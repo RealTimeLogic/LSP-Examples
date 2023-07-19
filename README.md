@@ -4,7 +4,7 @@
 * [Basic HTML form](html-form) - The tutorial: HTML Forms and LSP for Beginners
 * [Authentication: General](authentication) - Introduction to the Barracuda App Server's authentication mechanism
 * [Authentication: OAuth 2.0](oauth) - Shows how to access Github using OAuth 2.0
-* [Authentication: Single Sign On](fs-sso) - Authenticating using [OpenID Connect](https://openid.net/connect/) and [Microsoft Azure AD](https://portal.azure.com/)
+* [Authentication: Single Sign On](fs-sso) - Mitigating Security Vulnerabilities of Pre-Installed Passwords with Single Sign-On Solutions for Enhanced System Integrity
 * [AJAX: For Beginners](AJAX)
 * [AJAX: Over WebSockets](AJAX-Over-WebSockets)
 * [Create an Awesome Interactive Dashboard App using AdminLTE](Dashboard)
