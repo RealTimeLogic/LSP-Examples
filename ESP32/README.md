@@ -1,6 +1,6 @@
 ### ESP32 Examples
 
-Copy the files to an [Xedge-powered ESP32](https://realtimelogic.com/ba/ESP32/) by creating an LSP-enabled app and then uploading the files to the ESP32 by navigating to http://ip-address/rtl/apps/app-name/. Then drop the files into the Web File Manager window.
+Copy the files to an [Xedge-powered ESP32](https://realtimelogic.com/ba/ESP32/) by creating an LSP-enabled app and then uploading the files to the ESP32 by navigating to http://ip-address/rtl/apps/app-name/. Then drop the files into the Web File Manager window. Do not upload xlua files you do not intend to run since xlua files automatically run when the application starts. LSP files, on the other hand, only run when accessed by a browser or any other HTTP client. See the [Xedge documentation](https://realtimelogic.com/ba/doc/?url=Xedge.html) for details.
 
 New to Lua?
 Check out the online Lua tutorial: https://tutorial.realtimelogic.com/
