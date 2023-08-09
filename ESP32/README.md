@@ -1,10 +1,22 @@
 ### ESP32 Examples
 
-Copy the files to an [Xedge-powered ESP32](https://realtimelogic.com/ba/ESP32/) by creating an LSP-enabled app and then uploading the files to the ESP32 by navigating to http://ip-address/rtl/apps/app-name/. Then drop the files into the Web File Manager window. Do not upload xlua files you do not intend to run since xlua files automatically run when the application starts. LSP files, on the other hand, only run when accessed by a browser or any other HTTP client. See the [Xedge documentation](https://realtimelogic.com/ba/doc/?url=Xedge.html) for details.
+The Barracuda App Server, running on the ESP32 microcontroller, is packaged as a ready-to-use Integrated Development Environment (IDE) known as Xedge32.
+
+![Xedge32 is built upon the Barracuda App Server C Code Library](https://realtimelogic.com/images/bas-esp32.png)
+
+**Documentation:**
+
+- [What is Xedge32?](https://realtimelogic.com/downloads/bas/ESP32/)
+- [Xedge Intro Video](https://youtu.be/1w_NDxzESo8)
+- [Xedge Reference Manual](https://realtimelogic.com/ba/doc/?url=Xedge.html)
+- [Xedge32 Reference Manual](https://realtimelogic.com/ba/ESP32/)
 
 New to Lua?
 Check out the online Lua tutorial: https://tutorial.realtimelogic.com/
 
+**Examples:**
+
+Copy the files to an [Xedge-powered ESP32](https://realtimelogic.com/downloads/bas/ESP32/) by creating an LSP-enabled app and then uploading the files to the ESP32 by navigating to http://ip-address/rtl/apps/app-name/. Then drop the files into the Web File Manager window. Do not upload xlua files you do not intend to run since xlua files automatically run when the application starts. LSP files, on the other hand, only run when accessed by a browser or any other HTTP client. See the [Xedge documentation](https://realtimelogic.com/ba/doc/?url=Xedge.html) for details.
 
 - [blinkled.xlua](blinkled.xlua): An [XLua script](https://realtimelogic.com/ba/doc/?url=Xedge.html#apps), `blinkled.xlua` controls LED blinking. It's frequently used in IoT applications and microcontroller programming for testing hardware and software interaction.
 - [camread.lsp](camread.lsp): This LSP (Lua Server Pages) file returns and displays a new camera image in the browser each time the browser window is refreshed.

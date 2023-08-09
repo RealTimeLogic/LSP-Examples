@@ -1,5 +1,6 @@
 # LSP-Examples
- [Lua and LSP](https://realtimelogic.com/products/lua-server-pages/) examples, including IoT/Cloud connectivity.
+ [Lua and LSP](https://realtimelogic.com/products/lua-server-pages/) examples, including IoT/Cloud connectivity. New to Lua? Check out the [online Lua tutorial](https://tutorial.realtimelogic.com/).
+
 
 * [Basic HTML form](html-form) - The tutorial: HTML Forms and LSP for Beginners
 * [Authentication: General](authentication) - Introduction to the Barracuda App Server's authentication mechanism
@@ -15,7 +16,7 @@
 * [IoT: MQTT and AWS](AWS-MQTT) - How to Connect to AWS IoT Core using MQTT & ALPN
 * [IoT: MQTT Sparkplug](Sparkplug) - How to use the MQTT Sparkplug library
 * [IoT: MQTT Google Cloud](Cloud-IoT-Core) - Connecting to the Google MQTT Bridge
-* [ESP32 Microcontroller Examples](ESP32) - Examples designed for [Xedge32](https://realtimelogic.com/ba/ESP32/)
+* [ESP32 Microcontroller Examples](ESP32) - Examples designed for [Xedge32](https://realtimelogic.com/downloads/bas/ESP32/)
 * [SQL: SQLite Examples](SQLite) - Database examples
 * [SQL: PostgreSQL Example](PostgreSQL) - Database example
 * [File Upload, including drag and drop](upload) - HTML based file upload
