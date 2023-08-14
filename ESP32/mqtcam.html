@@ -1,0 +1,84 @@
+<!--
+This HTML file is designed to be dropped into a browser window. You do
+not need to host this file on a web server.
+
+The JavaScript code below connects to 'broker' and subscribes to
+'topic'. The JavaScript code then waits for messages received on this
+topic. These messages must be binary JPEG images.
+ 
+See the following for more information on the JavaScript MQTT client used in this code:
+https://github.com/mqttjs/MQTT.js
+
+Make sure to change the topic name in this file and in mqttcam.xlua.
+-->
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cam Images Over MQTT</title>
+  <style>
+  body{
+      background:black;
+      color:white;
+  }
+  #image-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+  }
+  #image {
+      max-width: 100%;
+      height: auto;
+  }
+  h2, p {
+      text-align: center;
+  }
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mqtt/5.0.0-beta.3/mqtt.min.js"></script>
+<script>
+
+//The following two settings must correspond with settings in mqtcam.xlua
+const topic="/xedge32/espcam/USA/92629";
+const broker="broker.hivemq.com";
+
+
+window.addEventListener("load", (event) => {
+    let img = document.getElementById("image");
+    let msg = document.getElementById("msg");
+    let frameCounter=0;
+
+    const options = {
+        clean: true,
+        connectTimeout: 4000,
+        port: 8000
+    };
+    const client = mqtt.connect("mqtt://"+broker+"/mqtt",options);
+
+    client.on('connect', function () {
+        msg.textContent="Connected; Waiting for images...";
+        client.subscribe(topic);
+    });
+    
+    client.on("message", (topic, message) => {
+        const blob = new Blob([message], { type: 'image/jpeg' });
+        img.src = URL.createObjectURL(blob);
+        frameCounter++;
+        msg.textContent = `Frames: ${frameCounter}`;
+    });
+});
+
+
+</script>
+</head>
+<body>
+    <h2>Cam Images Over MQTT</h2>
+   <div id="image-container">
+    <img id="image"/>
+  </div>
+    <p id="msg">Connecting...</p>
+</body>
+</html>

@@ -1,0 +1,61 @@
+-- The following code creates a CAM object and publishes images to the
+-- 'broker'. You must at a minimum change the 'topic' and the CAM
+-- settings in 'cfg' to the settings required by your CAM board.
+
+-- The following two settings must correspond with settings in mqtcam.html
+-- Change the topic to your address
+local topic = "/xedge32/espcam/USA/92629"
+-- We use the public HiveMQ broker
+local broker = "broker.hivemq.com"
+
+-- Settings for 'FREENOVE ESP32-S3 WROOM' CAM board
+-- Details: https://realtimelogic.com/ba/ESP32/source/cam.html
+local cfg={
+   d0=11, d1=9, d2=8, d3=10, d4=12, d5=18, d6=17, d7=16,
+   xclk=15, pclk=13, vsync=6, href=7, sda=4, scl=5, pwdn=-1,
+   reset=-1, freq="20000000", frame="HD"
+}
+
+-- Open the cam
+local cam,err=esp32.cam(cfg)
+assert(cam, err) -- Throws error if 'cfg' incorrect
+
+local timer -- Timer object; set below.
+
+-- MQTT connect/disconnect callback
+local function onstatus(type,code,status)
+   -- If connecting to broker succeeded
+   if "mqtt" == type and "connect" == code and 0 == status.reasoncode then
+      timer:set(100,false,true) -- Activate timer every 100 milliseconds
+      trace"Connected"
+      return true -- Accept connection
+   end
+   timer:cancel()
+   trace("Disconnect or connect failed",type,code)
+   return true -- Keep trying
+end
+
+-- Create MQTT client
+local mqtt=require("mqttc").create(broker,onstatus)
+
+-- Timer function activated every 100 millisecond
+function publishImage()
+   -- Flow control: If less than 2 queued MQTT messages
+   if mqtt:status() < 2 then
+      -- Delegating to a thread is not required but makes the app smoother
+      -- Ref: https://realtimelogic.com/ba/doc/?url=auxlua.html#thread_lib
+      ba.thread.run(function()
+         local image=cam:read()
+         mqtt:publish(topic,image)
+      end)
+   end
+   return true -- Interval timer
+end
+timer = ba.timer(publishImage)
+
+-- Run by Xedge32 when terminating this xlua script.
+function onunload()
+   timer:cancel()
+   mqtt:close()
+   cam:close()
+end
