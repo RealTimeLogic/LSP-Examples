@@ -26,7 +26,7 @@ local timer -- Timer object; set below.
 local function onstatus(type,code,status)
    -- If connecting to broker succeeded
    if "mqtt" == type and "connect" == code and 0 == status.reasoncode then
-      timer:set(100,false,true) -- Activate timer every 100 milliseconds
+      timer:set(500,false,true) -- Activate timer every 500 milliseconds
       trace"Connected"
       return true -- Accept connection
    end
@@ -38,7 +38,7 @@ end
 -- Create MQTT client
 local mqtt=require("mqttc").create(broker,onstatus)
 
--- Timer function activated every 100 millisecond
+-- Timer function activated every 500 millisecond
 function publishImage()
    -- Flow control: If less than 2 queued MQTT messages
    if mqtt:status() < 2 then
