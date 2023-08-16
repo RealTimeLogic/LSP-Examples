@@ -26,7 +26,7 @@ local timer -- Timer object; set below.
 local function onstatus(type,code,status)
    -- If connecting to broker succeeded
    if "mqtt" == type and "connect" == code and 0 == status.reasoncode then
-      timer:set(500,false,true) -- Activate timer every 500 milliseconds
+      timer:set(300,false,true) -- Activate timer every 300 milliseconds
       trace"Connected"
       return true -- Accept connection
    end
@@ -38,18 +38,24 @@ end
 -- Create MQTT client
 local mqtt=require("mqttc").create(broker,onstatus)
 
--- Timer function activated every 500 millisecond
+-- Timer coroutine function activated every 300 millisecond
 function publishImage()
-   -- Flow control: If less than 2 queued MQTT messages
-   if mqtt:status() < 2 then
-      -- Delegating to a thread is not required but makes the app smoother
-      -- Ref: https://realtimelogic.com/ba/doc/?url=auxlua.html#thread_lib
-      ba.thread.run(function()
-         local image=cam:read()
-         mqtt:publish(topic,image)
-      end)
+   local busy=false
+   while true do
+      --trace(mqtt:status(), busy)
+      -- Flow control: If less than 2 queued MQTT messages
+      if mqtt:status() < 2 and not busy then
+         busy=true
+         -- Delegating to a thread is not required but makes the app smoother
+         -- Ref: https://realtimelogic.com/ba/doc/?url=auxlua.html#thread_lib
+         ba.thread.run(function()
+            local image=cam:read()
+            mqtt:publish(topic,image)
+            busy=false
+         end)
+      end
+      coroutine.yield(true) -- sleep
    end
-   return true -- Interval timer
 end
 timer = ba.timer(publishImage)
 
