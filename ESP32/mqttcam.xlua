@@ -2,6 +2,12 @@
 -- 'broker'. You must at a minimum change the 'topic' and the CAM
 -- settings in 'cfg' to the settings required by your CAM board.
 
+-- WARNING:
+-- Make sure to test the CAM cfg settings in camtest.lsp prior to running this program.
+
+-- Tutorial:
+-- https://realtimelogic.com/articles/Streaming-ESP32CAM-Images-to-Multiple-Browsers-via-MQTT
+
 -- The following two settings must correspond with settings in mqtcam.html
 -- Change the topic to your address
 local topic = "/xedge32/espcam/USA/92629"
@@ -49,8 +55,12 @@ function publishImage()
          -- Delegating to a thread is not required but makes the app smoother
          -- Ref: https://realtimelogic.com/ba/doc/?url=auxlua.html#thread_lib
          ba.thread.run(function()
-            local image=cam:read()
-            mqtt:publish(topic,image)
+            local image,err=cam:read()
+            if image then
+               mqtt:publish(topic,image)
+            else
+               trace("cam:read()",err)
+            end
             busy=false
          end)
       end

@@ -85,29 +85,35 @@ local hMetric=nbirth:metric("Humidity", DataTypes.Double, humidity)
 local pMetric=nbirth:metric("Pressure",DataTypes.Double, pressure/100)
 ------- End NBIRTH
 
-
 -- Timer function sending the sensor metrics defined in NBIRTH.
 local function publishMetrics()
    local toint=math.tointeger
    local temperature,humidity,pressure = 1,1,1
    while true do -- forever, but thread stops when timer is stopped
-      local t, h, p = bme:read()
+      local t, h, p = bme:read() -- Read values from sensor
       if t then
          -- Convert to integer and multiply by 10 to keep one fraction.
          t, h, p = toint(t*10), toint(h*10), toint(p)
          -- Only publish if there is a reasonable amount of change.
          -- Divide // in Lua yields integer
-         if temperature//4 ~= t//4 or humidity//50 ~= h//50 or pressure//100 ~= p//100 then
-            temperature, humidity, pressure = t, h, p
+         local tc, hc, pc = temperature//4 ~= t//4, humidity//50, h//50, pressure//100 ~= p//100 
+         if tc or hc or pc then -- if [t or h or p]changed
+            temperature, humidity, pressure = t, h, p -- Update to new values
             local pl = SP.payload()
-            pl:metric("Temperature", DataTypes.Double, temperature/10)
-            pl:metric("Humidity", DataTypes.Double, humidity/10)
-            pl:metric("Pressure",DataTypes.Double, pressure/100)
+            if tc then
+               pl:metric("Temperature", DataTypes.Double, temperature/10)
+               -- Update nbirth message and make NCMD responses use the latest values
+               tMetric.double_value=temperature/10
+            end
+            if hc then
+               pl:metric("Humidity", DataTypes.Double, humidity/10)
+               hMetric.double_value=humidity/10
+            end
+            if pc then
+               pl:metric("Pressure",DataTypes.Double, pressure/100)
+               pMetric.double_value=pressure/100
+            end
             sp:ndata(pl) -- publish
-            -- Update nbirth message and make NCMD responses use the latest values
-            tMetric.double_value=temperature/10
-            hMetric.double_value=humidity/10
-            pMetric.double_value=pressure/100
             -- In addition to sending via MQTT, use the email log if enabled in Xedge.
             xedge.elog({ts=true}, "Temp=%.1f, Humidity=%.1f, Pressure=%.1f",
                        tMetric.double_value,hMetric.double_value,pMetric.double_value)

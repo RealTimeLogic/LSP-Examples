@@ -1,37 +1,28 @@
 <?lsp
 
--- A simple example that lets you test the CAM API. The example opens
--- a cam object and saves the cam object in the persistent page
--- table. The result is sent as an image to the browser. Refreshing
--- the page returns a new captured image.  You can terminate the cam
--- object by accesing the url camread.lsp?close=.
-
+-- A simple example that lets you test the CAM API. The result is sent
+-- as an image to the browser. Refreshing the page returns a new
+-- captured image.
 -- See also wscam.lsp
 
-if page.cam then
-   if request:data"close" then
-      page.cam:close()
-      page.cam=nil
-      response:senderror(200,"Cam closed!")
-      return
-   end
-else -- Create
-   -- Settings for Aideepen ESP32-CAM
-   local cfg={
-      d0=5, d1=18, d2=19, d3=21, d4=36, d5=39, d6=34, d7=35,
-      xclk=0, pclk=22, vsync=25, href=23, sda=26, scl=27, pwdn=32,
-      reset=-1, freq="20000000", frame="HD"
-   }
-   local err
-   page.cam,err=esp32.cam(cfg)
-   if not page.cam then
-      response:senderror(503,err)
-      return
-   end
+-- Settings for 'FREENOVE ESP32-S3 WROOM' CAM board
+-- Details: https://realtimelogic.com/ba/ESP32/source/cam.html
+local cfg={
+   d0=11, d1=9, d2=8, d3=10, d4=12, d5=18, d6=17, d7=16,
+   xclk=15, pclk=13, vsync=6, href=7, sda=4, scl=5, pwdn=-1,
+   reset=-1, freq="20000000", frame="HD"
+}
+
+local cam,err=esp32.cam(cfg)
+if not cam then
+   response:senderror(503,err)
+   return
 end
-local image=page.cam:read()
+local image=cam:read()
 response:reset()
 response:setcontentlength(#image)
 response:setcontenttype"image/jpeg"
 response:send(image)
+cam:close()
+
 ?>
