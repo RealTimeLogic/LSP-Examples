@@ -14,6 +14,8 @@ Please refer to this tutorial for the details.
 6. Open www/.preload in an editor; Set the broker name in the empty string: awsBroker = ""
 7. Run the example
 
+This example is compatible with the [Mako Server](https://makoserver.net/) and [Xedge32](https://realtimelogic.com/downloads/bas/ESP32/). See the tutorial [How to connect ESP32 to AWS IoT Core Using MQTT](https://realtimelogic.com/articles/How-to-connect-ESP32-to-AWS-IoT-Core-Using-MQTT) if you are using an ESP32.
+
 Run the example, using the Mako Server, as follows:
 
 ``` shell

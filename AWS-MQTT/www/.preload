@@ -4,72 +4,104 @@
 local awsBroker = ""
 local certName = "Demo_Thing.cert.pem"
 local keyName = "Demo_Thing.private.key"
-
+local amazonRootCA = "AmazonRootCA1.pem"
 local fmt=string.format
 
--- Enable code line below to debug code
--- Details: https://makoserver.net/articles/Lua-and-LSP-Debugging
---require"ldbgmon".connect{client=false}
+local timer -- Set by onstatus()
+local mqtt -- Set by startMQTT()
+local serpent=require"serpent" -- Docs: https://github.com/pkulchenko/serpent
 
--- https://realtimelogic.com/ba/doc/?url=auxlua.html#ba_create_certstore
-local certstore = ba.create.certstore()
--- Certifcate store with one cert:
-if certstore:addcert(io,"AmazonRootCA1.pem") then
-   -- https://realtimelogic.com/ba/doc/?url=auxlua.html#ba_create_sharkssl
-   local shark = ba.create.sharkssl(certstore)
-   -- https://realtimelogic.com/ba/doc/?url=auxlua.html#ba_create_sharkcert
-   local sharkcert = ba.create.sharkcert(io, certName, keyName)
-   -- Add our certificate so AWS can authenticate the 'basicPubSub' client
-   if sharkcert and shark:addcert(sharkcert) then
-      local timer, mqtt
-      -- MQTT connection status callback
-      local function onstatus(type,code,status)
-         trace("Server properties:", status and ba.json.encode(status) or 'nil')
-         if "mqtt" == type and "connect" == code and 0 == status.reasoncode then
-            trace"Successful new connection"
-            mqtt:subscribe("topic_1")
-            mqtt:subscribe("topic_2")
-            -- Publish messages to "topic_1" every second.
-            timer=ba.timer(function()
-               local seq=1
-               while true do
-                  mqtt:publish("topic_1",ba.json.encode{message="Hello World",sequence=seq})
-                  coroutine.yield(true)
-                  seq=seq+1
-               end
-            end)
-            timer:set(1000)
-            return true -- Accept connection
-         end
-         trace("Disconnect or connect failed",type,code)
-         if timer then
-            timer:cancel()
-            timer=nil
-         end
-         return true -- retry
-      end
-      -- MQTT PUBLISH callback (when we receive messages)
-      local function onpublish(topic,payload,prop)
-         trace("Received:",topic,payload)
-      end
-      local options = { -- ALPN and other required connection options
-         shark = shark,
-         port = 443,
-         alpn = "x-amzn-mqtt-ca",
-         clientidentifier = "basicPubSub",
-         secure=shark -- The shark object created above with AmazonRootCA1 store and cert.
-      }
-      mqtt=require("mqttc").create(awsBroker,onstatus,onpublish,options)
-   else
-      trace(fmt("Creating the SharkSSL certificate using %s and %s failed",certName,keyName))
-   end
-else
-   trace(fmt("Cannot open %s", io:realpath"AmazonRootCA1.pem"))
+-- Pretty encode a Lua table using the 'serpent' module
+local function table2string(tab)
+   return serpent.block(tab,{comment=false})
 end
 
 
--- This server side app should not expose the private key saved in the
--- directory. Another solution would be to create a hidden directory
--- (dir that starts with a dot). Details:
--- https://realtimelogic.com/ba/doc/?url=GettingStarted.html#VFSTree
-dir:unlink()
+local function createSharkObj(io, certName, keyName, amazonRootCA)
+   -- https://realtimelogic.com/ba/doc/?url=auxlua.html#ba_create_certstore
+   local certstore = ba.create.certstore()
+   -- Certifcate store with one cert:
+   if certstore:addcert(io,amazonRootCA) then
+      -- https://realtimelogic.com/ba/doc/?url=auxlua.html#ba_create_sharkssl
+      local shark = ba.create.sharkssl(certstore)
+      -- https://realtimelogic.com/ba/doc/?url=auxlua.html#ba_create_sharkcert
+      local sharkcert = ba.create.sharkcert(io, certName, keyName)
+      -- Add our certificate so AWS can authenticate the 'basicPubSub' client
+      if sharkcert and shark:addcert(sharkcert) then
+         return shark -- Return the SharkSSL object.
+      else
+         trace(fmt("Creating the SharkSSL certificate using %s and %s failed",certName,keyName))
+      end
+   else
+      trace(fmt("Cannot open %s", io:realpath(amazonRootCA)))
+   end
+end
+
+
+-- MQTT connection status callback
+local function onstatus(type,code,status)
+   trace("Server properties:", status and table2string(status) or 'nil')
+   if "mqtt" == type and "connect" == code and 0 == status.reasoncode then
+      trace"Successful new connection"
+      mqtt:subscribe("topic_1")
+      mqtt:subscribe("topic_2")
+      -- Publish messages to "topic_1" every second.
+      timer=ba.timer(function()
+         local seq=1
+         while true do
+            mqtt:publish("topic_1",ba.json.encode{message="Hello World",sequence=seq})
+            coroutine.yield(true)
+            seq=seq+1
+         end
+      end)
+      timer:set(1000)
+      return true -- Accept connection
+   end
+   trace("Disconnect or connect failed",type,code)
+   if timer then
+      timer:cancel()
+      timer=nil
+   end
+   return true -- retry
+end
+
+
+-- MQTT PUBLISH callback (when we receive messages)
+local function onpublish(topic,payload,prop)
+   local decodedPayload = ba.json.decode(payload)
+   trace("Received:",topic,decodedPayload and table2string(decodedPayload) or ("Invalid JSON: "..payload))
+end
+
+
+local function startMQTT()
+   local shark = createSharkObj(io, certName, keyName, amazonRootCA)
+
+   local options = { -- ALPN and other required connection options
+      shark = shark,
+      port = 443,
+      alpn = "x-amzn-mqtt-ca",
+      clientidentifier = "basicPubSub",
+      secure=shark, -- The shark object created above with AmazonRootCA1 store and cert.
+      recbta=false -- Make 'payload' in onpublish() a Lua string
+   }
+   mqtt=require("mqttc").create(awsBroker,onstatus,onpublish,options)
+end
+
+
+-- Auto-executed when the app is shut down
+function onunload()
+   trace"Shutting down MQTT example"
+   if timer then timer:cancel() end
+   if mqtt then mqtt:disconnect() end
+end
+
+if dir then
+   trace"Disabling LSP. See code for details"
+   -- This server side app should not expose the private key saved in the
+   -- directory. Another solution would be to create a hidden directory
+   -- (dir that starts with a dot). Details:
+   -- https://realtimelogic.com/ba/doc/?url=GettingStarted.html#VFSTree
+   dir:unlink()
+end
+
+startMQTT()
