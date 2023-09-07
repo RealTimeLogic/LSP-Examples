@@ -1,7 +1,12 @@
 -- MQTT 5 AWS IoT Core Example
 -- Doc: https://realtimelogic.com/ba/doc/?url=MQTT.html
+-- Tutorials for this example:
+--   Mako: https://makoserver.net/articles/How-to-Connect-to-AWS-IoT-Core-using-MQTT-amp-ALPN
+--   Xedge32: https://realtimelogic.com/articles/How-to-connect-ESP32-to-AWS-IoT-Core-Using-MQTT   
 
-local awsBroker = ""
+local awsBroker = "" -- NOTE: You must set the broker name
+
+
 local certName = "Demo_Thing.cert.pem"
 local keyName = "Demo_Thing.private.key"
 local amazonRootCA = "AmazonRootCA1.pem"
@@ -16,7 +21,11 @@ local function table2string(tab)
    return serpent.block(tab,{comment=false})
 end
 
-
+-- Create and return a SharkSSL object designed for the required AWS mTLS handshake
+-- io: A Barracuda App Server IO, where the certificates are stored in the root directory
+-- certName: in this case, "Demo_Thing.cert.pem"
+-- keyName: in this case, "Demo_Thing.private.key"
+-- amazonRootCA: Amazon's root Certificate Authority (CA) certificate name.
 local function createSharkObj(io, certName, keyName, amazonRootCA)
    -- https://realtimelogic.com/ba/doc/?url=auxlua.html#ba_create_certstore
    local certstore = ba.create.certstore()
@@ -74,10 +83,9 @@ end
 
 
 local function startMQTT()
-   local shark = createSharkObj(io, certName, keyName, amazonRootCA)
-
+   local sharkObj = createSharkObj(io, certName, keyName, amazonRootCA)
    local options = { -- ALPN and other required connection options
-      shark = shark,
+      shark = sharkObj, -- AWS specific mTLS configuration.
       port = 443,
       alpn = "x-amzn-mqtt-ca",
       clientidentifier = "basicPubSub",
@@ -95,7 +103,7 @@ function onunload()
    if mqtt then mqtt:disconnect() end
 end
 
-if dir then
+if dir then -- If LSP app
    trace"Disabling LSP. See code for details"
    -- This server side app should not expose the private key saved in the
    -- directory. Another solution would be to create a hidden directory
