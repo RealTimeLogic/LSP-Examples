@@ -83,7 +83,7 @@ local function printf(s,...) tracep(false,5,fmt(s,...)) end
 local bits=13 -- pwm resolution = 13 bits
 local maxPwm=2^bits - 1 -- any value between 0 and maxPwm
 local minPulseWidth = 1000  -- 1 ms
-local cycleTime = 20000      -- 20 ms
+local cycleTime = 20000     -- 20 ms
 
 local function calculatePwmDutyCycle(angle)
    return (maxPwm / cycleTime) * (angle * 1000 / 180 + minPulseWidth)
@@ -92,7 +92,7 @@ end
 -- The following function runs as a coroutine timer.
 -- timer: https://realtimelogic.com/ba/doc/?url=lua.html#ba_timer
 local function servo()
-   local ok,err=esp32.ledtimer{
+   local ok,err=esp32.pwmtimer{
       mode="LOW", -- speed_mode
       bits=bits, -- duty_resolution (bits)
       timer=0, -- timer_num
@@ -101,22 +101,22 @@ local function servo()
    trace(ok,err)
    if ok then
       local duty = 2000 / 20000 * 100
-      local led,err=esp32.ledchannel{
+      local pwm,err=esp32.pwmchannel{
          mode="LOW",
          channel=1,
          timer=0, -- timer_sel
-         gpio=14,
+         gpio=gpioPin,
          duty = calculatePwmDutyCycle(180),
          hpoint=0,
       }
-      trace(ok,err)
+      trace(pwm,err)
       if ok then
          while true do
             for angle=0,180 do
                local pwmDuty = calculatePwmDutyCycle(angle)
                printf("Angle of rotation: %d, PWM Duty Cycle: %d : %%%2.1f", angle, pwmDuty, pwmDuty/maxPwm*100);
                --printf("Angle of rotation: %d, PWM Duty Cycle", 0);
-               led:duty(pwmDuty)
+               pwm:duty(pwmDuty)
                coroutine.yield(true) -- Sleep
             end
          end

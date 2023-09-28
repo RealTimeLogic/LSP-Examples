@@ -1,0 +1,366 @@
+-- Source code for the tutorial:
+-- https://realtimelogic.com/articles/Your-First-Embedded-Single-Page-Application
+
+-- Import and abreviate the string formatting function for later use.
+local fmt=string.format
+
+-- Table to keep track of connected SPA clients.
+-- Key is the socket ('sock') and the value is a JSONS instance.
+-- JSONS: https://realtimelogic.com/ba/doc/?url=lua.html#JSONS
+local clients={}
+
+-- Import the Serpent library for pretty-printing tables.
+local serpent=require"serpent"
+-- Print JSON message: name, payload, where payload is a Lua table
+local function printMsg(msg,pl)
+   tracep(false,5,msg,serpent.block(pl,{comment=false}))
+end
+
+-- If the 'esp32' global variable is not defined, simulate the GPIO for ESP32.
+-- Used when running on the Mako Server.
+if not esp32 then
+   tracep(false,0,"Installing GPIO ESP32 simulator")
+
+   local G={} -- G: GPIO API
+   G.__index=G
+
+   function G:close()
+      tracep(false,5,"closing GPIO", self.pin)
+   end
+
+   -- Set or get the value of the simulated GPIO.
+   function G:value(val)
+      if val ~= nil then
+         self.state=val
+         tracep(false,5,"Set GPIO:value",self.pin,val)
+         return true
+      end
+      return self.state
+   end
+
+   -- Create a simulated ESP32 environment.
+   local esp32={}
+   _G.esp32=esp32
+
+   -- Simulate the GPIO pin creation for ESP32.
+   function esp32.gpio(pin)
+      return setmetatable({pin=pin},G)
+   end
+end
+
+-- Send a message to one or all connected clients (SPAs)
+-- msg: Message name
+-- payload: string or table
+-- js: JSONS instance. Used when sending a message to one client.
+local function sendMsg(msg, payload, js)
+   printMsg("Sending: "..msg,payload)
+   local data={msg,payload}
+   if js then -- unicast
+      js:put(data)
+   else -- multicast
+      for sock,js in pairs(clients) do
+         js:put(data)
+      end
+   end
+end
+
+-- Define the LED configurations used by the SPA for building the LED UI.
+local ledsInfo={
+   {
+      name="LED1",
+      id=1,
+      color="red",
+   },
+   {
+      name="LED2",
+      id=2,
+      color="green",
+   },
+   {
+      name="LED3",
+      id=3,
+      color="blue",
+   },
+   {
+      name="LED4",
+      id=4,
+      color="yellow",
+   },
+}
+
+-- Function to configure a button with an interrupt driven callback.
+local function cfgButton(pin,cb)
+   local cfg={
+      pulldown=true,
+      type="POSEDGE",
+      callback=cb
+   }
+   return esp32.gpio(pin,"IN", cfg)
+end
+
+-- Table to store LED data. Initialized below.
+local ledsData
+
+-- Called when a button is clicked; See ledsData below.
+local function buttonClick(index, on)
+   tracep(false,5,"Button",index)
+   local ledObj = ledsData[index]
+   if nil == on then -- if arg 'on' not provided
+      ledObj.state = not ledObj.state -- toggle
+   else
+      ledObj.state = not on -- inverse
+   end
+   ledObj.led:value(ledObj.state) -- set LED
+   sendMsg("setled", {id = index, on = not ledObj.state})
+end
+
+local function cfgLed(pin)
+   local led=esp32.gpio(pin,"OUT")
+   led:value(true) -- Set high: led off
+   return led
+end
+
+-- Initialize the LED data.
+ledsData={
+   {
+      state=true,
+      button=cfgButton(9, function() buttonClick(1) end),
+      led=cfgLed(1)
+   },
+   {
+      state=true,
+      button=cfgButton(8, function() buttonClick(2) end),
+      led=cfgLed(2)
+   },
+   {
+      state=true,
+      button=cfgButton(7, function() buttonClick(3) end),
+      led=cfgLed(3)
+   },
+   {
+      state=true,
+      button=cfgButton(44,function() buttonClick(4) end),
+      led=cfgLed(4)
+   },
+}
+
+
+-- Function to get the IO (Input/Output) interface.
+-- If the 'mako' global variable is defined, use the 'home' IO,
+-- otherwise use the 'disk' IO.
+local function getIO()
+   return mako and ba.openio"home" or  ba.openio"disk"
+end
+
+-- Function to hash a password using the SHA1 algorithm.
+local function hashPwd(pwd)
+   return ba.crypto.hash"sha1"(pwd)(true)
+end
+
+-- Function to retrieve stored credentials.
+-- If no credentials are stored, return the default values root/password.
+local function getCredentials()
+   local fp <close> = getIO():open"credentials.json"
+   if fp then
+      local cred = ba.json.decode(fp:read"*a")
+      if cred then return cred.uname,ba.b64decode(cred.pwd) end
+   end
+   -- Default
+   return "root", hashPwd"password"
+end
+
+-- AJAX requests managed by server code
+-- Tutorial: https://makoserver.net/articles/AJAX-over-WebSockets
+local ajaxRequests={
+   ["math/add"]=function(req)      return req[1] + req[2] end,
+   ["math/subtract"]=function(req) return req[1] - req[2] end,
+   ["math/mul"]=function(req)      return req[1] * req[2] end,
+   ["math/div"]=function(req)
+      if req[2] == 0 then return nil,"Divide by zero!" end
+      return req[1] / req[2]
+   end,
+   ["auth/setcredentials"]=function(req)
+      local uname, shaPwd = getCredentials()
+      local reqUname, reqShaPwd = req[1], hashPwd(req[2])
+      if uname==reqUname and shaPwd==reqShaPwd then
+         local newUname, newShaPwd = req[3], hashPwd(req[4])
+         local fp <close> = getIO():open("credentials.json","w")
+         if fp then
+            fp:write(ba.json.encode{uname=newUname,pwd=ba.b64encode(newShaPwd)})
+            return true
+         end
+         return nil, "Cannot save credentials!"
+      end
+      return nil, "Incorrect account or password"
+   end,
+}
+
+-- Find the AJAX request function in 'ajaxRequests' and call the function
+local function ajax(msg)
+   -- Ajax request name, AJAX response handle, payload
+   local req,handle,pl=msg[1],msg[2],msg[3]
+   -- payload is an array with two numbers
+   if pl[1] == ba.json.null then pl[1]=0 end
+   if pl[2] == ba.json.null then pl[2]=0 end
+   -- Lookup and call AJAX function
+   local rsp,err=ajaxRequests[req](pl)
+   return "AJAX",{handle, rsp and {rsp=rsp} or {err=err}}
+end
+
+-- Called when a user clicks a LED button in the SPA
+local function setled(msg)
+   buttonClick(msg.id, msg.on)
+end
+
+-- Table with key (name: string) and value (SPA request handler: function)
+-- Used by the "Main loop" below.
+local requests={
+   setled=setled,
+   AJAX=ajax
+}
+
+-- Store the simulated temperature. Initialized in the 'tempManager' function.
+local temperature
+-- send the current temperature to client(s). All clients if js not provided.
+local function sendTemperature(js)
+   sendMsg("settemp", temperature, js)
+end
+
+-- Called when we receive a binary WebSocket frame. Binary messages
+-- are used for uploading firmware.
+local function recFirmware()
+   local BinMsg_Upload <const> = 1
+   local BinMsg_UploadEOF <const> = 2
+   local io=getIO()
+   local fp,ok,err,binMsg,frameCounter
+
+   local function closeOnErr(js,err)
+      tracep(false,0,"Firmware upload error:",err)
+      -- Close socket, see internals in JSONS.lua
+      js._sock:close()
+      if fp then fp:close() fp=nil end
+   end
+
+   return function(data,bytesRead,frameLen,js)
+      if not fp then
+         tracep(false,5,"Opening FIRMWARE.bin")
+         fp,err=io:open("FIRMWARE.bin","wb")
+         if not fp then
+            return closeOnErr(js,fmt("Cannot open %s: %s",io:realpath("FIRMWARE.bin", err)))
+         end
+         frameCounter,binMsg=0,nil
+      end
+      -- eom: end of message (websocket frame)
+      local eom = not bytesRead or bytesRead == frameLen
+      if not binMsg then
+         binMsg=data:byte(1)
+         data=data:sub(2,-1) -- remainder
+      end
+      ok,err=fp:write(data)
+      if not ok then return closeOnErr(js,fmt("Writing failed: %s",err)) end
+      frameCounter=frameCounter+1
+      sendMsg("uploadack", frameCounter, js)
+      if eom then
+         if BinMsg_UploadEOF == binMsg then
+            tracep(false,5,"Closing FIRMWARE.bin")
+            fp:close()
+            fp=nil
+         end
+         binMsg=nil -- Reset
+      end
+   end
+end
+
+-- Called by code in index.lsp when a new SPA client connects.
+function newClient(sock)
+   tracep(false,5,"New client", sock)
+
+   local uname,shaPwd = getCredentials()
+   -- JSONS: https://realtimelogic.com/ba/doc/?url=lua.html#JSONS
+   local js,err = require("JSONS").create(sock, {
+                                             maxsize=2048,
+                                             bincb=recFirmware()
+                                          })
+
+   -- Designed for receiving JSON with: [message,payload]
+   -- Returns: message,payload
+   local function recMsg()
+      local msg = js:get()
+      if msg then -- msg is an array, where [1]=message name, [2]=payload
+         printMsg("Received: "..msg[1],msg[2])
+         return msg[1],msg[2]
+      end
+   end
+
+   -- Sent to the SPA when it connects.
+   local function sendLedInfo()
+      sendMsg("ledinfo",{leds=ledsInfo}, js)
+      for ix,ledObj in ipairs(ledsData) do
+         sendMsg("setled", {id = ix, on = not ledObj.state}, js)
+      end
+   end
+
+   sendMsg("devname",esp32 and "ESP32" or "simulator") -- First message
+   local authenticated=false
+   while not authenticated do -- Authentication loop
+      local nonce = ba.rndbs(12)
+      sendMsg("nonce",ba.b64encode(nonce), js)
+      local msg,payload=recMsg()
+      if not msg then break end
+      if "auth" == msg and
+         payload.name == uname and
+         payload.hash == ba.crypto.hash"sha1"(shaPwd)(nonce)(true,"hex") then
+         authenticated=true
+         sendLedInfo()
+         sendTemperature(js)
+      else
+         nonce = ba.rnds(12)
+         sendMsg("nonce",ba.b64encode(nonce), js)
+      end
+   end
+   
+   clients[sock]=js -- Register SPA
+   while true do -- Main loop
+      local msg,payload=recMsg()
+      if not msg then break end
+      msg,payload=requests[msg](payload)
+      -- Send unicast message if AJAX response
+      if msg then sendMsg(msg, payload, "AJAX" == msg and js) end
+   end
+   clients[sock]=nil -- Deregister SPA
+   tracep(false,5,"Closing client connection")
+end
+
+-- Timer coroutine used for simulating temperature.
+local function tempManager()
+   while true do
+      temperature=0
+      while true do
+         sendTemperature()
+         temperature = temperature + ba.rnd(5,100)
+         if temperature > 1000 then break end
+         coroutine.yield(true)
+      end
+      temperature=1000
+      while true do
+         sendTemperature()
+         temperature = temperature - ba.rnd(5,200)
+         if temperature < 0 then break end
+         coroutine.yield(true)
+      end
+   end
+end
+
+tempTimer=ba.timer(tempManager)
+tempTimer:set(5000)
+
+-- Clean up resources when the script is unloaded.
+function onunload()
+   for ix,ledObj in ipairs(ledsData) do
+      ledObj.button:close()
+      ledObj.led:close()
+   end
+   for sock in pairs(clients) do
+      sock:close()
+   end
+end

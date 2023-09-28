@@ -17,6 +17,7 @@
 * [IoT: MQTT Sparkplug](Sparkplug) - How to use the MQTT Sparkplug library
 * [IoT: MQTT Google Cloud](Cloud-IoT-Core) - Connecting to the Google MQTT Bridge
 * [ESP32 Microcontroller Examples](ESP32) - Examples designed for [Xedge32](https://realtimelogic.com/downloads/bas/ESP32/)
+* [MinnowSim](MinnowSim) - Source code for the tutorial [Your First Embedded Single Page Application](https://realtimelogic.com/articles/Your-First-Embedded-Single-Page-Application)
 * [SQL: SQLite Examples](SQLite) - Database examples
 * [SQL: PostgreSQL Example](PostgreSQL) - Database example
 * [File Upload, including drag and drop](upload) - HTML based file upload
