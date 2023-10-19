@@ -21,7 +21,8 @@
 * [SQL: SQLite Examples](SQLite) - Database examples
 * [SQL: PostgreSQL Example](PostgreSQL) - Database example
 * [File Upload, including drag and drop](upload) - HTML based file upload
-* [WebDAV and Web-File-Server](File-Server) - Network drive and secure file sharing
+* [WebDAV and Web-File-Server](File-Server) - Network drive and secure file sharing (example 1)
+* [WebDAV and Web-File-Server with User Database](JSON-File-Server) - (example 2)
 * [How to add 'require' search path to an app](require-test)
 * [Sockets and webSockets examples](socket-examples)
 * [Web Shell](Web-Shell) - web based alternative to SSH

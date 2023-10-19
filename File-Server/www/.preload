@@ -1,17 +1,30 @@
-local rio = ba.openio"disk" -- The root IO
-local env = mako.env
-local ldir = mako.dos2unix(env and (env.TMP or env.TEMP) or "/tmp").."/.LOCK"
-if not rio:stat(ldir) then
-   if not rio:mkdir(ldir) then
+local wdio -- The WebDAV IO; set below
+local ldir -- The directory used for storing WebDAV locks; set below
+
+-- When using Mako Server, use the "disk" IO and calculate the lock dir path.
+if mako then
+   wdio = ba.openio"disk" -- The Mako's root IO
+   local env = mako.env
+   ldir = mako.dos2unix(env and (env.TMP or env.TEMP) or "/tmp").."/.LOCK"
+else -- Any other BAS derivative product
+   -- "sd" is Xedge32 specific; set if SD card enabled
+   wdio = ba.openio"sd" or ba.openio"disk"
+   ldir="/.LOCK"
+end
+assert(wdio, "Cannot open IO, see Lua code for details")
+
+-- Create lock directory if it does not exist.
+if not wdio:stat(ldir) then
+   if not wdio:mkdir(ldir) then
       trace("Cannot open WebDAV lock directory:",ldir)
       ldir=nil -- WebDAV may be in read only mode when used by some clients
    end
 end
-if ldir then print("WebDAV lock directory:",ldir) end
-local maxUploads=50
+if ldir then trace("WebDAV lock directory:",ldir) end
+local maxUploads = mako and 200 or 10 -- Assume embedded if not mako
 local maxLocks=100
 require"wfs" -- install ba.create.wfs
-fsdir=ba.create.wfs("fs",rio,ldir,maxUploads,maxLocks)
+local fsdir=ba.create.wfs("fs",10,wdio,ldir,maxUploads,maxLocks)
 fsdir:insert() -- Insert as a root node with name 'fs' in the VFS
 
 
@@ -26,3 +39,8 @@ local authuser=ba.create.authuser(getpassword)
 local authenticator=ba.create.authenticator(authuser)
 -- Enable authentication for the directory.
 fsdir:setauth(authenticator)
+
+function onunload()
+   trace"Uninstalling file server"
+   fsdir:unlink()
+end

@@ -1,0 +1,92 @@
+local wdio -- The WebDAV IO; set below
+local ldir="/.LOCK" -- The directory used for storing WebDAV locks; set below
+
+-- When using Mako Server, use the "home" IO and calculate the lock dir path.
+if mako then
+   wdio = ba.openio"home"
+else -- Any other BAS derivative product
+   -- "sd" is Xedge32 specific; set if SD card enabled
+   wdio = ba.openio"sd" or ba.openio"disk"
+end
+if wdio then
+   wdio:mkdir("WebDavRoot")
+   wdio=ba.mkio(wdio,"WebDavRoot")
+end
+
+assert(wdio, "Cannot open IO, see Lua code for details")
+
+-- Create lock directory if it does not exist.
+if not wdio:stat(ldir) then
+   if not wdio:mkdir(ldir) then
+      trace("Cannot open WebDAV lock directory:",wdio:realpath(ldir))
+      ldir=nil -- WebDAV may be in read only mode when used by some clients
+   end
+end
+if ldir then trace("WebDAV lock directory:",wdio:realpath(ldir)) end
+local maxUploads = mako and 200 or 10 -- Assume resource constr. if not mako
+local maxLocks=100
+require"wfs" -- install ba.create.wfs
+local fsdir=ba.create.wfs("fs",10,wdio,ldir,maxUploads,maxLocks)
+fsdir:insert() -- Insert as a root node with name 'fs' in the VFS
+
+-- Create the user db with the users: guest, kids, dad, and mom.
+-- The password is the same as the username.
+local function createUserDB()
+   -- Setup the users, Defaults: maxusers=3,recycle=false,inactive=false
+   local userGuest={pwd='guest',roles={'guest'},maxusers=50}
+   local userKids={pwd='kids',roles={'guest','family'}}
+   local userDad={pwd='dad',roles={'guest','family','dad'},recycle=true,inactive=60*60}
+   local userMom={pwd='mom',roles={'guest','family','mom'},recycle=true,inactive=60*60}
+   return {guest=userGuest,kids=userKids,dad=userDad,mom=userMom}
+end
+
+-- Create the Access Control List (ACL)
+local function createConstraints()
+   local read={"OPTIONS","HEAD","GET","PROPFIND","LOCK","UNLOCK"}
+   local write={"POST","PUT","DELETE","MKCOL","COPY","MOVE","PROPPATCH"}
+   local rw={}
+   -- rw = read+write
+   for _,v in pairs(read) do rw[#rw+1]=v end
+   for _,v in pairs(write) do rw[#rw+1]=v end
+   local constr1={urls={'/*'},methods=read,roles={'guest'}}
+   local constr2={urls={'/*','/family/*'},methods=write,roles={'mom','dad'}}
+   local constr3={urls={'/family/*'},methods=read,roles={'family'}}
+   local constr4={urls={'/family/mom/*','/family/dad/*'},methods=read,roles={'mom','dad'}}
+   local constr5={urls={'/family/dad/*'},methods=write,roles={'dad'}}
+   local constr6={urls={'/family/mom/*'},methods=write,roles={'mom'}}
+   local constr7={urls={'/family/kids/*'},methods=rw,roles={'family'}}
+
+   -- Note, the constraint names are not used by the authorizer.
+   return {
+      Guest=constr1,FamilyPost=constr2,FamilyGet=constr3,
+      Parents=constr4,Dad=constr5,Mom=constr6,Kids=constr7
+   }
+end
+
+-- Create a JSON user database object
+local authuser=ba.create.jsonuser()
+authuser:set(createUserDB())
+-- Create a digest authenticator (using default values).
+local authenticator=ba.create.authenticator(authuser)
+
+-- Create the authorizer and install the constraints.
+local authorizer=authuser:authorizer()
+authorizer:set(createConstraints())
+
+-- Install the authenticator and the ACL
+fsdir:setauth(authenticator,authorizer)
+
+function onunload()
+   trace"Uninstalling file server"
+   fsdir:unlink()
+end
+
+for _,name in ipairs{'/family','/family/mom','/family/dad','/family/mom','/family/kids'} do
+   if not wdio:stat(name) then
+      if  wdio:mkdir(name) then
+         trace("Creating",wdio:realpath(name))
+      else
+         trace("Cannot create",wdio:realpath(name))
+      end
+   end
+end
