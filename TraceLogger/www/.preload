@@ -1,0 +1,106 @@
+local trpeer = require"loadconf".trpeer
+assert("string" == type(trpeer), "trpeer must be set in mako.conf")
+assert("localhost" ~= trpeer and "127.0.0.1" ~= trpeer, "Can't use 'localhost'")
+
+local sfmt,sbyte=string.format,string.byte
+local start -- function set below
+
+-- Must match C code
+local TR_set <const> = 1
+local TR_data <const> = 2
+local TR_acquired <const> = 3
+
+local function log(msg)
+   tracep(false,0,sfmt("[%s] %s",ba.datetime"NOW",msg))
+end
+
+local function notTR()
+   log"The peer does not appear to be a TraceLogger"
+end
+
+local function restart()
+   ba.timer(function() start(restart) end):set(1000,true)
+end
+
+local function traceLoggerReceiver(s)
+   local data,err = s:read(2000)
+   if not data or sbyte(data) ~= TR_set then
+      notTR()
+      return
+   end
+   s:setoption("keepalive",true,15,5)
+   local tinsert,tconcat=table.insert,table.concat
+   local collected
+   while true do
+      data,err = s:read()
+      if not data then break end
+      local cmd=sbyte(data)
+      if TR_data == cmd then
+         data=data:sub(2)
+         if #data > 0 then
+            local eol = 10 == sbyte(data,#data)
+            if eol then
+               if collected then
+                  tinsert(collected,data)
+                  data=tconcat(collected)
+                  collected=nil
+               end
+               log(data:sub(1,-2))
+            elseif eol then
+               log(data:sub(1,-2))
+            else
+               if not collected then collected={} end
+               tinsert(collected,data)
+            end
+         elseif TR_acquired == cmd then
+            log"Connection closed by another client"
+            return
+         end
+      end
+   end
+   if err and "sysshutdown" ~= err then
+      log("Socket read failed "..tostring(err))
+   end
+   restart()
+end
+
+start=function(callback)
+   ba.thread.run(function()
+      local s,ok,err
+      local c = require"httpc".create()
+      local url="http://"..trpeer.."/rtl/tracelogger.service/"
+      ok,err=c:request{url=url,header={["x-requested-with"]="Lua Client"}}
+      if ok then
+         local status=c:status()
+         if status == 204 then
+            c:close()
+            url="ws://"..trpeer.."/rtl/tracelogger.service/"
+            ok,err=c:request{url=url}
+            if ok then
+               s,err=ba.socket.http2sock(c)
+               if s then
+                  log("Connected to "..url)
+                  s:event(traceLoggerReceiver, "s")
+                  return true
+               end
+            end
+         elseif status == 503 then
+            log"The TraceLogger is serving another client"
+            return
+         elseif status == 401 then
+            log"Server requires authentication, but it's not implemented"
+            return
+         else
+            notTR()
+            return
+         end
+      end
+      log(sfmt("Cannot connect to %s: %s",url, err))
+      if callback then callback() end
+   end)
+end
+
+start()
+
+
+
