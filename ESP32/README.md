@@ -14,7 +14,6 @@ The Barracuda App Server, running on the ESP32 microcontroller, is packaged as a
 - [servo.lsp](servo.lsp): Introductory servo example with detailed explanation.
 - [uiservo.lsp](uiservo.lsp): This LSP script controls a servo motor through a real time web user interface.
 - [bme280.xlua](bme280.xlua): XLua script for interacting with the BME280 sensor. The BME280 sensor is a digital pressure, temperature, and humidity sensor that is often used in weather station projects.
-- [WeatherStationEoN.xlua](WeatherStationEoN.xlua): A complete MQTT Sparkplug enabled weather station system. For further details, refer to the [Sparkplug tutorial](../Sparkplug/README.md).
 
 **How to upload the examples:**
 
