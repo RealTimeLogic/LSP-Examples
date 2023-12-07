@@ -4,7 +4,12 @@
 -- The broker. The public HiveMQ broker typically has many connected Sparkplug clients
 local mqttServer = "broker.hivemq.com"
 
-local mqtt,serpent,pb -- forward declarations, see runExplorer()
+local mqttVer="mqttc" -- V5
+--local mqttVer="mqtt3c" -- V3
+
+local username,password="admin","admin"
+
+local mqtt,sp,serpent -- forward declarations, see runExplorer()
 local fmt=string.format
 
 -- MQTT connect/disconnect callback
@@ -23,15 +28,11 @@ end
 -- MQTT on publish callback
 local function onpublish(topic,payload,prop)
    tracep(false,0,fmt("Sparkplug topic: %s",topic))
-   if not pcall(function() -- Protected call
-      -- Attempt to decode the payload of the received MQTT message using
-      -- the protobuf (pb) library and the SparkPlug protocol buffer
-      -- definition (".org.eclipse.tahu.protobuf.Payload"). The payload is
-      -- then pretty printed using the Serpent library.
-      -- See function runExplorer() below for how the modules are loaded.
-      tracep(false,0,serpent.block(pb.decode(".org.eclipse.tahu.protobuf.Payload", payload),{comment=false}),"\n") end)
-   then
-      trace"Decoding failed"
+   local t,err = sp.decode(payload)
+   if t then
+      tracep(false,0,serpent.block(t,{comment=false}),"\n")
+   else
+      trace("Decode err",err)
    end
 end
 
@@ -48,10 +49,6 @@ end
 -- starts the Sparkplug Explorer.
 local function runExplorer()
    local ok
-   -- load the protobuf (pb) C module, which is used for encoding and
-   -- decoding protocol buffers.
-   ok,pb = pcall(require,"pb")
-   assert(ok, "\nThe lua protobuf C module is not included in the server")
    -- Load the 'protoc' Lua module, which is used for parsing the protobuf
    -- schema. If the module is not found, an error message is printed.
    local ok,protoc = pcall(require,"protoc")
@@ -64,7 +61,8 @@ local function runExplorer()
    serpent=require"serpent"
    tracep(false,0,fmt("\nConnecting to broker %s",mqttServer))
    -- Load and create instance: https://realtimelogic.com/ba/doc/?url=MQTT.html
-   mqtt=require("mqttc").create(mqttServer,onstatus,onpublish,{recbta=false})
+   mqtt=require(mqttVer).create(mqttServer,onstatus,onpublish,{recbta=false,username=username,password=password})
+   sp=require"SparkplugB"
    tracep(false,0,"Sparkplug Explorer started")
 end
 

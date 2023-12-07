@@ -1,204 +1,80 @@
--- The Sparkplug settings for this example.
-local mqttServer = "broker.hivemq.com"
-local groupId = "Sparkplug B Devices"
-local nodeName = "Lua Edge Node 1"
-
--- When using the Mako Server, the following code line makes it
--- possible to load .lua/sparkplug.lua from this app using the
--- function call 'require"sparkplug"'. Details:
--- https://realtimelogic.com/ba/doc/?url=Mako.html#mako_createloader
-if mako then mako.createloader(io) end
-
--- To reduce the amount of stack space required at startup and prevent
--- stack overflows on RTOS systems, we wrap all code in a
--- function. This helps ensure that the stack remains within its
--- allotted size and reduces the risk of errors due to insufficient
--- stack space. See the following for details:
--- https://realtimelogic.com/ba/doc/?url=lspappmgr/readme.html#memory
-local function run()
-
-trace"Starting EoN"
-
--- Preload 'protoc' to minimize stack usage on RTOS. This module is
--- loaded by the 'sparkplug' module.
-require"protoc" -- Throws error if it is not installed
-
-local SP,sp -- SP: Sparkplug module, sp: Sparkplug instance
-SP=require"sparkplug" -- Load the module
-local DataTypes <const> = SP.DataTypes
-
-------- Create the NBIRTH message
-local nbirth=SP.payload()
-
--- Set up the Node Controls
-nbirth:metric("Node Control/Next Server", DataTypes.Boolean, false)
-nbirth:metric("Node Control/Rebirth", DataTypes.Boolean, false)
-nbirth:metric("Node Control/Reboot", DataTypes.Boolean, false)
-
--- We keep all metrics that can be modified with an NCMD in this table
-local metricData  = {
-   metric1 = "Hello World",
-   metric2 = true,
-   metric3 = 123456,
-   metric4 = nil
-}
-
--- Add some regular node metrics
-
-nbirth:metric("Node Metric1", DataTypes.String, metricData.metric1)
-nbirth:metric("Node Metric2", DataTypes.Boolean, metricData.metric2)
-nbirth:metric("Node Metric3",DataTypes.UInt64, metricData.metric3)
-nbirth:metric("Node Metric4",DataTypes.Int32) -- Null metric
-
--- Add a dataset node metric
-local ds=nbirth:dataset("Node DataSet",{
-   {"Int8s", DataTypes.Int8},
-   {"Int16s", DataTypes.String},
-   {"Bool",DataTypes.Boolean}
-})
--- Add two rows, each with 3 columns
-ds:row(1,"Hello",true)
-ds:row(2,"World",false)
-
-------- End NBIRTH
-
-
- -- Timer function sending two metrics defined in NBIRTH.
-local function publishMetrics()
-   local cnt=0
-   while true do
-      local pl = SP.payload()
-      metricData.metric2 = metricData.metric3 % 2 == 0 and true or false
-      tracep(5,string.format("Sending NDATA: metric2=%q, metric3=%d",
-                          metricData.metric2,metricData.metric3))
-      pl:metric("Node Metric2", DataTypes.Boolean, metricData.metric2)
-      pl:metric("Node Metric3",DataTypes.UInt64,metricData.metric3)
-      sp:ndata(pl) -- publish
-      metricData.metric3 = metricData.metric3+1
-      coroutine.yield(true) -- Wait for next timer tick
-   end
-end
-
-local metricsTimer
-
--- MQTT status callback. See
--- https://realtimelogic.com/ba/doc/?url=MQTT.html#create
--- and the onstatus callback.
-local function onstatus(type,code,status)
-   if "mqtt" == type and "connect" == code and 0 == status.reasoncode then
-      trace"Successful new connection"
-      metricsTimer=ba.timer(publishMetrics)
-      metricsTimer:set(2000) -- Every two seconds
-   else -- Failed connecting or a broker disconnect
-      tracep(0,type,code,status)
-      if metricsTimer then
-         metricsTimer:cancel() -- Stop sending data
-         metricsTimer=nil
-      end
-   end
-   return true -- Always connect/reconnect
-end
-
--- The next 6 functions are called when the Primary Application sends
--- NCMD with metrics defined in NBIRTH. See README.md for details on
--- metric[metric.value]
-
-local function nodeControlNextServer(metric)
-   tracep(5,"Next server command: not implemented", metric[metric.value])
-end
-
-local function nodeControlRebirth(metric)
-   tracep(5,"Node Control/Rebirth",metric[metric.value])
-   if true == metric[metric.value] then
-      sp:nodebirth() -- Resend NBIRTH
-   end
-end
-
-local function nodeControlReboot(metric)
-   tracep(5,"Reboot command: not implemented", metric[metric.value])
-end
-
-local function nodeMetric1(metric)
-   metricData.metric1=metric[metric.value]
-   tracep(5,"Node Metric1", metricData.metric1)
-end
-
-local function nodeMetric2(metric)
-   metricData.metric2=metric[metric.value]
-   tracep(5,"Node Metric2", metricData.metric2)
-end
-
-local function nodeMetric3(metric)
-   metricData.metric3=metric[metric.value]
-   tracep(5,"Node Metric3", metricData.metric3)
-end
-
-local function nodeMetric4(metric)
-   metricData.metric4=metric[metric.value]
-   tracep(5,"Node Metric4", metricData.metric4)
-end
-
--- All above functions and their metric names as "key"
-local commands <const> = {
-   ["Node Control/Next Server"]=nodeControlNextServer,
-   ["Node Control/Rebirth"]=nodeControlRebirth,
-   ["Node Control/Reboot"]=nodeControlReboot,
-   ["Node Metric1"]=nodeMetric1,
-   ["Node Metric2"]=nodeMetric2,
-   ["Node Metric3"]=nodeMetric3,
-   ["Node Metric4"]=nodeMetric4
-}
-
--- We received an NCMD
-local function ncmd(payload)
-   -- Loop over all metrics in the Sparkplug payload
-   for _,metric in ipairs(payload.metrics) do
-      -- Typical solution for implementing 'switch' statement in
-      -- Lua. A table with keys and the values are functions.
-      local func = commands[metric.name]
-      if func then
-         func(metric)
-      else
-         tracep(5,"Received NCMD with unknown metric",metric.name)
-      end
-   end
-end
-
-
--- MQTT/Sparkplug callback for 'NCMD' and 'STATE' commands
-local function ondata(cmd,data,topic)
-   tracep(9,cmd,data,topic)
-   if "NCMD" == cmd then
-      ncmd(data)
-   elseif "STATE" == cmd then
-      -- The Primary Application state
-      -- data is the string 'ONLINE' or 'OFFLINE'.
-      tracep(5,"Sparkplug STATE",topic,data)
-   else
-      error"Unknown command"
-   end
-end
-
-
--- MQTT options, See
--- https://realtimelogic.com/ba/doc/?url=MQTT.html#create
--- and the 'options' argument.
 local op={
-   --clientidentifier="Lua Sparkplug Client", -- Must be unique
-   -- username="Sparkplug",
-   -- password="123456",
-   keepalive=3*60, -- PING every 3'rd minute
+   username="admin",
+   password="admin",
 }
 
--- Function runs if app is closed
-function onunload()
-   trace"Closing EoN MQTT connection"
-   if metricsTimer then metricsTimer:cancel() end -- Stop sending data
-   sp:disconnect() -- Close MQTT connection
-end 
+local addr= "broker.hivemq.com"
+local groupId="my groupId"
+local nodeName="my nodeName"
 
--- Create and connect the Sparkplug instance.
-sp=SP.create(mqttServer,onstatus,ondata,groupId,nodeName,nbirth,op)
+local client=require"SparkplugB".create(addr,groupId,nodeName,op)
 
-end -- the run wrapper function
-ba.thread.run(run)
+client:on('connect', function()
+   trace("received 'connect' event")
+end)
+
+client:on('reconnect', function()
+   trace("received 'reconnect' event")
+end)
+
+client:on('offline', function()
+   trace("received 'offline' event")
+end)
+
+client:on('error', function (error,status)
+   trace("received 'error' event: ", error,":",status)
+end)
+
+client:on('close', function()
+   trace("received 'close' event")
+end)
+
+local metrics={
+   {
+     name= "my_int",
+     value= 456,
+     type= "Int32"
+   },
+   {
+     name= "my_float",
+     value= 1.23,
+     type= "Float"
+   }
+}
+
+client:on('birth', function()
+   trace("received 'birth' event")
+   local payload = {metrics=metrics}
+   client:publishNodeBirth(payload)
+   client:publishDeviceBirth("deviceID",payload)
+end)
+
+client:on('ncmd', function (payload)
+   trace("received 'ncmd' event")
+   for _,mx in ipairs(payload.metrics) do
+     trace(ba.json.encode(mx))
+     for _,m in ipairs(metrics) do
+       trace(m.name)
+       if m.name == mx.name then m.value=mx.value end
+     end
+   end
+   client:publishNodeData{metrics=metrics}
+   client:publishDeviceData(deviceId,{metrics=metrics})
+end)
+
+client:on('dcmd', function (deviceId,payload)
+   trace("received 'dcmd' event",ba.json.encode(payload))
+   for _,mx in ipairs(payload.metrics) do
+     trace(ba.json.encode(mx))
+     for _,m in ipairs(metrics) do
+       trace(m.name)
+       if m.name == mx.name then m.value=mx.value end
+     end
+   end
+   client:publishNodeData{metrics=metrics}
+   client:publishDeviceData(deviceId,{metrics=metrics})
+end)
+
+client:on('state', function (groupId,jsonStr)
+   trace("received 'state' event:", groupId,jsonStr)
+end)
