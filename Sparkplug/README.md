@@ -437,9 +437,7 @@ end)
 
 ## The Sparkplug Explorer
 
-The Sparkplug Explorer is a simple example that listens for Sparkplug messages and prints all messages received to the console.
-
-The Sparkplug Explorer, a straightforward tool, monitors and displays incoming Sparkplug messages directly in the console. You'll find the MQTT settings at the beginning of the [.preload](SparkplugExplorer/.preload) script. Please modify these settings to suit your specific needs.
+The Sparkplug Explorer, an easy to use tool, monitors and displays incoming Sparkplug messages directly in the console. You'll find the MQTT settings at the beginning of the [.preload](SparkplugExplorer/.preload) script. Please modify these settings to suit your specific needs.
 
 ```
 cd Sparkplug
