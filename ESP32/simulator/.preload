@@ -1,0 +1,59 @@
+local G={} -- Gpio
+G.__index=G
+
+function G:close()
+   trace("closing", self.pin)
+end
+
+function G:value(val)
+   if val ~= nil then
+      self.state=val
+      if 45 ~= self.pin then -- Do not show blinking led status
+         trace("GPIO",self.pin,val)
+      end
+      return true
+   end
+   return self.state
+end
+
+local esp32={}
+_G.esp32=esp32
+
+function esp32.gpio(pin)
+   return setmetatable({pin=pin},G)
+end
+
+function esp32.mac()
+   return string.char(1,2,3,4,5,6)
+end
+
+function esp32.execute(cmd)
+   trace("WARN esp32.execute",cmd,"called!")
+end
+
+
+function esp32.ota(cmd)
+   if not cmd then
+      return {
+         version="Sim ver 1.0",
+         secureversion="secure_version",
+         projectname="project_name",
+         time="time",
+         date="date",
+         idfver="idf_ver"
+      }
+   end
+   if "begin" == cmd then
+      trace"OTA begin"
+      return {
+         write=function(self,data) trace("OTA write", #data) return true end,
+         commit=function() trace"OTA commit" return true end
+      }
+   else
+      error"Invalid command"
+   end
+end
+
+
+mako.createloader(io)
+trace"ESP32 Xedge32 API simulator 4 Mako Server started"
