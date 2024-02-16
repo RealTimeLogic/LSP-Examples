@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="/rtl/smq.js"></script>
+    <script src="smqrpc.js"></script>
+    <script>
+
+    var rpc; // Global; can be used by any code. This is smqRpc.proxy
+    let smq; // The SMQ instance
+
+    // subtopic Subscribe: sSub(subtopic, onmsg [, onack])
+    // Subscribe to messages sent to 'self' i.e. one-to-one messages
+    // sent to this client.
+    function sSub(subtopic, onmsg, onack) {
+        smq.subscribe("self", subtopic, {datatype:"json",onmsg:onmsg,onack:onack});
+    };
+
+    // Publish a sub-topic to the broker. The broker has the ephemeral
+    // TID set to 1.
+    function sPub(subtopic, payload) {
+        smq.pubjson(payload ? payload : {}, 1, subtopic);
+    };
+
+    /* The onConnect callback is triggered during both initial
+     * connections and reconnects. This function demonstrates
+     * subscribing to two topics directed at "self". Notice that the
+     * final subscription includes an acknowledgment callback, which
+     * signals readiness to receive messages on the subscribed
+     * topics. A 'hello' message is sent to the broker after
+     * this acknowledgment. The broker then sends messages to the two
+     * subtopics we subscribed to.
+     */
+    function onConnect(tid, rnd, ipaddr) {
+        console.log("Connected:" + tid + ", "+ rnd + ", "+ipaddr);
+/* You can enable the one2one code.
+        sSub("Hello Response 1", (payload) => console.log("rsp 1",payload) );
+        sSub("Hello Response 2",
+             (payload) => console.log("rsp 2",payload),
+             () => sPub("Hello Broker", {a:"1",b:"2",c:{x:"y"}}));
+*/
+    };
+
+    smq = SMQ.Client(SMQ.wsURL("smq/"),{cleanstart:true,info:"one2one client"});
+    smq.onconnect = onConnect;
+    smq.onreconnect = onConnect;
+
+    // ------------ The Remote Procedure Code (RPC over SMQ) ------------------
+
+    let smqRpc=createSmqRpc(smq);
+    rpc=smqRpc.proxy; //Set the global variable
+
+    smq.onclose  = (message) => {
+        console.log("Closed: "+message);
+        smqRpc.disconnect(); // Sends the promise:reject to all pending commands.
+        if("shutdown" == message) // See .preload -> smq:shutdown("shutdown")
+            alert("Will not reconnect");
+        return 1000; // Wait one sec before reconnecting
+    };
+
+    //Call the following functions asynchronously: echo, multiply, failfunc, and nosuchfunc
+    async function callRpcMethods() {
+        try {
+            // Await the Promise returned by the method call
+            const response = await rpc.echo('Hello', {data:"world"});
+            console.log("Echo response:");
+            console.log(response);
+        } catch (error) {
+            console.error('Echo failed:', error.message); // Logs the error message
+        }
+        try {
+            console.log(`5 x 5 = ${await rpc.multiply(5,5)}`)
+        } catch (error) {
+            console.error('Multiply failed:', error.message);
+        }
+        try {
+            await rpc.failfunc()
+        } catch (error) {
+            console.error('Error expected from failfunc:', error.message);
+        }
+        try {
+            await rpc.nosuchfunc()
+        } catch (error) {
+            console.error('Error expected when calling non existing function:', error.message);
+        }
+    }
+    callRpcMethods(); // Call the async functions
+
+    </script>
+    <title>SMQ Test</title>
+  </head>
+  <body>
+    <p>Check both the server console and the JavaScript console for output messages.</p>
+    <p>In the JavaScript console, enter:</p>
+    <ul>
+      <li>rpc.multiply(10,10).then(response => {console.log(response);})</li>
+    <li>rpc.whatever().catch(err => {console.log(`Should fail ${err}`);})</li>
+    </ul>
+  </body>
+</html>

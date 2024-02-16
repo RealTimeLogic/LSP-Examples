@@ -1,0 +1,65 @@
+mako.createloader(io) -- so we can call require"smqrpc"; See .lua/smqrpc.lua
+local serpent=require"serpent" -- Table print
+local function encTab(tab)
+   return serpent.block(tab,{comment=false})
+end
+
+-- SMQ broker options
+local op={
+   onconnect=function(tid, info, peer)
+      trace(tid, info, encTab(peer))
+   end,
+   onclose=function(tid, sock, peer, err)
+      trace(tid, sock, encTab(peer), err)
+   end,
+   ondrop=function(data, ptid, tid, subtid, peer)
+      trace(data, ptid, tid, subtid, encTab(peer))
+   end,
+}
+
+local smq=require"smq.hub".create(op)
+
+-- Subscribe to messages sent to 'self' i.e. sent to the broker
+local function sSub(subtopic, callback)
+   smq:subscribe("self",{subtopic=subtopic, json=true, onmsg=callback})
+end
+
+-- Publish to sender of original message. Topic is set as subtopic for one-to-one msg
+local function sPub(tid,topic,data)
+   smq:publish(data or {},tid,topic)
+end
+
+sSub("Hello Broker", function(data, senderTid)
+   trace("Received hello from ",senderTid,", payload:", encTab(data))
+   sPub(senderTid, "Hello Response 1", data)
+   sPub(senderTid, "Hello Response 2", data)
+end)
+
+
+-------- RPC functions the client can call
+
+local interface={
+   echo=function(...) return {...} end,
+   multiply=function(a,b) return a * b end,
+   failfunc=function() return nil, "this function fails" end
+}
+
+require"smqrpc".create(smq, interface)
+
+-------- The code below makes the SMQ instance activate via the virtual file system @ /smq/
+
+-- SMQ HTTP(S) directory entry, where we morph HTTPS to SMQ via smq:connect()
+local function smqDirectoryFunction(_ENV,relpath)
+   trace"New client"
+   smq:connect(request)
+   return true -- HTTP request was handled, stop searching for services.
+end
+
+local smqDir=ba.create.dir("smq")
+smqDir:setfunc(smqDirectoryFunction)
+dir:insert(smqDir,true)
+
+function onunload()
+   trace"Stopping app"
+--   smq:shutdown("shutdown")
+end

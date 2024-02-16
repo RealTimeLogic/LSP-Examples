@@ -1,8 +1,6 @@
 # SMQ IoT Tutorials and Examples
 
-[SMQ](https://realtimelogic.com/products/simplemq/) is an IoT protocol that lets you control and manage one to millions of IoT devices in real time from the same user interface. Broker instances are created programmatically on the server using Lua Server Pages. Since SMQ initiates the connection using HTTP(S), each broker instance is set up with a unique URL making it both easy and convenient to have one broker instance per customer. Isolating broker instances per customer greatly simplifies access control management design.
-
-The [SMQ documentation](https://realtimelogic.com/ba/doc/?url=SMQ.html) provides an introduction and a few basic hands-on examples.
+Source code for the [SMQ](https://realtimelogic.com/products/simplemq/) tutorials @ makoserver.net.
 
 **The following examples are for the three SMQ tutorials:**
 
