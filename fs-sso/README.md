@@ -2,6 +2,8 @@ This example shows how to implement Single Sign On (SSO) using
 [OpenID Connect](https://openid.net/connect/).
 The example is designed for [Microsoft Azure AD](https://portal.azure.com/).
 
+See the following article for an introduction to SSO: [Benefits of Active Directory Single Sign-On in Embedded Industrial Devices](https://www.linkedin.com/pulse/benefits-active-directory-single-sign-on-embedded/)
+
 Shipping products with pre-installed passwords creates a major security vulnerability by essentially setting up a "backdoor" into the system. This risk can be mitigated by implementing Single Sign-On (SSO) solutions. SSO protocols allow users to use a single set of login credentials to access multiple applications or services, reducing the reliance on a pre-installed password. By centralizing the authentication process, SSO makes it harder for unauthorized individuals to gain access and more effortless for system administrators to manage and monitor account activities. This helps significantly enhance system security and integrity.
 
 See the tutorial [Single Sign On for Embedded Devices](https://www.linkedin.com/pulse/benefits-active-directory-single-sign-on-embedded) for an introduction to this technology.
