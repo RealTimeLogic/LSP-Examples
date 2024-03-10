@@ -8,7 +8,7 @@ The Barracuda App Server, running on the ESP32 microcontroller, is packaged as a
 
 - [blinkled.xlua](blinkled.xlua): The source code for the tutorial [Your First Xedge32 Project](https://realtimelogic.com/articles/Your-First-Xedge32-Project)
 - [camread.lsp](camread.lsp): This LSP (Lua Server Pages) file returns and displays a new camera image in the browser each time the browser window is refreshed.
-- [wscam.lsp](wscam.lsp): A WebSocket example that continuously streams captured images to connected browsers.
+- [wscam.lsp](wscam.lsp): The source code for the tutorial [Streaming ESP32-CAM Images to Multiple Browsers using WebSockets](https://realtimelogic.com/articles/Creating-Browser-Video-Streams-with-WebSockets-using-ESP32CAM).
 - [mqttcam.xlua](mqttcam.xlua) and [mqttcam.html](mqttcam.html): The source code for the tutorial [Streaming ESP32-CAM Images to Multiple Browsers via MQTT](https://realtimelogic.com/articles/Streaming-ESP32CAM-Images-to-Multiple-Browsers-via-MQTT).
 - [pcmplayer.lsp](pcmplayer.lsp): This example activates the analog-to-digital converter and samples data at 20 kHz. Next, the data is sent via WebSockets to connected browsers, where a JavaScript-powered PCM player plays the incoming data.
 - [servo.lsp](servo.lsp): Introductory servo example with detailed explanation.
