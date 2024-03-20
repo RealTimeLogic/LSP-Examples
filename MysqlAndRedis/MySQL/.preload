@@ -1,0 +1,3 @@
+if dir then dir:unlink() end
+(mako or xedge).createloader(io)
+require"resty"

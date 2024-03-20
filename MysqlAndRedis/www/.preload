@@ -1,0 +1,1 @@
+tracep(false,0,"\n\nStarting www app.\nNavigate to http://localhost/MySQL.lsp and http://localhost/Redis.lsp\n\n")
