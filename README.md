@@ -8,7 +8,6 @@
 * [Authentication: Single Sign On](fs-sso) - Mitigating Security Vulnerabilities of Pre-Installed Passwords with Single Sign-On Solutions for Enhanced System Integrity
 * [AJAX: For Beginners](AJAX)
 * [AJAX: Over WebSockets](AJAX-Over-WebSockets)
-* [Create an Awesome Interactive Dashboard App using AdminLTE](Dashboard)
 * [Create a light Interactive Dashboard App using Pure.css](Light-Dashboard)
 * [Dynamic Navigation Menu](Dynamic-Nav-Menu)
 * [Debug Lua](Lua-Debug) - How to Debug Lua Code Using Visual Studio Code
@@ -18,7 +17,9 @@
 * [IoT: MQTT Google Cloud](Cloud-IoT-Core) - Connecting to the Google MQTT Bridge
 * [ESP32 Microcontroller Examples](ESP32) - Examples designed for [Xedge32](https://realtimelogic.com/downloads/bas/ESP32/)
 * [MinnowSim](MinnowSim) - Source code for the tutorial [Your First Embedded Single Page Application](https://realtimelogic.com/articles/Your-First-Embedded-Single-Page-Application)
+* [MyApp.zip](MyApp.zip) - Ready to run example designed for the tutorial [Mastering Xedge Application Deployment: From Installation to Creation](https://realtimelogic.com/articles/Mastering-Xedge-Application-Deployment-From-Installation-to-Creation)
 * [SQL: SQLite Examples](SQLite) - Database examples
+* [SQL: MySQL and Redis Examples](MysqlAndRedis) - Database examples
 * [SQL: PostgreSQL Example](PostgreSQL) - Database example
 * [File Upload, including drag and drop](upload) - HTML based file upload
 * [WebDAV and Web-File-Server](File-Server) - Network drive and secure file sharing (example 1)

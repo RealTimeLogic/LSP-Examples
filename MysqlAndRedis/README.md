@@ -88,11 +88,11 @@ You are now ready to run the two LSP examples; navigate to:
 
 **Note:** if you use WSL2, the Mako Server must also run on WSL2. It's possible to run the Mako Server on Windows, but you would need to set up a proxy using the netsh command. When using WSL2, you can use your browser on Windows, but do not navigate to localhost; navigate to the WSL2 IP address, which can be found by running the ipconfig command.
 
-## Using the MySQL Driver
+## Using the Database Drivers
 
 ### Sockets in the Barracuda App server
 
-Sockets within BAS operate in a blocking mode by default. Consequently, the drivers will use blocking socket calls unless they are encapsulated within a [ba.socket.event()](https://realtimelogic.com/ba/doc/en/lua/auxlua.html#ba_socket_event) call. It is important to note that blocking sockets should only be used within an LSP (Lua Server Page). The two LSP examples provided demonstrate the correct usage of blocking sockets. For any other cases, as previously discussed, it is imperative to wrap your code with a `ba.socket.event()` call, transforming the code execution into a non-blocking Cosocket operation.
+Sockets within BAS operate in a blocking mode by default. Consequently, the drivers will use blocking socket calls unless they are encapsulated within a [ba.socket.event()](https://realtimelogic.com/ba/doc/en/lua/auxlua.html#ba_socket_event) call. It is important to note that blocking sockets should only be used within an LSP ([Lua Server Page](https://realtimelogic.com/ba/doc/en/GettingStarted.html#LSPAndCSP)). The two LSP examples provided demonstrate the correct usage of blocking sockets. For any other cases, as previously discussed, it is imperative to wrap your code with a `ba.socket.event()` call, transforming the code execution into a non-blocking Cosocket operation.
 
 ### MySQL Persistent Database Connection Example
 
