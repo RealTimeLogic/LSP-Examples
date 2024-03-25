@@ -13,9 +13,10 @@
 -- Check out the MQTT Sparkplug-Enabled Weather Station after testing
 -- this example: http://bit.ly/3DwZYZY
 
-local SDA_GPIO <const> = 21
-local SCL_GPIO <const> = 22
-local BME280_I2C_ADDR <const> = 0x76
+local SDA_GPIO <const> = 21 -- the GPIO number; if you connect SDA to GPIO8, then set this to 8
+local SCL_GPIO <const> = 22 -- the GPIO number; if you connect SCL to GPIO9, then set this to 9
+
+local BME280_I2C_ADDR <const> = 0x76 -- Default BME280 I2C address
 
 local settings={
    tStandby=1,
