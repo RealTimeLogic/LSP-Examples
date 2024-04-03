@@ -8,7 +8,7 @@
 --     http://esp32-ip/fs/.lua/ (ESP32 web-file-manager and WebDAV address)
 --  2: Create an app using Xedge and add this file to the app
 --  3: Set your I2C GPIO settings below
---  4: Run this file as an LSP page
+--  4: Save and run
 
 -- Check out the MQTT Sparkplug-Enabled Weather Station after testing
 -- this example: http://bit.ly/3DwZYZY
