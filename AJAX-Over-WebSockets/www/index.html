@@ -9,13 +9,25 @@
 
 /* Create the required full WebSocket URL from a path component
 */
-function wsURL(path) {
-    var l = window.location;
-    if(path == undefined) path = l.pathname;
-    return ((l.protocol === "https:") ? "wss://" : "ws://") +
-        l.hostname +
-        (l.port!=80 && l.port!=443 && l.port.length!=0 ? ":" + l.port : "") +
-        path;
+function wsURL() {
+  var l = window.location;
+  // Function to strip off filename if present in the path
+  function stripFilename(path) {
+    if (path.endsWith('/')) {
+      return path;
+    }
+    const lastSegment = path.split('/').pop();
+    return lastSegment.includes('.') ? path.substring(0, path.lastIndexOf('/')) : path;
+  };
+  // Extract and process the path
+  var path = l.pathname;
+  var strippedPath = stripFilename(path);
+
+  // Construct WebSocket URL
+  return ((l.protocol === "https:") ? "wss://" : "ws://") +
+    l.hostname +
+    (l.port && l.port != 80 && l.port != 443 ? ":" + l.port : "") +
+    strippedPath;
 };
 
 
@@ -39,8 +51,7 @@ function wsURL(path) {
       ...args: the arguments sent to the server side service, if any.
 */
 function createAjax(service,onopen,onclose) {
-   var sock = new WebSocket(wsURL(service));
-   var sock = new WebSocket(wsurl);
+   var sock = new WebSocket(wsURL()+service);
    sock.onopen=onopen;
    sock.onclose=onclose;
    var callbacks={} // saved ajax callbacks: key=id, val=function
@@ -77,7 +88,7 @@ $(function() {
     disableInputs(true); //Initially disabled, then enabled when WebSocket is up
 
     // Create the AJAX client instance
-    var ajax=createAjax('service.lsp', // The server side WebSocket service
+    var ajax=createAjax('/service.lsp', // The server side WebSocket service
                         function() { disableInputs(false); }, // WS Up
                         function() { disableInputs(true); } // WS Down
                        );

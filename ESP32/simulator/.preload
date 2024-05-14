@@ -11,7 +11,7 @@ end
 function G:value(val)
    if val ~= nil then
       self.state=val
-      tracep(true,9,self.pin,val)
+      tracep(true,21,self.pin,val)
       return true
    end
    return self.state
@@ -31,36 +31,40 @@ end
 local O={} -- OTA
 O.__index=O
 function O:write(data)
-   trace("OTA write",#data)
+   local fp=self.fp
+   local ok = fp and fp:write(data) and true or false
+   trace("OTA write",#data,ok)
    return true
 end
 function O:commit()
    trace("OTA commit")
+   if self.fp then self.fp:close() self.fp=nil end
    return true
 end
 function O:abort()
    trace("OTA abort")
+   if self.fp then self.fp:close() self.fp=nil end
    return true
 end
 O.__gc=O.abort
 function esp32.ota(action)
    if not action then
       return {
-         secureversion="1",
-         version="1",
+         secureversion="0",
+         version="1.2",
          projectname="xedge",
-         time="1",
-         date="1",
-         idfver="1",
+         time="12:00:00",
+         date="May 8 2024",
+         idfver="v5.4-dev-78-gd4cd437ede",
          sha256="",
       }
    end
-   if "begin" == cmd then
-      trace"OTA begin"
-      return {
-         write=function(self,data) trace("OTA write", #data) return true end,
-         commit=function() trace"OTA commit" return true end
-      }
+   if "begin" == action then
+      local io=ba.openio"home"
+      trace("OTA begin",io:realpath"OTA.BIN")
+      return setmetatable({
+         fp=io:open("OTA.BIN","w"),
+      },O)
    else
       error"Invalid command"
    end
@@ -69,10 +73,8 @@ end
 function esp32.execute(cmd)
    trace("execute",cmd)
    if "restart" == cmd then
-      while true do
-         trace"Restart: CTRL-C"
-         ba.sleep(1000);
-      end
+      trace"Restart: CTRL-C"
+      error"RESTART"
    else
       error("Not implemented")
    end

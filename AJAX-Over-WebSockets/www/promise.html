@@ -9,13 +9,21 @@
 
 /* Create the required full WebSocket URL from a path component
 */
-function wsURL(path) {
-    var l = window.location;
-    if(path == undefined) path = l.pathname;
-    return ((l.protocol === "https:") ? "wss://" : "ws://") +
-        l.hostname +
-        (l.port!=80 && l.port!=443 && l.port.length!=0 ? ":" + l.port : "") +
-        path;
+function wsURL() {
+  var l = window.location;
+  function stripFilename(path) {
+    if (path.endsWith('/')) {
+      return path;
+    }
+    const lastSegment = path.split('/').pop();
+    return lastSegment.includes('.') ? path.substring(0, path.lastIndexOf('/')) : path;
+  };
+  var path = l.pathname;
+  var strippedPath = stripFilename(path);
+  return ((l.protocol === "https:") ? "wss://" : "ws://") +
+    l.hostname +
+    (l.port && l.port != 80 && l.port != 443 ? ":" + l.port : "") +
+    strippedPath;
 };
 
 
@@ -42,7 +50,7 @@ function wsURL(path) {
      https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise
 */
 function createAjax(service,onopen,onclose) {
-   var sock = new WebSocket(wsURL(service));
+   var sock = new WebSocket(wsURL()+service);
    sock.onopen=onopen;
    sock.onclose=onclose;
    var callbacks={} // saved ajax callbacks: key=id, val=function
