@@ -10,6 +10,7 @@ local aesencode,aesdecode=(function()
 end)()
 
 local function downloadKeys(msKeysT,openidT,http)
+   tracep(20,"Downloading MS openid keys")
    local run=true
    local function exit() http:close() run=false end
    if mako then mako.onexit(exit,true) end
@@ -21,7 +22,7 @@ local function downloadKeys(msKeysT,openidT,http)
          for _,t in ipairs(t and t.keys or {}) do
             msKeysT[t.kid] = {n=d(t.n),e=d(t.e)}
          end
-         break
+         return true
       end
       trace("Cannot download",url,err)
    end
@@ -64,7 +65,23 @@ local function init(openidT)
 
    local http = require"httpm".create{trusted=true}
    local msKeysT={}
-   ba.thread.run(function () downloadKeys(msKeysT,openidT,http) end)
+   local oneHour=60*60*1000 -- in millisecs
+   local oneDay=24*oneHour
+   local downloadKeysTimer
+   local function downloadKeysTimerFunc()
+      ba.thread.run(function()
+         local keysT={}
+         if downloadKeys(keysT,openidT,http) then
+            msKeysT=keysT
+            downloadKeysTimer:reset(oneDay)
+         else
+            downloadKeysTimer:reset(oneHour)
+         end
+      end)
+      return true
+   end
+   downloadKeysTimer=ba.timer(downloadKeysTimerFunc)
+   downloadKeysTimer:set(oneDay, true, true)
 
    local function loginCallback(cmd)
       local err
@@ -125,9 +142,9 @@ local function init(openidT)
    end
 
    return {
-      sendredirect=sendLoginRedirect,
-      login=loginCallback,
-      decode = function(token) return jwtDecode(token, msKeysT) end
+      sendLoginRedirect=sendLoginRedirect,
+      loginCallback=loginCallback,
+      jwtDecode = function(token) return jwtDecode(token, msKeysT) end
    }
 
 end -- init

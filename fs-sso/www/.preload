@@ -24,6 +24,4 @@ fs:configure{tmo=2*60*60,helpuri=base.."help.lsp",logouturi=base.."logout.lsp"}
 
 -- Load the Microsoft Single Sign On Module
 mako.createloader(io)
-local sso=require"ms-sso".init(require"loadconf".openid)
-OpenIdCallback=sso.login
-OpenIdLogin=sso.sendredirect
+sso=require"ms-sso".init(require"loadconf".openid)

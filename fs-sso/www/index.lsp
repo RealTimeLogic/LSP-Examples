@@ -1,5 +1,7 @@
 <?lsp
 
+local sso=app.sso
+
 ------------------------------------------------------------
 local function emitLogin()
 ?>
@@ -49,7 +51,7 @@ end
 
 local action
 if request:method() == "POST" then
-   local header,payload = app.OpenIdCallback(request)
+   local header,payload = sso.loginCallback(request)
    if header then
       request:login()
       action = function() emitOK(payload) end
@@ -60,7 +62,7 @@ else
    if request:user() then
       action=emitOK
    elseif request:data"login" then
-      app.OpenIdLogin(request)
+      sso.sendLoginRedirect(request)
    else
       action=emitLogin
    end
