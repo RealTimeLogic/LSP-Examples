@@ -109,8 +109,8 @@ end
 -- static assets. In other words, static assets take precedence. The
 -- callback is called when no static asset is found.
 -- Ref dir: https://realtimelogic.com/ba/doc/?url=lua.html#ba_create_dir
-local cmsdir = ba.create.dir()
-cmsdir:setfunc(cmsfunc)
+local cmsDir = ba.create.dir()
+cmsDir:setfunc(cmsfunc)
 
 
 ------------------- AUTHENTICATION ---------------------------------
@@ -165,7 +165,7 @@ end
 
 -- Create the authenticator that will be applied to the 'pages' directory.
 local authenticator=ba.create.authenticator(ju,{response=loginresponse, type="form", realm=realm})
-local authDir = ba.create.dir(1) -- No name matches "", set priority to a value greater than cmsdir.
+local authDir = ba.create.dir(1) -- No name matches "", set priority to a value greater than cmsDir.
 authDir:setauth(authenticator,ja)
 authDir:p403("/.lua/www/no-access.lsp")
 
@@ -174,13 +174,16 @@ authDir:p403("/.lua/www/no-access.lsp")
 -- The dir object is not set when running as an Xedge xlua app (not LSP enabled app)
 -- https://realtimelogic.com/ba/doc/en/Xedge.html#using
 if not dir then
-   dir=ba.create.dir()
+   -- The resource reader serves the static content and is executed
+   -- before the authenticator triggers.
+   dir=ba.create.resrdr(io) -- no name, thus root.
+   dir:lspfilter() -- LSP enable. We have one LSP file accessed via authDir:p403()
    dir:insert()
 end
 
--- Insert authDir and cmsdir as 'dir' siblings.
+-- Insert authDir and cmsDir as 'dir' siblings.
 dir:insert(authDir,true)
-dir:insert(cmsdir,true)
+dir:insert(cmsDir,true)
 
 -- Return onunload handler
 return function()

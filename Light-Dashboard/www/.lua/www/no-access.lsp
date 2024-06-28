@@ -24,6 +24,7 @@ response:setstatus(401)
     <div id="main">
         <div class="header">
             <h1>Unauthorized</h1>
+            <p>You are authenticated as: <?lsp=request:user()?></p>
             <h2>Click the back button to continue</h2>
         </div>
     </div>
