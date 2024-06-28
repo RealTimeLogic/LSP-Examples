@@ -169,9 +169,20 @@ local authDir = ba.create.dir(1) -- No name matches "", set priority to a value 
 authDir:setauth(authenticator,ja)
 authDir:p403("/.lua/www/no-access.lsp")
 
--- All applications have a predefined 'dir' object, which is a resrdr instance.
+-- All LSP applications have a predefined 'dir' object, which is a resrdr instance.
 -- Ref resrdr: https://realtimelogic.com/ba/doc/?url=lua.html#ba_create_resrdr
--- Insert authDir and cmsdir as siblings.
+-- The dir object is not set when running as an Xedge xlua app (not LSP enabled app)
+-- https://realtimelogic.com/ba/doc/en/Xedge.html#using
+if not dir then
+   dir=ba.create.dir()
+   dir:insert()
+end
+
+-- Insert authDir and cmsdir as 'dir' siblings.
 dir:insert(authDir,true)
 dir:insert(cmsdir,true)
 
+-- Return onunload handler
+return function()
+   dir:unlink() -- Required when run as an Xedge xlua app.
+end
