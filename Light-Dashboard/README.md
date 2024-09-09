@@ -6,22 +6,11 @@ devices.
 
 ![Light Dashboard Template](https://makoserver.net/blogmedia/dashboard/Light-Dashboard.gif)
 
-We provide two dashboard templates, this light version and a more
-advanced dashboard based on the
-[Bootstrap powered AdminLTE dashboard](../Dashboard). We recommend
-testing both dashboards on your host computer to get a solid
-understanding on how to create your own dashboard -- i.e. which of the dashboards you should base your design on or what server side code
-you should use for your own custom HTML/CSS.
+## Tutorial and hands-on microcontroller example:
+The server-side logic and web rendering are explained in the [dashboard article](https://makoserver.net/articles/How-to-Build-an-Interactive-Dashboard-App). For a hands-on microcontroller example of how to use this dashboard, see the tutorial, [Designing Your First Professional Embedded Web Interface](https://realtimelogic.com/articles/Designing-Your-First-Professional-Embedded-Web-Interface).
 
-The server side logic and rendering is similar for both dashboards,
-but the more advanced AdminLTE dashboard's server side code
-must manage the breadcrumb generation and proper menu expansion of sub
-menus. See the
-[AdminLTE dashboard article on the Mako Server site](https://makoserver.net/articles/How-to-Build-an-Interactive-Dashboard-App)
-for an introduction to how both dashboards dynamically render
-HTML on the server side.
-
-Run the dashboard example, using the Mako Server, as follows:
+## How to run using the Mako Server:
+Run the dashboard example, using the [Mako Server](https://makoserver.net/), as follows:
 
 ```
 cd Light-Dashboard
@@ -82,10 +71,6 @@ all resources if you log in as the user 'admin' and password
 additional users and the constraints set for the users. We use hard
 coded values for simplicity. A real application would store the users
 and the optional constraints as JSON data in two files.
-
-See the [AdminLTE dashboard](../Dashboard) if you do not want
-authentication for all pages. The AdminLTE dashboard template, in file
-cms.lua, shows how to use an authenticator for a subset of the pages.
 
 ## Notes:
 
