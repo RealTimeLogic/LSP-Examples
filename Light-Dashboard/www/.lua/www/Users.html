@@ -1,0 +1,54 @@
+<?lsp
+if not app.setuser then
+   print"Authenticator not enabled; See www/.lua/cms.lua for details"
+   return
+end
+
+-- HTML Escaping: Transforming potentially dangerous characters into a safe format.
+local xssfilt=(function()
+   local escSyms= {
+      ['&']="&amp;",
+      ['<']="&lt;",
+      ['>']="&gt;",
+      ['"']="&quot;",
+      ["'"]="&#x27;",
+      ['/']="&#x2F;"
+   }
+   local function escape(c) return escSyms[c] end
+   return function(x) return x and x:gsub("[&<>\"'/]", escape) end
+end)()
+
+-- Trim string at both ends
+local function trim(x)
+   return x and x:gsub("^%s*(.-)%s*$", "%1")
+end
+
+local username,password
+if "POST" == request:method() then
+   local data=request:data()
+   username,password=xssfilt(trim(data.username)),xssfilt(trim(data.password))
+   if username and password then
+      if 0 == #password then password=nil end -- remove
+      app.setuser(username,password)
+      response:setheader("Refresh", "3")
+   end
+end
+
+?>
+<div class="header">
+   <h1><?lsp=username and (password and "User Added" or "User Removed") or "Users"?></h1>
+</div>
+<div class="content">
+  <form class="pure-form pure-form-stacked" method="POST">
+    <fieldset class="pure-form pure-form-stacked">
+      <legend>Add/Remove Local User</legend>
+      <label for="AuthName">Username</label>
+      <input name="username" type="text" id="AuthName" placeholder="Enter a username" class="pure-input-1"/>
+      <label for="AuthPassword">Password</label>
+      <input name="password" type="password" id="AuthPassword" placeholder="Enter a password or leave it blank to remove the user" class="pure-input-1"/>
+      <div class="pure-controls">
+        <button id="AuthSave" class="pure-button pure-button-primary">Save</button>
+      </div>
+    </fieldset>
+  </form>
+</div>

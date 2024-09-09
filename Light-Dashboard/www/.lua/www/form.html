@@ -78,8 +78,6 @@ page.counter = page.counter and page.counter+1 or 1
 
   <p>Clicking the 'Enable AJAX' checkbox activates JavaScript code embedded in the page. This code prevents the form from being submitted using standard HTTP POST. Instead, the data is sent to the server using a JavaScript powered AJAX request. When AJAX is enabled, the page is not refreshed and you will notice that the page counter does not increment each time the Submit button is clicked.</p>
 
-  <p>You do not have access to perform HTTP POST when logged in with the username 'user' and an access denied message will be displayed when clicking the submit button. See the source in cms.lua for details. The access denied logic works with standard POST and AJAX POST.</p>
-
   <p>The submitted form data is sent to the <a target="_blank" href="https://realtimelogic.com/ba/doc/?url=lua.html#_G_trace">trace</a> and is subsequently printed in the console.</p>
 
   <p>See our <a target="_blank" href="https://tutorial.realtimelogic.com/HTML-Forms.lsp">online tutorial : forms</a> for an introduction on how to manage HTML forms on the server side.</p>
