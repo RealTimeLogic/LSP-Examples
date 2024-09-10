@@ -42,7 +42,7 @@ admin and password qwerty.
     |           404.html -- Triggered for pages not in menu.json
     |           login.html -- Triggered when not signed in
     |           logout.html -- Sign out page
-    |           no-access.lsp -- Triggered by authenticator/authorizer when user has no access
+    |           Users.html -- Add or remove users
     |
     \---static -- Pure.css files: See https://purecss.io/
             pure-min.css --  pure-min.css + grids-responsive-min.css
@@ -63,14 +63,14 @@ admin and password qwerty.
 8. The dynamically generated HTML is sent to the client (the browser)
 
 
-## Authentication and Authorization
+## Authentication
 
-An authenticator is installed for all pages. You have full access to
-all resources if you log in as the user 'admin' and password
-'qwerty'. See the hard coded values in source/.lua/cms.lua for
-additional users and the constraints set for the users. We use hard
-coded values for simplicity. A real application would store the users
-and the optional constraints as JSON data in two files.
+This example includes a [soft TPM-protected](https://realtimelogic.com/ba/doc/en/lua/auxlua.html#TPM) user database, along with a web interface for adding and removing users. The authentication logic is based on the example provided with [function ba.tpm.jsonuser()](https://realtimelogic.com/ba/doc/en/lua/auxlua.html#ba_tpm_jsonuser).
+
+Here's how the authentication works: if no users are found in the database, authentication is disabled. Once a user is added, authentication is automatically enabled. Conversely, removing the last user disables authentication again.
+
+The Users.html page provides a simple interface for managing the user database, allowing the addition and removal of users. For simplicity, the authentication code focuses purely on user authentication, without any authorization mechanisms.
+
 
 ## Notes:
 
