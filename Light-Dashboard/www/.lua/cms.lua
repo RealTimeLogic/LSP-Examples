@@ -93,6 +93,10 @@ local function cmsfunc(_ENV, relpath, notInMenuOK)
       pagesT[relpath]=pageT
    end
 
+   --Remove the following line and xrsp:finalize() if you do not want to
+   --compress the response.
+   local xrsp = response:setresponse() -- Activate compression
+
    -- Make the following available to template.lsp
    -- Note, we explicitly use the _ENV tab for code readability.
    -- Details: https://realtimelogic.com/ba/doc/en/lua/man/manual.html#2.2
@@ -107,6 +111,9 @@ local function cmsfunc(_ENV, relpath, notInMenuOK)
    templatePage(_ENV,relpath,io,pageT,app)
    -- non cached version of above. Use if testing new template.
    --parseLspPage(".lua/www/template.lsp")(_ENV,relpath,io,pageT,app)
+
+   xrsp:finalize(true) -- Send compressed data to client
+
    return true
 end
 
