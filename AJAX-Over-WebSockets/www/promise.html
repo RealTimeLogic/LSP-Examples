@@ -3,9 +3,7 @@
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"/>
-  <script src="/rtl/jquery.js"></script>
   <script>
-
 
 /* Create the required full WebSocket URL from a path component
 */
@@ -49,92 +47,104 @@ function wsURL() {
      The ajax function returns a JS Promise:
      https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise
 */
-function createAjax(service,onopen,onclose) {
-   var sock = new WebSocket(wsURL()+service);
-   sock.onopen=onopen;
-   sock.onclose=onclose;
-   var callbacks={} // saved ajax callbacks: key=id, val=function
-   /* WebSocket data received from server. Convert the JSON response to
-      an object, find the AJAX callback, and call the callback.
-   */
-   sock.onmessage = function(e) {
-       var resp=JSON.parse(e.data); // Convert the JSON response to an object
-       var promise=callbacks[resp.rpcID]; // Find the two promise callbacks
-       delete callbacks[resp.rpcID]; // Release
-       if(resp.rsp != null) promise.resolve(resp.rsp);
-       else promise.reject(resp.err);
-   };
-   // Return function used for sending AJAX requests.
-   return function(service, ...args) {
-       //Create and return a new Promise
-       return new Promise(function(resolve, reject) {
-            var rpcID; // Find a unique ID
-            do {
-               rpcID=Math.floor(Math.random() * 100000);
-            } while(callbacks[rpcID]); // while collisions
-             // Save promise callbacks: rpcID is the key.
-            callbacks[rpcID]={resolve:resolve,reject:reject};
-            // Convert to JSON and send data to server.
-            sock.send(JSON.stringify({rpcID:rpcID,service:service,args:args}));
-         });
-   };
-}; // End 'createAjax': 22 lines of code :-)
+function createAjax(service, onopen, onclose) {
+    const sock = new WebSocket(wsURL() + service);
+    sock.onopen = onopen;
+    sock.onclose = onclose;
 
+    const callbacks = {}; // Save AJAX callbacks with key=id, value=function
 
-// We use JQuery for interacting with the HTML
-$(function() {
-
-    // Disable/enable all HTML input elements
-    function disableInputs(disable) {
-        $("input").prop('disabled', disable);
+    // WebSocket data received from server; process JSON response
+    sock.onmessage = function (e) {
+        const resp = JSON.parse(e.data); // Convert JSON response to object
+        const promise = callbacks[resp.rpcID]; // Find corresponding promise
+        delete callbacks[resp.rpcID]; // Release callback once used
+        if (resp.rsp != null) {
+            promise.resolve(resp.rsp);
+        } else {
+            promise.reject(resp.err);
+        }
     };
-    disableInputs(true); //Initially disabled, then enabled when WebSocket is up
+
+    // Return an async function for sending AJAX requests
+    return async function (service, ...args) {
+        // Find a unique ID and save promise callbacks: rpcID is the key
+        let rpcID;
+        do {
+            rpcID = Math.floor(Math.random() * 100000);
+        } while (callbacks[rpcID]); // Ensure unique rpcID
+
+        // Create a promise for the response and assign to callbacks
+        return new Promise((resolve, reject) => {
+            callbacks[rpcID] = { resolve, reject };
+            sock.send(JSON.stringify({ rpcID, service, args }));
+        });
+    };
+}
+
+// When the DOM is fully loaded
+document.addEventListener("DOMContentLoaded", () => {
+
+    // Disable or enable all HTML input elements
+    function disableInputs(disable) {
+        document.querySelectorAll("input").forEach(input => {
+            input.disabled = disable;
+        });
+    }
+    disableInputs(true); // Initially disabled, enabled when WebSocket is up
 
     // Create the AJAX client instance
-    var ajax=createAjax('/service.lsp', // The server side WebSocket service
-                        function() { disableInputs(false); }, // WS Up
-                        function() { disableInputs(true); } // WS Down
-                       );
+    const ajax = createAjax(
+        '/service.lsp',
+        () => disableInputs(false), // WebSocket connection opened
+        () => disableInputs(true) // WebSocket connection closed
+    );
 
-    /* This function is called via the two functions below when the
-       'add' or 'subtract' button is clicked: Extract a and b from
-       HTML input elements and call the AJAX service.
-    */
-    function math(serviceFunc,button) {
-        $("#err").html(""); // Erase errors, if any
-        // Extract the two values from the two input elems.
-        var list=$(button).parent().parent().children();
-        var a = list.eq(0).find('input').val(); //First input
-        var b = list.eq(2).find('input').val(); // Second input
-        // Call server function "math/[add|subtract]"
-        ajax("math/"+serviceFunc, a, b).
-            then(function(rsp) { list.find("h2").html(rsp+""); }).
-            catch(function(err) { $("#err").html(err); });
-    };
+    // Function called when 'add' or 'subtract' button is clicked
+    async function math(serviceFunc, button) {
+        document.getElementById("err").textContent = ""; // Clear any previous errors
 
-    $("#addBut").click(function() { math("add",this); });
+        // Extract the two input values
+        const row = button.closest(".row");
+        const inputs = row.querySelectorAll("input");
+        const a = inputs[0].value * 1;
+        const b = inputs[1].value * 1;
 
-    $("#subBut").click(function() { math("subtract",this); });
+        // Call server function and handle response
+        try {
+            const rsp = await ajax(`math/${serviceFunc}`, a, b);
+            row.querySelector("h2").textContent = String(rsp);
+        } catch (err) {
+            document.getElementById("err").textContent = err;
+        }
+    }
 
-    $("#timeBut").click(function() {
-        /* Call the Lua function os.date with arg "*t".
-           Function os.date returns an object with time values.
-           This example shows how a complex data object may be sent.
-        */
-        ajax("os/date", "*t").
-            then(function(rsp) {
-                var html="";
-                // The response is an object
-                for (var key in rsp) {
-                    html += key + " : " + rsp[key] + "\n";
-                }
-                $("#time").html(html);
-            }).
-            catch(function(err) { $("#err").html(err); } );
+    // Event listeners for buttons
+    document.getElementById("addBut").addEventListener("click", function () {
+        math("add", this);
+    });
+
+    document.getElementById("subBut").addEventListener("click", function () {
+        math("subtract", this);
+    });
+
+    document.getElementById("timeBut").addEventListener("click", async function () {
+        try {
+           /* Call the Lua function os.date with arg "*t".
+              Function os.date returns an object with time values.
+              This example shows how a complex data object may be sent.
+           */
+            const rsp = await ajax("os/date", "*t");
+            let html = "";
+            for (const key in rsp) {
+                html += `${key} : ${rsp[key]}\n`;
+            }
+            document.getElementById("time").textContent = html;
+        } catch (err) {
+            document.getElementById("err").textContent = err;
+        }
     });
 });
-
-
 
   </script>
 </head>

@@ -46,7 +46,7 @@ not authenticated. These resources are placed in the /public/
 directory, which is always public when using a Resource Reader
 directory instance. See dir:setauth() for details:
 
-https://realtimelogic.com/ba/doc/?url=lua.html#ba_dir_setauth
+https://realtimelogic.com/ba/doc/en/lua/lua.html#ba_dir_setauth
 
 # Example "subdir"
 
@@ -105,7 +105,7 @@ when using HTTP in any of the above examples.
 If you plan on using form based authentication with non encrypted
 HTTP, make sure to use the secure version as explained in the
 following section:
-https://realtimelogic.com/ba/doc/?url=lua.html#sha1_login
+https://realtimelogic.com/ba/doc/en/lua/lua.html#EncryptedPasswords
 
 The tutorial Dynamic Navigation Menu includes form based
 authentication that is secure on plain old HTTP. The example also

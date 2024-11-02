@@ -11,7 +11,11 @@ body{
   background: url(https://cdn.shopify.com/s/files/1/1302/0941/files/DANNY_COVER_1728x.jpg) no-repeat fixed;
   background-size: cover;
   background-position: 50%;
-} 
+  color:white;
+  font-weigth:bold;
+}
+p {  font-size:140%; }
+
 </style>
 ]]
 
@@ -21,6 +25,6 @@ body{
 <h1>404 not found</h1>
 
 <p class="center">This message comes from the file <a href="showsource/?path=.404.lsp">.404.lsp</a>.</p>
-<p>Danny Ching is paddling on his 404 paddle board at the Pacific Paddle Games Doheny State Beach.</p>
+<p>Danny Ching is paddling on his 404 paddle board at the Pacific Paddle Games at Doheny State Beach. He named the <a href="https://404seas.com/">404 brand</a> after the HTTP 404 error code and the concept of an error page.</p>
 
 <?lsp response:include"footer.shtml" ?>
