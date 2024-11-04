@@ -51,6 +51,12 @@ local function calculatePwmDutyCycle(angle)
    return (maxPwm / cycleTime) * (angle * 1000 / 180 + minPulseWidth)
 end
 
+or
+
+local function calculatePwmDutyCycle(angle)
+   return (maxPwm / cycleTime) * (angle * 5.55 + minPulseWidth)
+end
+
 How to wire the servos:
 
 See the introduction in the following tutorial on how to physically
@@ -86,7 +92,7 @@ local minPulseWidth = 1000  -- 1 ms
 local cycleTime = 20000     -- 20 ms
 
 local function calculatePwmDutyCycle(angle)
-   return (maxPwm / cycleTime) * (angle * 1000 / 180 + minPulseWidth)
+   return (maxPwm / cycleTime) * (angle * 5.55 + minPulseWidth)
 end
 
 -- The following function runs as a coroutine timer.

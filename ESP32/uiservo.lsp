@@ -36,9 +36,8 @@ local minPulseWidth = 1000  -- 1 ms
 local cycleTime = 20000      -- 20 ms
 
 local function calculatePwmDutyCycle(angle)
-   return (maxPwm / cycleTime) * (angle * 1000 / 180 + minPulseWidth)
+   return (maxPwm / cycleTime) * (angle * 5.55 + minPulseWidth)
 end
-
 
 if page.smq then
    if require"smq.hub".isSMQ(request) then
