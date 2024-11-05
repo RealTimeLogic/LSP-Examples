@@ -1,61 +1,12 @@
-<?lsp
-
-if require"smq.hub".isSMQ(request) then
-   -- Upgrade HTTP(S) request to SMQ connection
-   -- See code in the .preload script (the app).
-   app.connectClientSlider(request)
-   response:abort() -- stop executing page
-end
-?>
-
 <!--
 Slider documentation: https://roundsliderui.com/
 -->
 <link href="https://cdn.jsdelivr.net/npm/round-slider@1.6.1/dist/roundslider.min.css" rel="stylesheet" />
+<link href="/static/WebSockets.css" rel="stylesheet" />
 <script src="/rtl/jquery.js"></script>
 <script src="/rtl/smq.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/round-slider@1.6.1/dist/roundslider.min.js"></script>
-<style>
-#SliderContainer {
-    position:relative;
-    height: 200px;
-}
-#Slider {
-    width: 260px;
-    height: 130px;
-    padding: 20px;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    margin: -85px 0 0 -130px;
-}
-#Slider .rs-handle  {
-    background-color: transparent;
-    border: 8px solid transparent;
-    border-right-color: black;
-    margin: -8px 0 0 14px !important;
-}
-#Slider .rs-handle:before  {
-    display: block;
-    content: " ";
-    position: absolute;
-    height: 12px;
-    width: 12px;
-    background: black;
-    right: -6px;
-    bottom: -6px;
-    border-radius: 100%;
-}
-#Slider .rs-handle:after  {
-    display: block;
-    content: " ";
-    width: 106px;
-    position: absolute;
-    top: -1px;
-    right: 0px;
-    border-top: 2px solid black;
-}
-</style>
+<script src="/static/WebSockets.js"></script>
 
 <div class="header">
   <h1>WebSockets</h1>
@@ -74,42 +25,3 @@ Slider documentation: https://roundsliderui.com/
 
   <p>See our <a target="_blank" href="https://tutorial.realtimelogic.com/WebSockets.lsp">online tutorial : WebSockets</a> for a WebSockets introduction.</p>
 </div>
-
-<script>
-$(function() {
-    var smq = SMQ.Client(); // No args: connect back to 'origin' i.e. the same page.
-    let active=true;
-
-    //SMQ callback for data sent to the topic "slider" and "self"
-    function onSmqMsg(d,ptid) {
-        if(ptid != smq.gettid()) { //Ignore messages from 'self'
-            active=true;
-            $("#Slider").roundSlider("option", "value", Math.floor(d.angle * 100 / 180));
-            active=false;
-        }
-    }
-    
-    smq.subscribe("self",{datatype:"json",onmsg:onSmqMsg});
-    smq.subscribe("slider",{datatype:"json",onmsg:onSmqMsg});
-
-    function onChange (e) {
-        if(!active)
-            smq.pubjson({angle:Math.floor(e.value * 180 / 100)}, "slider");
-    }
-
-    $("#Slider").roundSlider({
-        animation:false,
-        sliderType: "min-range",
-        radius: 130,
-        showTooltip: false,
-        width: 16,
-        value: 0,
-        handleSize: 0,
-        handleShape: "square",
-        circleShape: "half-top",
-        change: onChange,
-        tooltipFormat: onChange
-    });
-    active=false;
-});
-</script>

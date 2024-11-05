@@ -71,6 +71,15 @@ Here's how the authentication works: if no users are found in the database, auth
 
 The Users.html page provides a simple interface for managing the user database, allowing the addition and removal of users. For simplicity, the authentication code focuses purely on user authentication, without any authorization mechanisms.
 
+## Security Policies
+
+The following default security policies are set to enhance security by controlling content sources and protecting against MIME-type sniffing:
+
+- Content-Security-Policy: Limits resources (scripts, styles) to load only from trusted sources. By default, it restricts all resources to 'self', with an exception for scripts and styles from cdn.jsdelivr.net. You may need to adjust this policy to include additional trusted domains based on your application's requirements.
+- X-Content-Type-Options: Set to "nosniff" to prevent browsers from interpreting files as a different MIME type than declared. This helps prevent certain attacks that rely on MIME-type misinterpretation.
+
+**Note:** These policies are examples and may require customization to meet the specific needs of your deployment environment and any third-party services you integrate. See www/.lua/cms.lua and 'securityPolicies' for details.
+
 
 ## Notes:
 

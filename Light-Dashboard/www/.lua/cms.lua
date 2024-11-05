@@ -1,4 +1,3 @@
-
 -- Mini Content Management System (CMS) designed for the Pure.css dashboard.
 
 -- All LSP applications have a predefined 'dir' object, which is a resrdr instance.
@@ -19,6 +18,13 @@ local rw=require"rwfile"
 -- Closure def: https://en.wikipedia.org/wiki/Closure_(computer_programming)
 local app,io,dir=app,app.io,app.dir
 
+-- Set on 'dir' and used by function cmsfunc()
+local securityPolicies={
+   ["Content-Security-Policy"]= "default-src 'self'; script-src 'self' cdn.jsdelivr.net; style-src 'self' cdn.jsdelivr.net",
+   ["X-Content-Type-Options"]="nosniff",
+}
+-- Doc: https://realtimelogic.com/ba/doc/en/lua/lua.html#rsrdr_header
+dir:header(securityPolicies)
 
 -- Takes the data content of an LSP page (HTML with LSP tags) as
 -- argument, converts the LSP page to Lua code, and compiles the Lua
@@ -69,6 +75,7 @@ local pagesT={}
 -- See the following for details on the request/response environment:
 -- https://realtimelogic.com/ba/doc/en/lua/lua.html#CMDE
 local function cmsfunc(_ENV, relpath, notInMenuOK)
+   local response=response -- e.g. = _ENV.response. Now faster.
 
    -- Translate to (path/)index.html if only directory name is provided.
    if #relpath == 0 or relpath:find"/$" then
@@ -96,6 +103,8 @@ local function cmsfunc(_ENV, relpath, notInMenuOK)
    --Remove the following line and xrsp:finalize() if you do not want to
    --compress the response.
    local xrsp = response:setresponse() -- Activate compression
+   response:setdefaultheaders()
+   for k,v in pairs(securityPolicies) do response:setheader(k,v) end
 
    -- Make the following available to template.lsp
    -- Note, we explicitly use the _ENV tab for code readability.
