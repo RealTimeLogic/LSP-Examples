@@ -20,7 +20,7 @@ local app,io,dir=app,app.io,app.dir
 
 -- Set on 'dir' and used by function cmsfunc()
 local securityPolicies={
-   ["Content-Security-Policy"]= "default-src 'self'; script-src 'self' cdn.jsdelivr.net 'unsafe-inline'; style-src 'self' cdn.jsdelivr.net 'unsafe-inline'",
+   ["Content-Security-Policy"]= "default-src 'self'; script-src 'self' cdn.jsdelivr.net unpkg.com 'unsafe-inline'; style-src 'self' cdn.jsdelivr.net unpkg.com 'unsafe-inline'",
    ["X-Content-Type-Options"]="nosniff",
 }
 -- Doc: https://realtimelogic.com/ba/doc/en/lua/lua.html#rsrdr_header
@@ -75,6 +75,7 @@ local pagesT={}
 -- See the following for details on the request/response environment:
 -- https://realtimelogic.com/ba/doc/en/lua/lua.html#CMDE
 local function cmsfunc(_ENV, relpath, notInMenuOK)
+   trace("hx-request:",request:header"hx-request" and "yes" or "no")
    local response=response -- e.g. = _ENV.response. Now faster.
 
    -- Translate to (path/)index.html if only directory name is provided.
@@ -104,23 +105,27 @@ local function cmsfunc(_ENV, relpath, notInMenuOK)
    --compress the response.
    local xrsp = response:setresponse() -- Activate compression
    response:setdefaultheaders()
-   for k,v in pairs(securityPolicies) do response:setheader(k,v) end
 
-   -- Make the following available to template.lsp
-   -- Note, we explicitly use the _ENV tab for code readability.
-   -- Details: https://realtimelogic.com/ba/doc/en/lua/man/manual.html#2.2
-   --          https://realtimelogic.com/ba/doc/en/lua/lua.html#CMDE
-   _ENV.menuL=menuL
-   _ENV.menuT=menuT
-   _ENV.relpath=relpath
-   -- lspPage is the parsed page (function as explained in parseLspPage above)
-   _ENV.lspPage=parseLspPage(".lua/www/"..relpath)
-   -- Call the template page and pass in the required arguments.
-   -- Arg details: https://realtimelogic.com/ba/doc/en/lua/lua.html#ba_parselsp
-   templatePage(_ENV,relpath,io,pageT,app)
-   -- non cached version of above. Use if testing new template.
-   --parseLspPage(".lua/www/template.lsp")(_ENV,relpath,io,pageT,app)
-
+   local lspPage=parseLspPage(".lua/www/"..relpath)
+   if request:header"hx-request" then
+      lspPage(_ENV,relpath,io,pageT,app)
+   else
+      for k,v in pairs(securityPolicies) do response:setheader(k,v) end
+      -- Make the following available to template.lsp
+      -- Note, we explicitly use the _ENV tab for code readability.
+      -- Details: https://realtimelogic.com/ba/doc/en/lua/man/manual.html#2.2
+      --          https://realtimelogic.com/ba/doc/en/lua/lua.html#CMDE
+      _ENV.menuL=menuL
+      _ENV.menuT=menuT
+      _ENV.relpath=relpath
+      -- lspPage is the parsed page (function as explained in parseLspPage above)
+      _ENV.lspPage=lspPage
+      -- Call the template page and pass in the required arguments.
+      -- Arg details: https://realtimelogic.com/ba/doc/en/lua/lua.html#ba_parselsp
+      templatePage(_ENV,relpath,io,pageT,app)
+      -- non cached version of above. Use if testing new template.
+      --parseLspPage(".lua/www/template.lsp")(_ENV,relpath,io,pageT,app)
+   end
    xrsp:finalize(true) -- Send compressed data to client
 
    return true

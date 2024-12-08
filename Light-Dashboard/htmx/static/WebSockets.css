@@ -1,0 +1,39 @@
+#SliderContainer {
+    position:relative;
+    height: 200px;
+}
+#Slider {
+    width: 260px;
+    height: 130px;
+    padding: 20px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin: -85px 0 0 -130px;
+}
+#Slider .rs-handle  {
+    background-color: transparent;
+    border: 8px solid transparent;
+    border-right-color: black;
+    margin: -8px 0 0 14px !important;
+}
+#Slider .rs-handle:before  {
+    display: block;
+    content: " ";
+    position: absolute;
+    height: 12px;
+    width: 12px;
+    background: black;
+    right: -6px;
+    bottom: -6px;
+    border-radius: 100%;
+}
+#Slider .rs-handle:after  {
+    display: block;
+    content: " ";
+    width: 106px;
+    position: absolute;
+    top: -1px;
+    right: 0px;
+    border-top: 2px solid black;
+}

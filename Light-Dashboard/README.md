@@ -6,8 +6,10 @@ devices.
 
 ![Light Dashboard Template](https://makoserver.net/blogmedia/dashboard/Light-Dashboard.gif)
 
-## Tutorial and hands-on microcontroller example:
-The server-side logic and web rendering are explained in the [dashboard article](https://makoserver.net/articles/How-to-Build-an-Interactive-Dashboard-App). For a hands-on microcontroller example of how to use this dashboard, see the tutorial, [Designing Your First Professional Embedded Web Interface](https://realtimelogic.com/articles/Designing-Your-First-Professional-Embedded-Web-Interface).
+
+## Tutorial and Hands-On Microcontroller Example
+- Explore the server-side logic, HTMX, and web rendering principles detailed in the [dashboard article](https://makoserver.net/articles/How-to-Build-an-Interactive-Dashboard-App).
+- For a practical microcontroller implementation using this dashboard, check out the tutorial [Designing Your First Professional Embedded Web Interface](https://realtimelogic.com/articles/Designing-Your-First-Professional-Embedded-Web-Interface).
 
 ## How to run using the Mako Server:
 Run the dashboard example, using the [Mako Server](https://makoserver.net/), as follows:
@@ -16,6 +18,13 @@ Run the dashboard example, using the [Mako Server](https://makoserver.net/), as 
 cd Light-Dashboard
 mako -l::www
 ```
+
+Run the [HTMX](https://htmx.org/) version as follows:
+```
+cd Light-Dashboard
+mako -l::htmx
+```
+
 For detailed instructions on starting the Mako Server, check out our [command line video tutorial](https://youtu.be/vwQ52ZC5RRg) and review the server's [command line options](https://realtimelogic.com/ba/doc/?url=Mako.html#loadapp) in our documentation.
 
 After starting the Mako Server, use a browser and navigate to
