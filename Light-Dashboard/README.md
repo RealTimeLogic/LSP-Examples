@@ -19,7 +19,7 @@ cd Light-Dashboard
 mako -l::www
 ```
 
-Run the [HTMX](https://htmx.org/) version as follows:
+Run the [HTMX](https://makoserver.net/articles/How-to-Build-an-Interactive-Dashboard-App#htmx) version as follows:
 ```
 cd Light-Dashboard
 mako -l::htmx
@@ -56,21 +56,23 @@ admin and password qwerty.
     \---static -- Pure.css files: See https://purecss.io/
             pure-min.css --  pure-min.css + grids-responsive-min.css
             styles.css -- For the dashboard
-            ui.js -- See https://purecss.io/
+            ui.js -- Manages the Hamburger button logic. This button is visible on
+             smaller devices or if you narrow the browser window. Details: https://purecss.io/
 ```
 
 
 ## The server side code works as follows:
 
-1. A [directory function](https://realtimelogic.com/ba/doc/?url=GettingStarted.html#directory) (in cms.lua) triggers when the user navigates to the server
+1. A [directory function](https://realtimelogic.com/ba/doc/en/VirtualFileSystem.html#directory) (function cmsfunc() in [cms.lua](www/.lua/cms.lua)) triggers when the user navigates to the server
 2. The directory function checks if the requested URL is in the file menu.json
 3. The directory function then loads and parses the LSP page to be executed and saves the "LSP page function" as variable 'lspPage' in the [request/response environment](https://realtimelogic.com/ba/doc/?url=lua.html#CMDE)
 4. The directory function calls the "pre parsed" template.lsp function
 5. The code in template.lsp renders the menu and static HTML components part of the 'theme'
 6. Template.lsp calls the "LSP page function" stored as variable 'lspPage'
-7. The "LSP page function" renders the page specific content
-8. The dynamically generated HTML is sent to the client (the browser)
+7. The "LSP page function" renders the page specific content (the HTML fragment)
+8. The compressed dynamically generated HTML is sent to the client (the browser)
 
+The [HTMX](https://makoserver.net/articles/How-to-Build-an-Interactive-Dashboard-App#htmx) version, when detecting an HTMX request, directly sends the HTML page fragment. Thus the sequence is 1,2,3, call lspPage directly, and send the compressed fragment to the client.
 
 ## Authentication
 
