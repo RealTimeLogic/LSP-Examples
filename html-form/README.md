@@ -1,4 +1,4 @@
-# Dynamic Navigation Menu
+# HTML Forms and LSP for Beginners 
 
 This is the companion example for the [HTML Forms and LSP for Beginners](https://makoserver.net/articles/HTML-Forms-and-LSP-for-Beginners) tutorial.
 
