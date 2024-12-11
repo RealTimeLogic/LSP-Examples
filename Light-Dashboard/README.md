@@ -72,7 +72,13 @@ admin and password qwerty.
 7. The "LSP page function" renders the page specific content (the HTML fragment)
 8. The compressed dynamically generated HTML is sent to the client (the browser)
 
-The [HTMX](https://makoserver.net/articles/How-to-Build-an-Interactive-Dashboard-App#htmx) version, when detecting an HTMX request, directly sends the HTML page fragment. Thus the sequence is 1,2,3, call lspPage directly, and send the compressed fragment to the client.
+#### CMS Server-Side Routing
+Server-side routing is the process by which a web server handles incoming HTTP requests, determining the appropriate resource or action based on the URL path. In the CMS, the cmsfunc() function, located in [cms.lua](www/.lua/cms.lua), checks whether the requested URL exists in menu.json. If a match is found, the URL is mapped to an HTML fragment file, which is then included in the template file. The HTML fragment file can contain either static HTML or LSP, allowing for further request routing when needed.
+
+
+
+#### JavaScript Powered HTMX Version
+The [HTMX](https://makoserver.net/articles/How-to-Build-an-Interactive-Dashboard-App#htmx) version, when detecting an HTMX request, directly sends the HTML page fragment. Thus the sequence is 1,2,3, call lspPage directly, and send the compressed fragment to the client.
 
 ## Authentication
 
