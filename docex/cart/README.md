@@ -1,6 +1,6 @@
 # Shopping Cart
 
-This is the example for the [Getting Started : cart](https://realtimelogic.com/ba/doc/?url=GettingStarted.html#directory)
+This is the example for the [The Virtual File System: Directory: Shopping Cart](https://realtimelogic.com/ba/doc/en/VirtualFileSystem.html#directory)
 
 Run the example, using the Mako Server, as follows:
 
