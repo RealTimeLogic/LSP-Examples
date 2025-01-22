@@ -5,13 +5,13 @@
 -- Details:
 --  https://realtimelogic.com/articles/Debugging-WiFi-Signal-Strength-with-ESP32-and-Xedge32
 
+if page.s then
+   response:senderror(503,"Busy: in use by another page")
+   return
+end
 
 local ap=esp32.apinfo()
 if request:header"Sec-WebSocket-Key" then
-   if page.s then
-      response:senderror(503,"Busy: in use by another page")
-      return
-   end
    local s = ba.socket.req2sock(request)
    if s then
       local page=page
@@ -171,6 +171,8 @@ end
                 rssi.textContent=event.data
             };
         }
+
+        window.onbeforeunload=()=> websocket.close()
 
         // Initialize WebSocket connection
         connectWebSocket();
