@@ -2,7 +2,7 @@
  [Lua and LSP](https://realtimelogic.com/products/lua-server-pages/) examples, including IoT/Cloud connectivity. New to Lua? Check out the [online Lua tutorial](https://tutorial.realtimelogic.com/).
 
 
-* [Basic HTML form](html-form) - The tutorial: HTML Forms and LSP for Beginners
+* [Basic HTML form](html-form) - Source code for the tutorial [HTML Forms and LSP for Beginners](https://makoserver.net/articles/HTML-Forms-and-LSP-for-Beginners).
 * [Authentication: General](authentication) - Introduction to the Barracuda App Server's authentication mechanism
 * [Authentication: OAuth 2.0](oauth) - Shows how to access Github using OAuth 2.0
 * [Authentication: Single Sign On](fs-sso) - Mitigating Security Vulnerabilities of Pre-Installed Passwords with Single Sign-On Solutions for Enhanced System Integrity
