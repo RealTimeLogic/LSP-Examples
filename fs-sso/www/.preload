@@ -1,27 +1,61 @@
 
 local dio=ba.openio("disk")
+mako.createloader(io) -- makes it possible to do: require"ms-sso"
 
--- The following should work for both Windows and Linux
-local lockDir = mako.dos2unix(os.getenv"TEMP" or os.getenv"TMP" or "/tmp").."/.LOCK"
-if not dio:stat(lockDir) and not dio:mkdir(lockDir) then
-   trace("Error, cannot create:",lockDir)
+-- Loads and configures the SSO module
+-- Creates and returns the authenticator object
+local function createSSO(baseURL)
+   sso=require"ms-sso".init(
+                         require"loadconf".openid, -- The parameters must be set in mako.conf
+                         baseURL -- login page is index.lsp and is accessible at base.
+                         )
+   -- The sso object is used by index.lsp
+
+   -- Create an authenticator that simply redirects the user to the base URL if not authenticated
+   -- Doc:
+   --   Authuser: https://realtimelogic.com/ba/doc/en/lua/lua.html#ba_create_authuser
+   --   Authenticator: https://realtimelogic.com/ba/doc/en/lua/lua.html#ba_create_authenticator
+   local function authresp(_ENV, authinfo) response:sendredirect(baseURL) end
+   local function notAuthenticated() end -- No return = not authenticated (always).
+   local auth=ba.create.authenticator(ba.create.authuser(notAuthenticated),{type="auth",response=authresp})
+   return auth
 end
 
--- Create a file server instance and insert into this app's directory.
-require"wfs"
+
+
+-- The following code sets up a WebDAV/Web-File-Manager and uses the 'auth' object created by createSSO()
+
+-- The following should work for both Windows and Linux
+local lockDir = mako.dos2unix(os.getenv"LocalAppData" or os.getenv"TEMP" or os.getenv"TMP" or "/tmp").."/.LOCK"
+if not dio:stat(lockDir) and not dio:mkdir(lockDir) then
+   trace("Error, cannot create:",lockDir)
+else
+   trace("WebDAV .lock directory", lockDir)
+   local type,platform=io:resourcetype()
+   if "windows" == platform then
+      -- On Windows, the Web File Manager creates a virtual top-level
+      -- directory that lists all available drives. However, when
+      -- mapping a WebDAV client on the same computer as the WebDAV
+      -- server, using this virtual directory is not advisable. Doing
+      -- so can create a circular reference that ultimately deadlocks
+      -- the file system and the server.
+      local drive,path=lockDir:match("(.)(.+)")
+      if drive then
+         dio=ba.mkio(dio,drive)
+         assert(dio)
+         trace(string.format("Setting drive to '%s'",drive))
+         lockDir=path
+      end
+   end
+end
+
+-- Create a file server instance and insert it into this app's directory.
+-- VFS intro: https://realtimelogic.com/ba/doc/en/VirtualFileSystem.html
+require"wfs" -- Create 'ba.create.wfs'
 local fs=ba.create.wfs("fs", dio, lockDir)
 dir:insert(fs,true)
-local base=dir:baseuri() -- Where it is installed
-
--- Create an authenticator that simply redirects the user to the base
--- URL if not authenticated
-local function authresp(_ENV, authinfo) response:sendredirect(base) end
-local auth=ba.create.authenticator(
-   ba.create.authuser(function() end),{type="auth",response=authresp})
+local base=dir:baseuri() -- Where it is installed: '/' if mako -l::www, '/myapp/' if mako -lmyapp::www
+trace("Installing Web File Server at:",base)
 -- Prevent non authenticated users from using the file server
-fs:setauth(auth)
+fs:setauth(createSSO(base))
 fs:configure{tmo=2*60*60,helpuri=base.."help.lsp",logouturi=base.."logout.lsp"}
-
--- Load the Microsoft Single Sign On Module
-mako.createloader(io)
-sso=require"ms-sso".init(require"loadconf".openid)
