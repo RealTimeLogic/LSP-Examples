@@ -108,7 +108,7 @@ openid={
 For detailed instructions on starting the Mako Server, check out our
 [command line video tutorial](https://youtu.be/vwQ52ZC5RRg) and review
 the server\'s [command line
-options](https://realtimelogic.com/ba/doc/?url=Mako.html#loadapp) in our
+options](https://realtimelogic.com/ba/doc/en/Mako.html#loadapp) in our
 documentation.
 
 > **Warning:** If the Mako Server cannot find `mako.conf` or if the
@@ -251,4 +251,4 @@ sso = ssoModule.init(openid, login [, log])
     * **On Error:**
       - `nil, errorMessage, errorCodes`
          + **errorMessage:** A string detailing the error, which can be presented to the user.
-         + **errorCodes:** An array of [error codes](https://learn.microsoft.com/en-us/entra/identity-platform/reference-error-codes) returned by MS Entre. The index.lsp example page manages the two error codes 7000215 and 7000222 related to invalid client secret.
+         + **errorCodes:** An array of [error codes](https://learn.microsoft.com/en-us/entra/identity-platform/reference-error-codes) returned by MS Entra. The index.lsp example page manages the two error codes 7000215 and 7000222 related to invalid client secret.

@@ -2,17 +2,6 @@
 
 local sso=app.sso
 
-local function debugLoginResponse(request)
-   local header=request:header()
-   local data=request:data()
-   
-   for k,v in pairs(header) do trace(k,v) end
-   for k,v in pairs(data) do trace(k,v) end
-   
-   
-end
-
-
 ------------------------------------------------------------
 local function emitLogin()
 ?>
@@ -99,7 +88,6 @@ if request:method() == "POST" then
 	 action=function() doIdErr("Invalid secret") end
       end
    else -- 3: Login sequence
-      debugLoginResponse(request)
       local header,payload,ecodes = sso.login(request)
       if header then
          request:login()
