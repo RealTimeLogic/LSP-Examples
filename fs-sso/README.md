@@ -36,7 +36,7 @@ Follow these steps to configure your application in the Azure portal:
 5.  Set the account type to **Single tenant** (in most cases).
 6.  Click on **Select a platform** and choose **Web**.
 7.  For the redirect URI, include all relevant sites (e.g., test sites).
-    For testing purposes, you can use `http://localhost`.
+    For testing purposes, you can use `http://localhost`. For deployment, see [Redirect URI Requirements](#redirect-uri-requirements).
 8.  Click **Register** at the bottom of the page.
 9.  On the following page, copy and save both the **Application (client)
     ID** and the **Directory (tenant) ID**.
@@ -252,3 +252,9 @@ sso = ssoModule.init(openid, login [, log])
       - `nil, errorMessage, errorCodes`
          + **errorMessage:** A string detailing the error, which can be presented to the user.
          + **errorCodes:** An array of [error codes](https://learn.microsoft.com/en-us/entra/identity-platform/reference-error-codes) returned by MS Entra. The index.lsp example page manages the two error codes 7000215 and 7000222 related to invalid client secret.
+
+## Redirect URI Requirements
+
+For testing purposes, using HTTP on `localhost` is acceptable. However, in real-world deployments, MS Entra mandates using HTTPS to redirect URI. This requirement ensures that all communications are securely encrypted and that sensitive authentication tokens remain protected during transmission.
+
+When deploying your product/device in a production environment, you must ensure that your web server is configured to use HTTPS and, more importantly, that the browser trusts the server certificate. One option is to use a technology like [SharkTrust](https://realtimelogic.com/services/SharkTrust/), which provides DNS and trusted certificates specifically designed for Intranet web servers. Alternatively, you can implement a similar solution that offers trusted certificate management for your Intranet deployment environment.

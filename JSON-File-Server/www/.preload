@@ -27,6 +27,7 @@ local maxUploads = mako and 200 or 10 -- Assume resource constr. if not mako
 local maxLocks=100
 require"wfs" -- install ba.create.wfs
 local fsdir=ba.create.wfs("fs",10,wdio,ldir,maxUploads,maxLocks)
+fsdir:configure{logouturi=dir:baseuri().."logout.lsp"}
 fsdir:insert() -- Insert as a root node with name 'fs' in the VFS
 
 -- Create the user db with the users: guest, kids, dad, and mom.
@@ -70,8 +71,15 @@ authuser:set(createUserDB())
 local authenticator=ba.create.authenticator(authuser)
 
 -- Create the authorizer and install the constraints.
-local authorizer=authuser:authorizer()
-authorizer:set(createConstraints())
+local authorizer
+local authorize = false ~= require"loadconf".authorize or false
+if authorize then
+   authorizer=authuser:authorizer()
+   authorizer:set(createConstraints())
+   trace"Installing authorizer"
+else
+   trace"Authorizer not installed!!!"
+end
 
 -- Install the authenticator and the ACL
 fsdir:setauth(authenticator,authorizer)
