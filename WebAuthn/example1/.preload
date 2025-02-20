@@ -1,0 +1,79 @@
+trace"example1/.preload: Starting Example"
+local ok,cbor=pcall(require,"org.conman.cbor")
+if not ok then
+   error"Sorry, module CBOR is not integrated into the server!"
+   return
+end
+if not pcall(require,"webauthn") then
+   error"Oops, you did not load the WebAuthnModule example"
+end
+
+-- The WebAuthn instance and the webauth directory service; set below
+local webauthn,wadir
+
+-- Read or write the Webauthn database
+local function rwUserDb(data)
+   return require"rwfile".file(ba.openio"home","Webauthn.userdb",data)
+end
+
+-- Encode and save the 'users' table, the Webauthn database
+local function saveDb(users)
+   rwUserDb(cbor.encode(users))
+end
+
+-- Read and decode the Webauthn database.
+-- Return the 'users' table
+local function readDb()
+   local data=rwUserDb()
+   if data then
+      return cbor.decode(data)
+   end
+   trace"Webauthn.userdb not found. Creating empty DB"
+   return {}
+end
+
+-- Debug function: Lists all registered authenticators associated with
+-- the user. Prints the binary rawId using B64 encoding.
+local function listAuth(user)
+   -- The user table is a key/value store, where key is WebAuth rawId
+   -- and value is the device authenticator.
+   for rawId,auth in pairs(user) do
+      tracep(false,0,string.format("\tUser's authenticator created at '%s', last used at '%s'",
+                                  os.date("%c",auth.createdAt), os.date("%c",auth.lastUsedAt)))
+   end
+end
+
+-- Called when new user registers
+local function register(username,user,rawId,url)
+   trace(username)
+   listAuth(user)
+   return true, true, -- accept-reg, immediately
+          "Hello new user" -- Sent to browser
+end
+
+-- Called when the WebAuthn module activates the new registered user
+local function registered(username, cmd)
+   trace(username)
+   saveDb(webauthn:get())
+end
+
+-- Called when the WebAuthn module authenticated an existing user
+local function authenticate(cmd,username,user,rawId)
+   local auth=user[rawId] -- get authenticator
+   trace(username,auth.signatureCounter)
+   listAuth(user)
+   return true,
+          "Hello "..username -- sent to browser
+end
+
+webauthn,wadir=require"webauthn".create{
+   register=register,
+   registered=registered,
+   authenticate=authenticate,
+   loginerr=function(emsg) trace("WebAuthn failed:",emsg) end
+}
+dir:insert(wadir)
+webauthn:set(readDb())
+
+_ENV.webauthn=webauthn -- Reference (anchor) the 'local' variable so it's not GC'd.
+assert(_ENV == app) -- FYI: they are the same

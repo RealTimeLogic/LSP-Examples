@@ -1,0 +1,168 @@
+trace"example2/.preload: Starting Example"
+local ok,cbor=pcall(require,"org.conman.cbor")
+if not ok then
+   error"Sorry, module CBOR is not integrated into the server!"
+   return
+end
+if not pcall(require,"webauthn") then
+   error"Oops, you did not load the WebAuthnModule example"
+end
+
+local rw=require"rwfile"
+
+-- Check if SMTP is configured and create the sendRegEmail(name,url) function
+local sendRegEmail=function() end -- Default: do nothing
+local conf=require"loadconf"
+if conf.log and conf.log.smtp then
+   local sendmail=require"log".sendmail
+   sendRegEmail=function(email,url)
+      local body=rw.file(io,".RegEmail") -- Load the email template
+      if body then
+         local cfg={
+            subject="WebAuthn Registration Demo",
+            to=email,
+            htmlbody=string.format(body,url)
+         }
+         ba.thread.run(function()
+            local ok,err=sendmail(cfg)
+            if not ok then trace("Sending email failed:",err) end
+         end)
+      else
+         trace"Err: cannot open .RegEmail"
+      end
+   end
+   trace"Email sending enabled"
+else
+   trace"Email sending not enabled"
+end
+
+-- The WebAuthn instance and the webauth directory service; set below
+local webauthn,wadir
+
+-- Read or write the Webauthn database
+local function rwUserDb(data)
+   return rw.file(ba.openio"home","Webauthn.userdb",data)
+end
+
+-- Encode and save the 'users' table, the Webauthn database
+local function saveDb(users)
+   rwUserDb(cbor.encode(users))
+end
+
+-- Read and decode the Webauthn database.
+-- Return the 'users' table
+local function readDb()
+   local data=rwUserDb()
+   if data then
+      return cbor.decode(data)
+   end
+   trace"Webauthn.userdb not found. Creating empty DB"
+   return {}
+end
+
+-- Debug function: Lists all registered authenticators associated with
+-- the user. Prints the binary rawId using B64 encoding.
+local function listAuth(user)
+   -- The user table is a key/value store, where key is WebAuth rawId
+   -- and value is the device authenticator.
+   for rawId,auth in pairs(user) do
+      tracep(false,0,string.format(
+         "\tUser's authenticator created at '%s', last used at '%s'",
+         os.date("%c",auth.createdAt), os.date("%c",auth.lastUsedAt)))
+   end
+end
+
+-- Callback: when a new user registers
+local function register(username,user,rawId,url)
+   trace(username,"\nReg URL:",url)
+   listAuth(user)
+   sendRegEmail(username,url)
+   return true, false, -- accept-reg, quarantine
+          "Not sent to browser" -- "quarantined" is sent
+end
+
+-- Callback: when the WebAuthn module activates the new registered user
+local function registered(username, cmd)
+   trace(username)
+   saveDb(webauthn:get())
+   if cmd then -- if activated via registration URL
+      -- Send HTML to browser
+      -- cmd:write(rw.file(io,"registered.shtml")) -- Option 1: HTML only
+      cmd:forward(dir:baseuri().."registered.shtml") -- Option 2: can execute LSP
+   end
+end
+
+-- Callback: when the WebAuthn module authenticated an existing user
+local function authenticate(cmd,username,user,rawId)
+   local auth=user[rawId] -- get authenticator
+   trace(username,auth.signatureCounter)
+   listAuth(user)
+   cmd:login(username)
+   return true,
+          "Hello "..username -- sent to browser
+end
+
+
+webauthn,wadir=require"webauthn".create{
+   register=register,
+   registered=registered,
+   authenticate=authenticate,
+   loginerr=function(emsg) trace("WebAuthn failed:",emsg) end
+}
+dir:insertprolog(wadir) -- Makes it execute before authenticator
+webauthn:set(readDb())
+
+
+_ENV.webauthn=webauthn -- Reference (anchor) the 'local' variable so it's not GC'd.
+assert(_ENV == app) -- FYI: they are the same
+
+
+-- The following code sets up a WebDAV/Web-File-Manager and uses the 'auth' object created by createAuthenticator()
+local dio=ba.openio("disk")
+-- The following should work for both Windows and Linux
+local lockDir = mako.dos2unix(os.getenv"LocalAppData" or os.getenv"TEMP" or os.getenv"TMP" or "/tmp").."/.LOCK"
+if not dio:stat(lockDir) and not dio:mkdir(lockDir) then
+   trace("Error, cannot create:",lockDir)
+else
+   trace("WebDAV .lock directory", lockDir)
+   local type,platform=io:resourcetype()
+   if "windows" == platform then
+      -- On Windows, the Web File Manager creates a virtual top-level
+      -- directory that lists all available drives. However, when
+      -- mapping a WebDAV client on the same computer as the WebDAV
+      -- server, using this virtual directory is not advisable. Doing
+      -- so can create a circular reference that ultimately deadlocks
+      -- the file system and the server.
+      local drive,path=lockDir:match("(.)(.+)")
+      if drive then
+         dio=ba.mkio(dio,drive)
+         assert(dio)
+         trace(string.format("Setting drive to '%s'",drive))
+         lockDir=path
+      end
+   end
+end
+
+
+local function createAuthenticator(base)
+   -- Doc:
+   --   Authuser: https://realtimelogic.com/ba/doc/en/lua/lua.html#ba_create_authuser
+   --   Authenticator: https://realtimelogic.com/ba/doc/en/lua/lua.html#ba_create_authenticator
+   local function authresp(_ENV, authinfo) response:forward(base..".login.lsp") end
+   local function notAuthenticated() end -- No return = not authenticated (always).
+   local auth=ba.create.authenticator(ba.create.authuser(notAuthenticated),{type="form",response=authresp})
+   return auth
+end
+
+
+
+-- Create a file server instance and insert it into this app's directory.
+-- VFS intro: https://realtimelogic.com/ba/doc/en/VirtualFileSystem.html
+require"wfs" -- Create 'ba.create.wfs'
+local fs=ba.create.wfs("fs", dio, lockDir)
+dir:insert(fs,true)
+local base=dir:baseuri() -- Aapp's base directory
+trace("Installing Web File Server at:",base)
+-- Prevent non authenticated users from using the file server
+dir:setauth(createAuthenticator(base))
+fs:configure{tmo=2*60*60,helpuri=base.."help.lsp",logouturi=base.."logout.lsp"}

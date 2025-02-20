@@ -1,0 +1,4 @@
+-- The code below makes require"webauthn" work
+-- Ref: https://realtimelogic.com/ba/doc/en/Mako.html#mako_createloader
+mako.createloader(io)
+dir:unlink() -- This is not a web app so remove from the Virtual File System

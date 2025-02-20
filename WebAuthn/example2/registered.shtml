@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>WebAuthn Example: Registered</title>
+  <script src="https://cdn.tailwindcss.com"></script> <!-- Add Tailwind CSS -->
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+  <div class="bg-white p-6 rounded-lg shadow-md w-96">
+    <h1 class="text-xl font-bold text-center mb-4">You Are Registered</h1>
+    <a href="../../" class="block text-center w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 transition">Continue</a>
+  </div>
+</body>
+</html>
