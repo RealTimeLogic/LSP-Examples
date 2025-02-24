@@ -1,5 +1,13 @@
 local fmt,sbyte=string.format,string.byte
-local cbor=require"org.conman.cbor"
+local ok,cbor=pcall(require,"org.conman.cbor_s")
+if not ok then
+   ok,cbor=pcall(require,"org.conman.cbor")
+   if not ok then
+      local e="Err: module CBOR is not integrated into the server!"
+      trace(e)
+      return nil,e
+   end
+end
 local json=ba.json
 local b64enc,b64dec=ba.b64urlencode,ba.b64decode
 local secretKey=ba.aeskey(32)
@@ -384,4 +392,4 @@ local function create(op,o)
    return o,dir
 end
 
-return {create=create}
+return {create=create,cbor=cbor}

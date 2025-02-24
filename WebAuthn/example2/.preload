@@ -1,10 +1,6 @@
 trace"example2/.preload: Starting Example"
-local ok,cbor=pcall(require,"org.conman.cbor")
-if not ok then
-   error"Sorry, module CBOR is not integrated into the server!"
-   return
-end
-if not pcall(require,"webauthn") then
+local cbor
+if not pcall(function() cbor=require"webauthn".cbor end) then
    error"Oops, you did not load the WebAuthnModule example"
 end
 
