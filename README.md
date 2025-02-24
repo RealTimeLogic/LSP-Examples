@@ -4,11 +4,13 @@
 
 * [Basic HTML form](html-form) - Source code for the tutorial [HTML Forms and LSP for Beginners](https://makoserver.net/articles/HTML-Forms-and-LSP-for-Beginners).
 * [Authentication: General](authentication) - Introduction to the Barracuda App Server's authentication mechanism
-* [Authentication: OAuth 2.0](oauth) - Shows how to access Github using OAuth 2.0
-* [Authentication: Single Sign On](fs-sso) - Mitigating Security Vulnerabilities of Pre-Installed Passwords with Single Sign-On Solutions for Enhanced System Integrity
+* [Authentication and Authorization](JSON-File-Server) - Shows how to use the **[JSON Authenticator](https://realtimelogic.com/ba/doc/en/lua/lua.html#ba_create_jsonuser)** with a File Server
+* [Authentication: OAuth 2.0](oauth) - Shows how to access GitHub using OAuth 2.0
+* [Authentication: WebAuthn](WebAuthn) - Passwordless, FIDO2-compliant security with public-key cryptography
+* [Authentication: Single Sign On](fs-sso) - Prevent Pre-Installed Password Vulnerabilities with Single Sign-On
 * [AJAX: For Beginners](AJAX)
 * [AJAX: Over WebSockets](AJAX-Over-WebSockets)
-* [Create a light Interactive Dashboard App using Pure.css](Light-Dashboard)
+* [Website Template Engine for Embedded](Light-Dashboard) - Fast track your web app design with this engine. Includes TPM-protected user database.
 * [Dynamic Navigation Menu](Dynamic-Nav-Menu)
 * [Debug Lua](Lua-Debug) - How to Debug Lua Code Using Visual Studio Code
 * [IoT: SMQ Examples](SMQ-examples) - Easy and secure device management using [SMQ](https://realtimelogic.com/ba/doc/?url=SMQ.html)
@@ -22,8 +24,7 @@
 * [SQL: MySQL and Redis Examples](MysqlAndRedis) - Database examples
 * [SQL: PostgreSQL Example](PostgreSQL) - Database example
 * [File Upload, including drag and drop](upload) - HTML based file upload
-* [WebDAV and Web-File-Server](File-Server) - Network drive and secure file sharing (example 1)
-* [WebDAV and Web-File-Server with User Database](JSON-File-Server) - (example 2)
+* [WebDAV and Web-File-Server](File-Server) - Network drive and secure file sharing
 * [How to add 'require' search path to an app](require-test)
 * [Sockets and webSockets examples](socket-examples)
 * [Web Shell](Web-Shell) - web based alternative to SSH
