@@ -90,7 +90,8 @@ if request:method() == "POST" then
    else -- 3: Login sequence
       local header,payload,ecodes = sso.login(request)
       if header then
-         request:login()
+         trace("Login:",payload.preferred_username)
+         request:login(payload.preferred_username)
          action = function() emitOK(payload) end
       else
          action = function() emitError(payload,ecodes) end -- Payload is now 'err'

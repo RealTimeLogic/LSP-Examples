@@ -1,5 +1,6 @@
 local fmt,jdecode=string.format,ba.json.decode
 local msKeysT,http,openidT,downloadKeysTimer={},require"httpm".create{trusted=true}
+local jwt=require"jwt"
 local loginPage
 local function log(...) trace("SSO:",fmt(...)) end
 
@@ -78,32 +79,12 @@ end
 
 
 -- JWT: decode and verify compact format (header.payload.signature) with RSA signature
-local function jwtDecode(token,verify)
+local function jwtDecode(token)
    local err
    if not next(msKeysT) then return nil, "Waiting for signing keys to be downloaded" end
-   local signedData=token:match"([^%.]+%.[^%.]+)"
-   local header,payload,signature=token:match"([^%.]+)%.([^%.]+)%.([^%.]+)"
-   if signedData and header then
-      local d=ba.b64decode
-      header,payload,signature = jdecode(d(header) or ""),jdecode(d(payload) or""),d(signature)
-      if header and payload and signature then
-	 if verify then
-	    local keyT = msKeysT[header.kid]
-	    if keyT then
-	       if ba.crypto.verify(signedData,signature,keyT) then
-		  return header,payload
-	       else
-		  err="Invalid JWT signature"
-	       end
-	    else
-	       err=(fmt("Unknown JWT kid %s, signing keys may have expired",header.kid))
-	    end
-	 else
-	    return header,payload
-	 end
-      end
-   end
-   return nil, (err or "Invalid JWT")
+   local ok,header,payload=jwt.verify(token,msKeysT,true)
+   if true ~= ok then return nil, header end
+   return header,payload
 end
 
 local function init(idT,login,logFunc)
@@ -126,7 +107,7 @@ local function init(idT,login,logFunc)
 	   })
 	 rspT = jdecode(d)
 	 if status == 200 and rspT and rspT.id_token and rspT.access_token then
-	    local header,payload=jwtDecode(rspT.id_token,openidT.tenant ~= "common")
+	    local header,payload=jwtDecode(rspT.id_token)
 	    if header then
 	       local now=ba.datetime"NOW"
 	       local dt = ba.datetime(aesdecode(payload.nonce or "") or "MIN")
