@@ -16,7 +16,6 @@
 * [IoT: SMQ Examples](SMQ-examples) - Easy and secure device management using [SMQ](https://realtimelogic.com/ba/doc/?url=SMQ.html)
 * [IoT: MQTT and AWS](AWS-MQTT) - How to Connect to AWS IoT Core using MQTT & ALPN
 * [IoT: MQTT Sparkplug](Sparkplug) - How to use the MQTT Sparkplug library
-* [IoT: MQTT Google Cloud](Cloud-IoT-Core) - Connecting to the Google MQTT Bridge
 * [ESP32 Microcontroller Examples](ESP32) - Examples designed for [Xedge32](https://realtimelogic.com/downloads/bas/ESP32/)
 * [MinnowSim](MinnowSim) - Source code for the tutorial [Your First Embedded Single Page Application](https://realtimelogic.com/articles/Your-First-Embedded-Single-Page-Application)
 * [MyApp.zip](MyApp.zip) - Ready to run example designed for the tutorial [Mastering Xedge Application Deployment: From Installation to Creation](https://realtimelogic.com/articles/Mastering-Xedge-Application-Deployment-From-Installation-to-Creation)
