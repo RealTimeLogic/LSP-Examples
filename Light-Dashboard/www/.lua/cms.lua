@@ -102,7 +102,7 @@ local function cmsfunc(_ENV, relpath, notInMenuOK)
 
    --Remove the following line and xrsp:finalize() if you do not want to
    --compress the response.
-   local xrsp = response:setresponse() -- Activate compression
+   local xrsp <close> = response:setresponse() -- Activate compression
    response:setdefaultheaders()
    for k,v in pairs(securityPolicies) do response:setheader(k,v) end
 
