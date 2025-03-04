@@ -9,7 +9,7 @@ local webauthn,wadir
 
 -- Read or write the Webauthn database
 local function rwUserDb(data)
-   return require"rwfile".file(ba.openio"home","Webauthn.userdb",data)
+   return require"rwfile".file(ba.openio(xedge and "disk" or "home"),"Webauthn.userdb",data)
 end
 
 -- Encode and save the 'users' table, the Webauthn database
