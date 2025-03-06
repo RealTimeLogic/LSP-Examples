@@ -198,7 +198,7 @@ If you followed the configuration instructions for Example 2, the **Mako Server*
 #### **Finding Your Server**
 1. Navigate to **[https://local.makoserver.net/](https://local.makoserver.net/)**.
 2. You should see a **link to your local Mako Server instance**.
-3. Clicking this link allows you to **register and authenticate** your Intranet server using a **trusted domain name**.
+3. Clicking this link allows you to **register and authenticate** with your Intranet server using a **trusted domain name**.
 
 #### **Important Note**
 Since this setup provides a **new domain name**, you will need to **re-register your credentials** before using WebAuthn authentication.
