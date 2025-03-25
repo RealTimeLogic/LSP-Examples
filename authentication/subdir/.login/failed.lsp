@@ -11,9 +11,9 @@ h1 {font-size:42px;}
   </head>
 <body>
   <div class="center">
-    <h1>Login credentails are incorrect.</h1>
-    <h1>Use username and password "admin".</h1>
-    <h1><a href="<?lsp=request:uri()?>">Try again</a></h1>
+    <h1>Incorrect login credentials!</h1>
+    <h2>Use username and password "admin".</h2>
+    <h2><a href="<?lsp=request:uri()?>">Try again</a></h2>
   </div>
   <div class="shade"><div>
 </body>

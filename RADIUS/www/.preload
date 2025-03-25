@@ -1,0 +1,69 @@
+
+-- Configuration: Set the target RADIUS server and shared secret
+local radiusServerIP = "127.0.0.1"       -- RADIUS server IP address
+local radiusServerPort = 1812            -- Standard RADIUS authentication port
+local sharedSecret = "myradiussecret"    -- Shared secret for client-server trust
+
+-- Enable Lua module loading via Mako Server's I/O system
+mako.createloader(io)  -- Makes Lua's `require` work with local files
+
+-- Instantiate a RADIUS client using the configuration above
+local rad = require"radius".create(radiusServerIP, radiusServerPort, sharedSecret)
+
+-- This is the password callback function used for authentication.
+-- It is triggered when a client attempts to log in.
+local function getpassword(username, passwd, _ENV)
+   trace("In getpassword; username:", username)
+   if not passwd then
+      trace("Error: DIGEST authentication not supported in this setup")
+      return false
+   end
+
+   -- Delegate authentication to the RADIUS server
+   local accept, err = rad:login(username, passwd)
+   if not accept then trace("Login failed:", err) end
+   return accept
+end
+
+-- The rest of the code is virtually identical to:
+--  LSP-Examples/authentication/root/.preload 
+
+-- Handles post-login routing or fallback behavior.
+-- For form-based auth: forwards to login or failure page depending on context.
+-- For basic auth: includes error page inline (no redirects allowed).
+local function loginresponse(_ENV, authinfo)
+   -- Debug log for understanding authentication flow
+   local info = string.format("In loginresponse (%s), type=%s, path=%s",
+      authinfo.type == "form" and
+         (authinfo.username and "setting password" or "fetching login page") or
+         "fetching error page",
+      authinfo.type,
+      request:uri())
+   trace(info)
+
+   -- Form-based login routing
+   if authinfo.type == "form" then
+      if authinfo.username then
+         response:forward"/.login/failed.lsp"  -- Invalid login
+      end
+      response:forward"/.login/form.lsp"       -- Serve login form
+   end
+
+   -- Fallback for non-form auth (e.g. HTTP  Basic)
+   response:include"/.login/failed.lsp"
+end
+
+-- Create the user authentication interface, backed by our RADIUS-auth
+-- callback
+local authuser = ba.create.authuser(getpassword)
+
+-- Create an authenticator object tied to our application using
+-- "auth," which implies all authenticator types, but Digest
+-- authentication is not allowed
+local authenticator = ba.create.authenticator(authuser, {
+   response = loginresponse,
+   type = "auth"
+})
+
+-- Apply the authenticator to the app's resource directory
+dir:setauth(authenticator)

@@ -8,6 +8,7 @@
 * [Authentication: OAuth 2.0](oauth) - Shows how to access GitHub using OAuth 2.0
 * [Authentication: WebAuthn](WebAuthn) - Passwordless, FIDO2-compliant security with public-key cryptography
 * [Authentication: Single Sign On](fs-sso) - Prevent Pre-Installed Password Vulnerabilities with Single Sign-On
+* [Authentication: RADIUS](RADIUS) - Remote Authentication Dial-In User Service Lua authentication integration
 * [AJAX: For Beginners](AJAX)
 * [AJAX: Over WebSockets](AJAX-Over-WebSockets)
 * [Website Template Engine for Embedded](Light-Dashboard) - Fast track your web app design with this engine. Includes TPM-protected user database.
