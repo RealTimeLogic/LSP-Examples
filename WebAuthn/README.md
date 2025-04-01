@@ -2,6 +2,9 @@
 
 The **BAS WebAuthn module** enables **WebAuthn authentication** for **embedded devices**, providing **passwordless, FIDO2-compliant security** for **IoT, industrial systems, and OEM products**. Designed for **resource-constrained environments**, BAS WebAuthn seamlessly integrates into **[Barracuda App Server](https://realtimelogic.com/products/barracuda-application-server/) (BAS)-powered OEM products**, ensuring **secure and scalable authentication**.
 
+### Introduction
+- [Why Biometric Authentication Is a Perfect Fit for Embedded Web Servers](https://realtimelogic.com/articles/FIDO2-amp-WebAuthn-for-Embedded-Web-Servers)
+
 ### **Key Benefits:**
 - **Passwordless Security** - Eliminates passwords with **public-key cryptography**.
 - **FIDO2 & WebAuthn Compliance** - Meets modern **authentication standards**.
@@ -10,7 +13,7 @@ The **BAS WebAuthn module** enables **WebAuthn authentication** for **embedded d
 
 By integrating **BAS WebAuthn**, developers can enhance **security, user experience, and compliance** in **embedded applications**, ensuring **future-proof authentication** for connected devices.
 
-![WebAuthn](https://embed-ssl.wistia.com/deliveries/854c59c095616d3938b1bacc893d0534b3c8919a.webp)
+![WebAuthn](https://realtimelogic.com/blogmedia/FIDO2-poster.png)
 
 ### **How WebAuthn Works**
 - When a user registers, their **authenticator device** generates a **private-public key pair**.
@@ -203,7 +206,7 @@ If you followed the configuration instructions for Example 2, the **Mako Server*
 #### **Important Note**
 Since this setup provides a **new domain name**, you will need to **re-register your credentials** before using WebAuthn authentication.
 
-By leveraging **SharkTrustX**, you can seamlessly deploy WebAuthn on **Intranet servers** without creating your own complex PKI.
+By leveraging **SharkTrustX**, you can seamlessly deploy WebAuthn on **Intranet servers** without creating your own complex DNS and PKI.
 
 ## The BAS WebAuthn Module's API
 
