@@ -52,6 +52,7 @@ end
              -- Call _ENV.lspPage (set by directory callback in cms.lua) and
              -- inject page content.
              lspPage(_ENV,relpath,io,page,app)
+             if not response:valid() then return end
         ?>
     </div>
 </div>

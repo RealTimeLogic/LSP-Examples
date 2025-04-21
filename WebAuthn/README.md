@@ -123,7 +123,7 @@ While **BAS WebAuthn** does **not require email-based registration**, using **em
    - Open **`mako.conf`** in an editor.
    - Change **`activeExample`** from `"example1"` to `"example2"`.
    - Set the **email** and **email password** fields, **Note:**
-        - The include `mako.conf` file includes configuration set for **Gmail SMTP**, but any SMTP provider can be used.
+        - The `mako.conf` file includes configuration settings for **Gmail SMTP**, but any SMTP provider can be used.
         - **For Gmail users:**
           - Do **not** use your regular Gmail password.
           - You must generate a **Gmail App Password**.
