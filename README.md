@@ -11,6 +11,7 @@
 * [Authentication: RADIUS](RADIUS) - Remote Authentication Dial-In User Service Lua authentication integration
 * [AJAX: For Beginners](AJAX)
 * [AJAX: Over WebSockets](AJAX-Over-WebSockets)
+* [htmx Examples](htmx) - htmx lets you update web pages with server-rendered HTML, making it the perfect match for LSP's lightweight, dynamic backend.
 * [Website Template Engine for Embedded](Light-Dashboard) - Fast track your web app design with this engine. Includes TPM-protected user database.
 * [Dynamic Navigation Menu](Dynamic-Nav-Menu)
 * [Debug Lua](Lua-Debug) - How to Debug Lua Code Using Visual Studio Code

@@ -1,0 +1,20 @@
+<html>
+<head>
+  <title>LSP + htmx Example</title>
+  <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+</head>
+<body>
+  <h1>User Directory</h1>
+
+  <button 
+    hx-get="/users.lsp" 
+    hx-target="#userList" 
+    hx-swap="innerHTML">
+    Load Users
+  </button>
+
+  <div id="userList">
+    <!-- User list will load here -->
+  </div>
+</body>
+</html>
