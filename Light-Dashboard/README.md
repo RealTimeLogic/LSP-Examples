@@ -78,7 +78,7 @@ Server-side routing is the process by which a web server handles incoming HTTP r
 
 
 #### JavaScript Powered HTMX Version
-The [HTMX](https://makoserver.net/articles/How-to-Build-an-Interactive-Dashboard-App#htmx) version, when detecting an HTMX request, directly sends the HTML page fragment. Thus the sequence is 1,2,3, call lspPage directly, and send the compressed fragment to the client.
+The [HTMX](https://makoserver.net/articles/How-to-Build-an-Interactive-Dashboard-App#htmx) version, when detecting an HTMX request, directly sends the HTML page fragment. Thus the sequence is 1,2,3, call lspPage directly, and send the compressed fragment to the client. Check out the tutorial [LSP + htmx: A Powerful Duo for Web Apps](https://realtimelogic.com/articles/LSP-htmx-A-Powerful-Duo-for-Embedded-Web-Apps) if you are new to htmx.
 
 ## Authentication
 
