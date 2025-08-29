@@ -1,0 +1,169 @@
+(mako or xedge).createloader(io)  -- makes it possible to do: require"test"
+-- Add HTTP debugging
+ba.create.tracelogger():configure{request=true}
+
+-- User Management REST API built on top of rest.lua (your router)
+--
+-- Endpoints (Base path: /api/)
+--   GET    /users
+--   POST   /users
+--   GET    /users/{id}
+--   PUT    /users/{id}
+--   DELETE /users/{id}
+
+local app  = require("rest").create()
+
+----------------------------------------------------------------------
+-- In-memory data store (replace with persistent storage as needed)
+----------------------------------------------------------------------
+local users  = {}   -- [id] = { id=number, name=string, email=string }
+local nextId = 1
+
+----------------------------------------------------------------------
+-- Utilities
+----------------------------------------------------------------------
+local function sendJson(_ENV, status, bodyTbl)
+   response:setstatus(status)
+   response:json(bodyTbl or {})
+   return true
+end
+
+local function sendText(_ENV, status, msg)
+   response:setstatus(status)
+   response:setcontenttype"text/plain; charset=utf-8"
+   if msg then response:send(msg) end
+end
+
+local function readJsonBody(env)
+   local request=env.request
+   local jparser = ba.json.parser()
+   local ok,x
+   for data in request:rawrdr() do
+      ok,x=jparser:parse(data)
+      if not ok or x then break end
+   end
+   if ok and x then return x end
+   return nil,x -- x now error
+end
+
+local function isValidEmail(s)
+   -- Minimal email sanity check (not RFC-complete, but practical)
+   -- requires non-space before/after '@' and at least one dot after '@'
+   return type(s) == "string" and s:match("^%S+@%S+%.%S+$") ~= nil
+end
+
+local function extractIdFromPath(path, prefix)
+   -- path like: "users/123" or "users/123/..." (we only accept *exactly* one segment after prefix)
+   -- prefix is "users/"
+   if path:sub(1, #prefix) ~= prefix then return nil end
+   local rest = path:sub(#prefix + 1)
+   local slash = rest:find("/", 1, true)
+   if slash then
+      -- Contains extra segments: reject to enforce /users/{id} (exactly one segment)
+      return nil
+   end
+   local id = tonumber(rest)
+   return id
+end
+
+----------------------------------------------------------------------
+-- /users collection
+----------------------------------------------------------------------
+
+-- GET /users  -> 200 [ {user}, ... ]
+app:route("GET", "users", function(env, path)
+   local list = {}
+   for _, u in pairs(users) do list[#list+1] = u end
+   -- Optional: stable order
+   table.sort(list, function(a,b) return a.id < b.id end)
+   sendJson(env, 200, list)
+end)
+
+-- POST /users  -> 201 { id = newId }
+-- Body: { name = string, email = string }
+app:route("POST", "users", function(env, path)
+   local data, err = readJsonBody(env)
+   if not data then
+      return sendJson(env, 400, { error = err or "Bad Request" })
+   end
+   if type(data.name) ~= "string" or data.name == "" then
+      return sendJson(env, 400, { error = "Field 'name' is required (string)" })
+   end
+   if not isValidEmail(data.email) then
+      return sendJson(env, 400, { error = "Field 'email' is required and must be a valid email" })
+   end
+   local id = nextId
+   nextId = nextId + 1
+   users[id] = { id = id, name = data.name, email = data.email }
+   env.response:setheader("Location", "/api/users/" .. id)  -- helpful (not required)
+   sendJson(env, 201, { id = id })
+end)
+
+----------------------------------------------------------------------
+-- /users/{id} item
+----------------------------------------------------------------------
+
+-- GET /users/{id} -> 200 {user} | 404
+app:route("GET", "users/*", function(env, path, method)
+   local id = extractIdFromPath(path, "users/")
+   if not id then return false end -- let other wildcard routes try (or fall through)
+   local u = users[id]
+   if not u then
+      return sendJson(env, 404, { error = "Not Found" })
+   end
+   sendJson(env, 200, u)
+end)
+
+-- PUT /users/{id} -> 200 {updated user} | 404
+-- Body: { name = string, email = string }
+app:route("PUT", "users/*", function(env, path, method)
+   local id = extractIdFromPath(path, "users/")
+   if not id then return false end
+   local u = users[id]
+   if not u then
+      return sendJson(env, 404, { error = "Not Found" })
+   end
+   local data, err = readJsonBody(env)
+   if not data then
+      return sendJson(env, 400, { error = err or "Bad Request" })
+   end
+   if type(data.name) ~= "string" or data.name == "" then
+      return sendJson(env, 400, { error = "Field 'name' is required (string)" })
+   end
+   if not isValidEmail(data.email) then
+      return sendJson(env, 400, { error = "Field 'email' is required and must be a valid email" })
+   end
+   u.name  = data.name
+   u.email = data.email
+   sendJson(env, 200, u)
+end)
+
+-- DELETE /users/{id} -> 204 | 404
+app:route("DELETE", "users/*", function(env, path, method)
+   local id = extractIdFromPath(path, "users/")
+   if not id then return false end
+   if not users[id] then
+      return sendJson(env, 404, { error = "Not Found" })
+   end
+   users[id] = nil
+   sendText(env, 204) -- No Content
+end)
+
+
+----------------------------------------------------------------------
+-- Optional: local 404 for /api/* (if nothing matched)
+----------------------------------------------------------------------
+app:route({"GET","POST","PUT","DELETE","PATCH","HEAD","OPTIONS"}, "*", function(env, path)
+   -- You can remove this if you prefer to return false and let a global 404 handle it.
+   sendJson(env, 404, { error = "Not Found" })
+end)
+
+----------------------------------------------------------------------
+-- Mount under /api
+----------------------------------------------------------------------
+-- As root: /api
+app:install("api")
+
+function onunload()
+   app:unlink()
+end
