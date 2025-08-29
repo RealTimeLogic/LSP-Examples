@@ -31,7 +31,7 @@ end
 local function sendText(_ENV, status, msg)
    response:setstatus(status)
    response:setcontenttype"text/plain; charset=utf-8"
-   if msg then response:send(msg) end
+   if msg then response:write(msg) end
 end
 
 local function readJsonBody(env)

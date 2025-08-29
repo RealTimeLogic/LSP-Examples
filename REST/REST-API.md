@@ -11,21 +11,18 @@ local app = require"rest".create()
 
 -- Register routes
 app:route("GET", "/sensors/temperature", function(env, path, method)
-  env.response:send("22.3")
-  return true
+  env.response:write("22.3")
 end)
 
 app:route({"GET","POST"}, "/relays/*", function(env, path, method)
   -- `path` is the full relative path (no leading slash), e.g. "relays/1/toggle"
   -- This wildcard route matches anything that starts with "relays/"
   env.response:setstatus(204)
-  return true
 end)
 
 -- Catch root (empty relative path)
 app:route("GET", "/*", function(env, path, method)
-  env.response:send("root")
-  return true
+  env.response:write("root")
 end)
 
 -- Mount in VFS at /api (root if no parent dir is provided)
@@ -94,19 +91,11 @@ Mount the router in the BAS Virtual File System.
 ## Error handling patterns
 
 ```lua
--- 405 for method not allowed
-app:route({"GET"}, "profile", function(env, path, method)
-  if method ~= "GET" then
-    env.response:setstatus(405)
-    env.response:setheader("Allow", "GET")
-    return true
-  end
-end)
 
 -- Local 404
 app:route({"GET","POST"}, "*", function(env, path)
   env.response:setstatus(404)
-  env.response:send("Not Found")
+  env.response:write("Not Found")
   return true
 end)
 ```
@@ -119,7 +108,7 @@ end)
 local app = require"rest".create()
 
 app:route("GET", "status", function(env)
-  env.response:send("ok")
+  env.response:write("ok")
   return true
 end)
 
@@ -129,7 +118,7 @@ end)
 
 app:route("GET", "*", function(env)
   env.response:setstatus(404)
-  env.response:send("Not Found")
+  env.response:write("Not Found")
   return true
 end)
 
