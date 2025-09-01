@@ -15,7 +15,7 @@ mako -l::www
 
 ## Testing the Service
 
-A Python script is included to test the RESTful API implementation. Before running the script, ensure that the server is listening on **port 80** (on Linux run: sudo ./restservice).
+A Python script is included to test the RESTful API implementation. Before running the script, ensure that the server is listening on **port 80** (on Linux run: sudo mako -u`whoami` -l::www).
 
 To run the test:
 
