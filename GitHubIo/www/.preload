@@ -1,0 +1,19 @@
+mako.createloader(io)
+
+error"Oops, you forgot to edit www/.preload: Add your GIT repo details below and delete this code line"
+
+local ghio = require"GitHubIo".create{
+   owner  = "REPO-OWNER",
+   repo   = "REPO-NAME",
+   token  = "GITHUB-TOKEN",
+   branch = "main",
+   log=function(url,code,message) trace(url,code,message) end,
+   mtime=os.time()
+}
+
+-- Create a WebDAV/Web-File-Manager and attach the GitHub IO
+require"wfs" -- Install function ba.create.wfs
+fs=ba.create.wfs("git", ghio, ".LOCK")
+fs:insert()
+
+print"GitHubIo test: Navigate to http://localhost/git/"

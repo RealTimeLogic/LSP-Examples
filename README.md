@@ -15,6 +15,7 @@
 * [Website Template Engine for Embedded](Light-Dashboard) - Fast track your web app design with this engine. Includes TPM-protected user database.
 * [Dynamic Navigation Menu](Dynamic-Nav-Menu)
 * [Debug Lua](Lua-Debug) - How to Debug Lua Code Using Visual Studio Code
+* [GitHub IO](GitHubIo) - How to make a GitHub repository look and behave like a file system
 * [IoT: SMQ Examples](SMQ-examples) - Easy and secure device management using [SMQ](https://realtimelogic.com/ba/doc/?url=SMQ.html)
 * [IoT: MQTT and AWS](AWS-MQTT) - How to Connect to AWS IoT Core using MQTT & ALPN
 * [IoT: MQTT Sparkplug](Sparkplug) - How to use the MQTT Sparkplug library
