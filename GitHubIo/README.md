@@ -20,10 +20,6 @@ In addition to calling the Lua IO interface methods directly, the object can als
 > When using the **[Xedge IDE](https://realtimelogic.com/ba/doc/en/Xedge.html)**, you can integrate a GitHub-backed file system directly into the Xedge UI by calling the **[xedge.auxapp() function](https://realtimelogic.com/ba/doc/en/Xedge.html#auxapp)**.
 > This allows you to mount a GitHub IO instance as an auxiliary app, making the repository appear in the IDE just like a local project. From there, you can browse, edit, and manage files while keeping them versioned in GitHub.
 
-
-
-
-
 ## Testing the GitHub IO
 
 To test the code, first create a new empty GitHub repository and generate a fine-grained personal access token with permissions limited to that repository. Next, edit the `GitHubIo/www/.preload` file and update the initialization code with the repository owner, the repository name, and token.
@@ -134,9 +130,9 @@ Any GitHub error (for example, invalid credentials) causes the IO object operati
 
 GitHub does not provide file modification timestamps. You can normalize and assign a fixed `mtime` value to all nodes. For example:
 
-`mtime = os.time()`
+### `lockdir` _(string, optional)_
 
-
+The `lockdir` name (default: `.LOCK`) should match the value passed to the WebDAV create function when using GitHub IO with a WebDAV instance. This directory is used internally to maintain a cache and prevent non-essential files from being pushed to GitHub.
 
 * * *
 
