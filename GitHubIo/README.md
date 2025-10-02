@@ -16,6 +16,14 @@ In practice, this means you can mount a GitHub repo as if it were a local filesy
 
 In addition to calling the Lua IO interface methods directly, the object can also be passed to any BAS component that accepts an IO interface, such as the [WebDAV server](https://realtimelogic.com/ba/doc/en/lua/lua.html#ba_create_dav). By doing so, you can expose a GitHub repository as a versioned network file system. Note that many WebDAV clients, including the one built into Windows, generate a high volume of file I/O operations, which can result in substantial traffic to GitHub. When using WebDAV, limit it to small repositories and avoid transferring large files. It is best suited for working with source code files only.
 
+> **&#x1F449; Tip:**
+> When using the **[Xedge IDE](https://realtimelogic.com/ba/doc/en/Xedge.html)**, you can integrate a GitHub-backed file system directly into the Xedge UI by calling the **[xedge.auxapp() function](https://realtimelogic.com/ba/doc/en/Xedge.html#auxapp)**.
+> This allows you to mount a GitHub IO instance as an auxiliary app, making the repository appear in the IDE just like a local project. From there, you can browse, edit, and manage files while keeping them versioned in GitHub.
+
+
+
+
+
 ## Testing the GitHub IO
 
 To test the code, first create a new empty GitHub repository and generate a fine-grained personal access token with permissions limited to that repository. Next, edit the `GitHubIo/www/.preload` file and update the initialization code with the repository owner, the repository name, and token.
