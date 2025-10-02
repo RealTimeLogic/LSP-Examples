@@ -130,6 +130,10 @@ Any GitHub error (for example, invalid credentials) causes the IO object operati
 
 GitHub does not provide file modification timestamps. You can normalize and assign a fixed `mtime` value to all nodes. For example:
 
+``` lua
+mtime=os.time()
+```
+
 ### `lockdir` _(string, optional)_
 
 The `lockdir` name (default: `.LOCK`) should match the value passed to the WebDAV create function when using GitHub IO with a WebDAV instance. This directory is used internally to maintain a cache and prevent non-essential files from being pushed to GitHub.
