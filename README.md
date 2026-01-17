@@ -1,5 +1,8 @@
-# LSP-Examples
- [Lua and LSP](https://realtimelogic.com/products/lua-server-pages/) examples, including IoT/Cloud connectivity. New to Lua? Check out the [online Lua tutorial](https://tutorial.realtimelogic.com/).
+# Lua modules, tools, and Examples
+
+This repository includes ready-to-use Lua modules, tools, Lua scripts, and Lua Server Pages (LSP) examples intended to be dropped directly into real applications or used as practical reference material. The examples span common web and device use cases such as form handling, REST services, AJAX and WebSocket interaction, authentication and session management, database access, IoT messaging, and embedded-specific workflows used with the [Barracuda App Server](https://realtimelogic.com/products/barracuda-application-server/), [Mako Server](https://makoserver.net/), and [Xedge](https://realtimelogic.com/products/xedge/)-based systems.
+
+### New to Lua? Check out the [online Lua tutorial](https://tutorial.realtimelogic.com/).
 
 
 * [Basic HTML form](html-form) - Source code for the tutorial [HTML Forms and LSP for Beginners](https://makoserver.net/articles/HTML-Forms-and-LSP-for-Beginners).

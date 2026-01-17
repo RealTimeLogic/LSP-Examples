@@ -1,9 +1,29 @@
 
 local fmt=string.format
+local smq
+
+-- Return data if it is json encoded and "?" if it is not.
+local function toJ(data)
+   return ba.json.decode(data) and data or "?"
+end
 
 -- Callback for dropped messages
 local function ondrop(data, ptid, tid, subtid, peer)
-   trace(fmt("--SMQ DROP--, ptid: %u, tid: %u, subtid: %u",ptid,tid,subtid))
+   trace(fmt("ptid: %u, tid: %s, subtid: %s, data %s",
+             ptid,
+             smq:tid2topic(tid) or tid,
+             smq:tid2subtopic(subtid) or tostring(subtid),
+             toJ(data)))
+end
+
+-- Callback for all messages
+local function onpublish(data, ptid, tid, subtid, peer)
+   trace(fmt("ptid: %u, tid: %s, subtid: %s, data %s",
+             ptid,
+             smq:tid2topic(tid) or tid,
+             smq:tid2subtopic(subtid) or tostring(subtid),
+             toJ(data)))
+   return true
 end
 
 local function onconnect(etid, infoT, peerT)
@@ -14,10 +34,11 @@ local function onclose(etid, sock, peer, err)
    trace(fmt("SMQ client disconnecting, etid: %u, err: %s",etid,err))
 end
 
-local smq=require"smq.hub".create{
+smq=require"smq.hub".create{
    ondrop=ondrop,
    onconnect=onconnect,
-   onclose=onclose
+   onclose=onclose,
+   onpublish=onpublish
 }
 
 -- Called by smq.lsp

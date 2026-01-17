@@ -58,3 +58,9 @@ ba.timer(oneshot):set(3000,true)
 function connect(request)
    smq:connect(request)
 end
+
+-- Called when app terminates
+function onunload()
+   smq:shutdown"Broker app shutting down!"
+end
+
