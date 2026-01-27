@@ -1,42 +1,75 @@
-# Light Dashboard Template
+# Light Dashboard Templates
 
-This example shows how to implement a dashboard (device management
-app) suitable for constrained devices such as RTOS/firmware type
-devices.
+Three ready-to-run dashboard UIs for embedded devices (routers, gateways, RTOS/firmware).
 
-![Light Dashboard Template](https://makoserver.net/blogmedia/dashboard/Light-Dashboard.gif)
+### What the Article Covers (High-Level)
 
+**For a step-by-step walkthrough, diagrams, and acronyms, see the introductory article:**
 
-## Tutorial and Hands-On Microcontroller Example
-- Explore the server-side logic, HTMX, and web rendering principles detailed in the [dashboard article](https://makoserver.net/articles/How-to-Build-an-Interactive-Dashboard-App).
-- For a practical microcontroller implementation using this dashboard, check out the tutorial [Designing Your First Professional Embedded Web Interface](https://realtimelogic.com/articles/Designing-Your-First-Professional-Embedded-Web-Interface).
+- https://makoserver.net/articles/How-to-Build-an-Interactive-Dashboard-App
 
-## How to run using the Mako Server:
-Run the dashboard example, using the [Mako Server](https://makoserver.net/), as follows:
+The article explains the design and behavior of this dashboard without requiring deep framework knowledge:
+
+- **Two dashboard styles:** a default SSR flow and a lightweight HTMX-based CSR flow that uses partial updates but still falls back to SSR when JavaScript is off.
+- **MVC-style structure:** `menu.json` defines pages, the CMS builds the response, and `template.lsp` wraps each page fragment.
+- **Dynamic assembly:** pages are composed at runtime (template + fragment), which makes it easy to add or change pages.
+- **Navigation + HTMX behavior:** HTMX requests return fragments while full requests return the complete layout.
+- **WebSockets behavior:** SSR navigation closes sockets, while CSR can keep them alive if managed carefully. The CSR versions include code in WebSockets.js to explicitly close the SMQ connection on navigation; if you want persistent sockets, move SMQ loading into `template.lsp`.
+- **Compression + authentication:** responses are compressed, and a TPM-backed user database is included for authentication.
+
+## Versions at a glance
+
+- **`www/`** - **SSR + Pure.css** (original server-side rendered version)
+- **`htmx/`** - **CSR/HTMX + Pure.css** (HTML fragments assembled in the client)
+- **`custom/`** - **CSR/HTMX + custom CSS** (two-level menu + modern design)
+
+**Default for new work:** `custom/` (modern CSS and two-level navigation).
+
+All three use the same CMS flow: `menu.json` defines pages, `cms.lua` routes requests, and `template.lsp` renders the shell around each page fragment.
+
+## Quick Start
+
+Run the **SSR + Pure.css** version:
 
 ```
 cd Light-Dashboard
 mako -l::www
 ```
 
-Run the [HTMX](https://makoserver.net/articles/How-to-Build-an-Interactive-Dashboard-App#htmx) version as follows:
+Run the **CSR/HTMX + Pure.css** version:
+
 ```
 cd Light-Dashboard
 mako -l::htmx
 ```
 
-For detailed instructions on starting the Mako Server, check out our [command line video tutorial](https://youtu.be/vwQ52ZC5RRg) and review the server's [command line options](https://realtimelogic.com/ba/doc/?url=Mako.html#loadapp) in our documentation.
-
-After starting the Mako Server, use a browser and navigate to
-http://localhost:portno, where portno is the HTTP port number used by
-the Mako Server (printed in the console). Login with the username
-admin and password qwerty.
-
-
-## 'LSP-Examples/Light-Dashboard' Files:
+Run the **CSR/HTMX + custom CSS** version (recommended):
 
 ```
----www
+cd Light-Dashboard
+mako -l::custom
+```
+
+Then open your browser at:
+
+```
+http://localhost:portno
+```
+
+## AI-Assisted Changes
+
+This project is AI-friendly. It has been tested with [Codex](https://openai.com/codex/), but other AI engines should work as well.
+
+- See [AGENTS.md](AGENTS.md) for the exact file map and update workflow.
+- When using AI, say which version you want updated.
+- For most changes, target **`custom/`** first, then port to `www/` and `htmx/` only if you want all three versions to stay in sync.
+
+## Project Layout (Simplified)
+
+```
+Light-Dashboard/
+
+  -www     -- SSR + Pure.css
     |   .preload -- Loads cms.lua when server starts
     |
     +---.lua
@@ -58,51 +91,78 @@ admin and password qwerty.
             styles.css -- For the dashboard
             ui.js -- Manages the Hamburger button logic. This button is visible on
              smaller devices or if you narrow the browser window. Details: https://purecss.io/
+
+  -htmx/     -- CSR/HTMX + Pure.css
+     -- (Similar to the www/ layout)
+
+  -custom/   -- CSR/HTMX + custom CSS + 2-level menu
+     -- (Similar to the www/ layout)
+
+  - README.md
+  - AGENTS.md
 ```
 
+## How the CMS Routing Works (Short Version)
 
-## The server side code works as follows:
+1. The CMS directory function in `cms.lua` checks whether the URL exists in `menu.json`.
+2. It loads the corresponding page fragment from `.lua/www/`.
+3. `template.lsp` renders the shared layout and injects the fragment.
+4. The response is compressed before it is sent to the browser.
 
-1. A [directory function](https://realtimelogic.com/ba/doc/en/VirtualFileSystem.html#directory) (function cmsfunc() in [cms.lua](www/.lua/cms.lua)) triggers when the user navigates to the server
-2. The directory function checks if the requested URL is in the file menu.json
-3. The directory function then loads and parses the LSP page to be executed and saves the "LSP page function" as variable 'lspPage' in the [request/response environment](https://realtimelogic.com/ba/doc/?url=lua.html#CMDE)
-4. The directory function calls the "pre parsed" template.lsp function
-5. The code in template.lsp renders the menu and static HTML components part of the 'theme'
-6. Template.lsp calls the "LSP page function" stored as variable 'lspPage'
-7. The "LSP page function" renders the page specific content (the HTML fragment)
-8. The compressed dynamically generated HTML is sent to the client (the browser)
+In the HTMX/CSR versions, HTMX requests return only the fragment; normal requests return the full layout.
 
-#### CMS Server-Side Routing
-Server-side routing is the process by which a web server handles incoming HTTP requests, determining the appropriate resource or action based on the URL path. In the CMS, the cmsfunc() function, located in [cms.lua](www/.lua/cms.lua), checks whether the requested URL exists in menu.json. If a match is found, the URL is mapped to an HTML fragment file, which is then included in the template file. The HTML fragment file can contain either static HTML or LSP, allowing for further request routing when needed.
+## Add / Modify / Remove Pages
 
+### Add a new page
+1) Create a new fragment in `.lua/www/`, e.g. `Diagnostics.html`:
 
+```
+<div class="header">
+  <h1>Diagnostics</h1>
+</div>
+<div class="content">
+  ...
+</div>
+```
 
-#### JavaScript Powered HTMX Version
-The [HTMX](https://makoserver.net/articles/How-to-Build-an-Interactive-Dashboard-App#htmx) version, when detecting an HTMX request, directly sends the HTML page fragment. Thus the sequence is 1,2,3, call lspPage directly, and send the compressed fragment to the client. Check out the tutorial [LSP + htmx: A Powerful Duo for Web Apps](https://realtimelogic.com/articles/LSP-htmx-A-Powerful-Duo-for-Embedded-Web-Apps) if you are new to htmx.
+2) Add it to `.lua/menu.json`:
 
-## Authentication
+```
+{ "name": "Diagnostics", "href": "Diagnostics.html" }
+```
 
-This example includes a [soft TPM-protected](https://realtimelogic.com/ba/doc/en/lua/auxlua.html#TPM) user database, along with a web interface for adding and removing users. The authentication logic is based on the example provided with [function ba.tpm.jsonuser()](https://realtimelogic.com/ba/doc/en/lua/auxlua.html#ba_tpm_jsonuser).
+Or under a group in the **custom** version:
 
-Here's how the authentication works: if no users are found in the database, authentication is disabled. Once a user is added, authentication is automatically enabled. Conversely, removing the last user disables authentication again.
+```
+{
+  "name": "System",
+  "children": [
+    { "name": "Diagnostics", "href": "Diagnostics.html" }
+  ]
+}
+```
 
-The Users.html page provides a simple interface for managing the user database, allowing the addition and removal of users. For simplicity, the authentication code focuses purely on user authentication, without any authorization mechanisms.
+3) Apply the change in the version(s) you want to keep in sync:
+- `custom/.lua/www/` (recommended default)
+- `www/.lua/www/`
+- `htmx/.lua/www/`
+
+### Modify a page
+- Edit the fragment in `.lua/www/`.
+- If the menu label or location changes, update `.lua/menu.json`.
+- Apply the change in the version(s) you want to keep in sync.
+
+### Remove a page
+- Delete the fragment file.
+- Remove the matching entry from `.lua/menu.json`.
+
+## Styling & UI
+
+- `www/` and `htmx/` use **Pure.css**.
+- `custom/` uses a **custom CSS design** with a two-level menu.
+- Global styles live in `static/styles.css` and layout/menu behavior in `static/ui.js`.
+- Keep page markup consistent by using `.header` and `.content` wrappers.
 
 ## Security Policies
 
-The following default security policies are set to enhance security by controlling content sources and protecting against MIME-type sniffing:
-
-- Content-Security-Policy: Limits resources (scripts, styles) to load only from trusted sources. By default, it restricts all resources to 'self', with an exception for scripts and styles from cdn.jsdelivr.net. You may need to adjust this policy to include additional trusted domains based on your application's requirements.
-- X-Content-Type-Options: Set to "nosniff" to prevent browsers from interpreting files as a different MIME type than declared. This helps prevent certain attacks that rely on MIME-type misinterpretation.
-
-**Note:** These policies are examples and may require customization to meet the specific needs of your deployment environment and any third-party services you integrate. See www/.lua/cms.lua and 'securityPolicies' for details.
-
-
-## Notes:
-
-We use camel case naming convention in the example code. The Lua table
-type implements associative arrays. An associative array is an array
-that can be indexed not only with numbers but also with keys such as
-strings. We use the naming convention tableT when the table expects a
-key based lookup and the naming convention tableL when the table is a
-list (array).
+Default security headers (including CSP) are in `cms.lua`. If you add new external scripts/styles, update CSP accordingly.

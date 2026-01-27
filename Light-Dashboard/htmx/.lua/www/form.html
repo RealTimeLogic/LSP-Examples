@@ -2,13 +2,13 @@
 
 local data -- POST data
 if "POST" == request:method() then
-    trace"HTTP POST"
+   local ajax=request:header"hx-request" -- Set if HTMX AJAX call.
+   trace(string.format("HTTP%s POST",ajax and " HTMX AJAX" or ""))
     data=request:data()
     for key,val in pairs(data) do
-       trace(key,val)
+       trace("",key,val)
     end
-    -- If AJAX call.
-    if request:header"hx-request" then
+    if ajax then
        response:write("HTMX response; page counter not changed")
        return
     end
@@ -46,7 +46,7 @@ page.counter = page.counter and page.counter+1 or 1
         </div>
         <div class="pure-u-1 pure-u-md-1-3">
           <label for="email">E-Mail</label>
-          <input type="email" id="email" name="email" value="<?lsp=data.email or ''?>" class="pure-u-23-24" required />
+          <input type="email" id="email" name="email" value="<?lsp=data.email or ''?>" class="pure-u-23-24" required="" />
         </div>
         <div class="pure-u-1 pure-u-md-1-3">
           <label for="city">City</label>

@@ -1,0 +1,88 @@
+<?lsp
+
+local data -- POST data
+if "POST" == request:method() then
+   local ajax=request:header"hx-request" -- Set if HTMX AJAX call.
+   trace(string.format("HTTP%s POST",ajax and " HTMX AJAX" or ""))
+    data=request:data()
+    for key,val in pairs(data) do
+       trace("",key,val)
+    end
+    if ajax then
+       response:write("HTMX response; page counter not changed")
+       return
+    end
+else
+    data={} -- Empty
+end
+
+-- We increment a page counter  each time this page is accessed, excluding AJAX.
+page.counter = page.counter and page.counter+1 or 1
+
+
+?>
+<div class="header">
+  <h1>HTMX AJAX Form Submit</h1>
+</div>
+
+<div class="content">
+
+  <form class="form"
+        method="POST"
+        id="ajaxForm"
+        hx-post="form.html"
+        hx-target="#response"
+  >
+    <div class="panel">
+      <div class="panel-header">
+        <h3 class="panel-title">Legend</h3>
+      </div>
+      <div class="form-grid">
+        <div class="form-field">
+          <label for="first_name">First Name</label>
+          <input type="text" id="first_name" name="first_name" value="<?lsp=data.first_name or''?>" />
+        </div>
+        <div class="form-field">
+          <label for="last_name">Last Name</label>
+          <input type="text" id="last_name" name="last_name" value="<?lsp=data.last_name or''?>" />
+        </div>
+        <div class="form-field">
+          <label for="email">E-Mail</label>
+          <input type="email" id="email" name="email" value="<?lsp=data.email or''?>" required="" />
+        </div>
+        <div class="form-field">
+          <label for="city">City</label>
+          <input type="text" id="city" name="city" value="<?lsp=data.city or''?>" />
+        </div>
+        <div class="form-field">
+          <label for="state">State</label>
+          <select id="state" name="state">
+            <?lsp
+            local states={"AL","CA","IL"}
+            for _,state in ipairs(states) do
+              response:write('<option',data.state == state and " selected" or "",'>',state,'</option>')
+            end
+            ?>
+          </select>
+        </div>
+      </div>
+      <label for="terms" class="checkbox">
+        <input type="checkbox" id="terms" name="terms" <?lsp=data.terms and 'checked' or ''?> />
+        <span>I&#x27;ve read the terms and conditions</span>
+      </label>
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">Submit</button>
+      </div>
+    </div>
+  </form>
+
+  <p id="response">Page counter: <?lsp=page.counter?></p>
+
+  <p>This page demonstrates form submission using HTMX. Submitting the form using AJAX updates the form without refreshing the page fragment.</p>
+
+  <p>This page shows a responsive multi-column form built with modern CSS Grid and a lightweight form system. When not using htmx, The server side logic keeps the data persistent, so submitting the form does not clear it. The new form rendered by the server inserts the submitted data into the form elements.</p>
+
+  <p>The submitted form data is sent to the <a target="_blank" href="https://realtimelogic.com/ba/doc/?url=lua.html#_G_trace">trace</a> and is subsequently printed in the console.</p>
+
+  <p>See our <a target="_blank" href="https://tutorial.realtimelogic.com/HTML-Forms.lsp">online tutorial : forms</a> for an introduction on how to manage HTML forms on the server side.</p>
+</div>

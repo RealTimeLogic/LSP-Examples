@@ -1,0 +1,519 @@
+/* ==========================================================================
+   Light Dashboard - Modern CSS (no external framework)
+   Keep this file readable: sections are grouped by layout, nav, and forms.
+   ========================================================================== */
+
+:root {
+    /* Core palette */
+    --page-bg: #eef2f7;
+    --main-bg: #f7f8fb;
+    --surface: #ffffff;
+    --surface-muted: #f1f4f8;
+    --text: #0f172a;
+    --muted: #5b667a;
+    --border: rgba(15, 23, 42, 0.08);
+    --shadow: 0 18px 40px rgba(15, 23, 42, 0.12);
+
+    /* Navigation */
+    --nav-width: 260px;
+    --nav-bg: #0f2233;
+    --nav-surface: #132b3f;
+    --nav-text: #e6eef7;
+    --nav-muted: #9bb0c6;
+    --nav-accent: #f59e0b;
+
+    /* Accents */
+    --link: #2463eb;
+    --accent: #2563eb;
+    --accent-ink: #ffffff;
+
+    /* Sizing */
+    --radius: 18px;
+    --radius-sm: 10px;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+    color: var(--text);
+    background:
+        radial-gradient(1200px 600px at 15% -20%, #dbe8ff 0%, rgba(219, 232, 255, 0) 70%),
+        radial-gradient(900px 500px at 110% 10%, #ffe7c2 0%, rgba(255, 231, 194, 0) 60%),
+        var(--page-bg);
+}
+
+a {
+    color: var(--link);
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* ==========================================================================
+   App shell + layout
+   ========================================================================== */
+
+#layout {
+    min-height: 100vh;
+    position: relative;
+}
+
+/* Mobile scrim when the nav is open */
+#layout::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: rgba(7, 16, 27, 0.45);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+    z-index: 900;
+}
+
+#layout.active::before {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+#main {
+    min-height: 100vh;
+    background: var(--main-bg);
+    padding: 2.5rem 1.5rem 3.5rem;
+}
+
+.header {
+    max-width: 1040px;
+    margin: 0 auto 1.75rem;
+    padding: 2rem 2.5rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+}
+
+.header h1 {
+    margin: 0 0 0.35rem 0;
+    font-family: "Space Grotesk", "IBM Plex Sans", "Segoe UI", sans-serif;
+    font-size: clamp(2rem, 2.5vw, 2.8rem);
+    letter-spacing: -0.02em;
+}
+
+.header h2 {
+    margin: 0;
+    font-weight: 500;
+    color: var(--muted);
+}
+
+.content {
+    max-width: 1040px;
+    margin: 0 auto;
+    display: grid;
+    gap: 1.2rem;
+    color: var(--text);
+}
+
+.content p {
+    margin: 0;
+    color: var(--muted);
+    line-height: 1.7;
+}
+
+/* ==========================================================================
+   Navigation (left pane)
+   ========================================================================== */
+
+#menu {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: var(--nav-width);
+    background: linear-gradient(180deg, #0f2233 0%, #0b1a27 100%);
+    color: var(--nav-text);
+    transform: translateX(calc(-1 * var(--nav-width)));
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    z-index: 1000;
+    overflow: hidden;
+}
+
+#menu.active {
+    transform: translateX(0);
+    box-shadow: 14px 0 40px rgba(9, 18, 28, 0.45);
+}
+
+.nav-inner {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 1.75rem 1.5rem;
+    gap: 1.5rem;
+}
+
+.nav-brand {
+    font-family: "Space Grotesk", "IBM Plex Sans", "Segoe UI", sans-serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--nav-text);
+    letter-spacing: 0.02em;
+}
+
+.nav-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    padding: 0.65rem 0.9rem;
+    border-radius: var(--radius-sm);
+    color: var(--nav-muted);
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    background: transparent;
+    transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.nav-link:hover,
+.nav-link:focus {
+    background: var(--nav-surface);
+    color: var(--nav-text);
+    text-decoration: none;
+    transform: translateX(2px);
+}
+
+.nav-link.is-active {
+    background: var(--nav-accent);
+    color: #23160a;
+}
+
+.nav-group {
+    margin-top: 0.4rem;
+}
+
+.nav-group-title {
+    position: relative;
+    display: block;
+    padding: 0.35rem 0.9rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--nav-muted);
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.nav-group-title:hover,
+.nav-group-title:focus {
+    color: var(--nav-text);
+    text-decoration: none;
+}
+
+.nav-group-title::after {
+    content: "+";
+    position: absolute;
+    right: 0.6rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.85rem;
+    color: var(--nav-muted);
+}
+
+.nav-group.is-open .nav-group-title::after,
+.nav-group.is-active .nav-group-title::after {
+    content: "-";
+    color: var(--nav-text);
+}
+
+.nav-group-title.is-active,
+.nav-group.is-active .nav-group-title {
+    color: var(--nav-text);
+}
+
+.nav-sublist {
+    list-style: none;
+    margin: 0.25rem 0 0.35rem;
+    padding: 0 0 0 0.6rem;
+    display: none;
+    flex-direction: column;
+    gap: 0.25rem;
+    border-left: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.nav-group.is-open .nav-sublist,
+.nav-group.is-active .nav-sublist {
+    display: flex;
+}
+
+.nav-sublink {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 0.75rem;
+    border-radius: 12px;
+    color: var(--nav-muted);
+    font-weight: 600;
+    font-size: 0.92rem;
+    transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.nav-sublink:hover,
+.nav-sublink:focus {
+    background: var(--nav-surface);
+    color: var(--nav-text);
+    text-decoration: none;
+    transform: translateX(2px);
+}
+
+.nav-sublink.is-active {
+    background: rgba(245, 158, 11, 0.18);
+    color: var(--nav-accent);
+}
+
+/* ==========================================================================
+   Mobile menu toggle
+   ========================================================================== */
+
+.menu-link {
+    position: fixed;
+    top: .5rem;
+    left: .5rem;
+    width: 46px;
+    height: 46px;
+    border-radius: 14px;
+    background: #0b1a27;
+    box-shadow: 0 12px 24px rgba(6, 12, 20, 0.35);
+    z-index: 1100;
+    display: grid;
+    place-items: center;
+    transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.menu-link:hover,
+.menu-link:focus {
+    background: #122437;
+}
+
+.menu-link span {
+    position: relative;
+    width: 22px;
+    height: 2px;
+    background: #ffffff;
+    display: block;
+    pointer-events: none;
+}
+
+.menu-link span::before,
+.menu-link span::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    width: 22px;
+    height: 2px;
+    background: #ffffff;
+    pointer-events: none;
+}
+
+.menu-link span::before {
+    top: -7px;
+}
+
+.menu-link span::after {
+    top: 7px;
+}
+
+/* ==========================================================================
+   Forms and controls
+   ========================================================================== */
+
+.panel {
+    padding: 1.5rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+}
+
+.form {
+    display: grid;
+    gap: 1.2rem;
+}
+
+.form-narrow {
+    max-width: 520px;
+}
+
+.form-grid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.form-field {
+    display: grid;
+    gap: 0.4rem;
+}
+
+.form-field label {
+    font-weight: 600;
+    color: var(--text);
+}
+
+input,
+select,
+textarea {
+    width: 100%;
+    padding: 0.65rem 0.8rem;
+    border-radius: 12px;
+    border: 1px solid rgba(15, 23, 42, 0.15);
+    background: var(--surface-muted);
+    color: var(--text);
+    font: inherit;
+    transition: border 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    outline: none;
+    border-color: rgba(37, 99, 235, 0.6);
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
+    background: #ffffff;
+}
+
+fieldset {
+    border: none;
+    margin: 0;
+    padding: 0;
+}
+
+legend {
+    display: block;
+    font-weight: 700;
+    margin: 0 0 0.85rem;
+    color: var(--text);
+}
+
+.panel-header {
+    margin-bottom: 1rem;
+}
+
+.panel-title {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--text);
+}
+
+.checkbox {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-weight: 500;
+    color: var(--muted);
+}
+
+.checkbox input {
+    width: 18px;
+    height: 18px;
+}
+
+.form-actions {
+    margin-top: 0.5rem;
+    display: flex;
+    justify-content: flex-start;
+}
+
+.btn {
+    border: none;
+    border-radius: 999px;
+    padding: 0.7rem 1.4rem;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-primary {
+    background: var(--accent);
+    color: var(--accent-ink);
+    box-shadow: 0 12px 25px rgba(37, 99, 235, 0.3);
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+    transform: translateY(-1px);
+}
+
+.btn-large {
+    font-size: 1.1rem;
+    padding: 0.9rem 1.7rem;
+}
+
+.alert {
+    padding: 0.85rem 1rem;
+    border-radius: 12px;
+    font-weight: 600;
+}
+
+.alert-error {
+    background: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+}
+
+.centered {
+    min-height: 55vh;
+    display: grid;
+    place-items: center;
+}
+
+/* ==========================================================================
+   Responsive layout
+   ========================================================================== */
+
+@media (min-width: 60rem) {
+    #layout {
+        padding-left: var(--nav-width);
+    }
+
+    #layout::before {
+        display: none;
+    }
+
+    #menu {
+        transform: translateX(0);
+        box-shadow: none;
+    }
+
+    #main {
+        padding: 3rem 3rem 4rem;
+    }
+
+    .menu-link {
+        display: none;
+    }
+}
+
+@media (max-width: 48rem) {
+    #layout.active #menu {
+        transform: translateX(0);
+    }
+}

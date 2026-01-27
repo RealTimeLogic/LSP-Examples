@@ -1,0 +1,33 @@
+[
+  {
+    "name": "Home",
+    "href": "index.html"
+  },
+  {
+    "name": "Examples",
+    "children": [
+      {
+        "name": "HTML Form",
+        "href": "form.html"
+      },
+      {
+        "name": "WebSockets",
+        "href": "WebSockets.html"
+      }
+    ]
+  },
+  {
+    "name": "Management",
+    "children": [
+      {
+        "name": "Users",
+        "href": "Users.html"
+      }
+    ]
+  },
+  {
+    "name": "Sign Out",
+    "href": "logout.html",
+    "auth": true //Only show if authenticated. See template.lsp
+  }
+]

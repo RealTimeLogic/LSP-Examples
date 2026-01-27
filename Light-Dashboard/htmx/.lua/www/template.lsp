@@ -15,7 +15,7 @@ local authenticated = request:user() and true or false
 local function emitMenu()
    for _,m in ipairs(menuL) do
       if not m.auth or authenticated then
-         response:write('<li class="pure-menu-item"><a href="',m.href,'"hx-get="',m.href,'" hx-push-url="true" hx-target="#main" class="pure-menu-link',activeMenuItem == m and ' pure-menu-selected' or '','">',m.name,'</a></li>')
+         response:write('<li class="pure-menu-item"><a href="',m.href,'" hx-get="',m.href,'" hx-push-url="true" hx-target="#main" class="pure-menu-link',activeMenuItem == m and ' pure-menu-selected' or '','">',m.name,'</a></li>')
       end
    end
 end

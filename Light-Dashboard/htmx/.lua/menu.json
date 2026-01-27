@@ -18,5 +18,6 @@
     {
         "name": "Sign Out",
         "href": "logout.html",
+        "auth": true, //Only show if authenticated. See template.lsp
     }
 ]

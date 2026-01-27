@@ -1,0 +1,26 @@
+<div class="header">
+  <h1>Sign In</h1>
+</div>
+
+<div class="content">
+  <form method="post" class="form">
+    <div class="panel">
+      <div class="form-field">
+        <label for="aligned-name">Username</label>
+        <input type="text" name="ba_username" id="aligned-name" placeholder="Enter your username" autofocus required tabindex="1" />
+      </div>
+      <div class="form-field">
+        <label for="aligned-password">Password</label>
+        <input type="password" name="ba_password" id="aligned-password" placeholder="Enter your password" required tabindex="2" />
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary" tabindex="3">Sign In</button>
+      </div>
+    </div>
+  </form>
+
+  <?lsp if request:method() == "POST" then ?>
+    <div class="alert alert-error">Incorrect credentials. Please try again.</div>
+  <?lsp end ?>
+
+</div>

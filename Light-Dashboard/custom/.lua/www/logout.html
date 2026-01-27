@@ -1,0 +1,14 @@
+<?lsp
+if "POST" == request:method() then
+   request:logout()
+   response:sendredirect"/"
+end
+?>
+<div class="content">
+  <div class="centered">
+    <form method="post">
+      <button type="submit" class="btn btn-primary btn-large" autofocus>Sign Out</button>
+    </form>
+  </div>
+     
+</div>
