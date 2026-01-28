@@ -1,6 +1,6 @@
 <?lsp
 
--- JS code in the WebSockets.html page (in WebSockets.js) connects to
+-- JS code in the RoundSlider.html page (in RoundSlider.js) connects to
 -- this page to set up an SMQ WebSocket Connection.
 
 -- Doc: https://realtimelogic.com/ba/doc/en/SMQ.html
