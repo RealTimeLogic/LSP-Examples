@@ -27,6 +27,10 @@ The article explains the design and behavior of this dashboard without requiring
 
 All three use the same CMS flow: `menu.json` defines pages, `cms.lua` routes requests, and `template.lsp` renders the shell around each page fragment.
 
+The Pure.css–based versions are well suited for developers who are not CSS experts, as most of the layout and styling are handled by Pure.css with minimal customization required.
+
+The custom version is the most flexible option. It is designed for creating a dashboard that closely matches your company’s visual identity, whether you prefer to work with a CSS designer or use AI to assist with theming and styling.
+
 ## Quick Start
 
 Run the **SSR + Pure.css** version:
@@ -56,6 +60,15 @@ Then open your browser at:
 http://localhost:portno
 ```
 
+## Authentication (Optional)
+
+Authentication is **disabled by default**.
+
+- **Enable:** Open **Users** in the left navigation and add at least one user. Once a user exists, authentication is enforced.
+- **Add users:** You can add multiple users.
+- **Remove a user:** Enter an existing username and leave the password blank.
+- **Disable:** Remove all users; authentication is automatically disabled again.
+
 ## AI-Assisted Changes
 
 This project is AI-friendly. It has been tested with [Codex](https://openai.com/codex/), but other AI engines should work as well.
@@ -63,6 +76,7 @@ This project is AI-friendly. It has been tested with [Codex](https://openai.com/
 - See [AGENTS.md](AGENTS.md) for the exact file map and update workflow.
 - When using AI, say which version you want updated.
 - For most changes, target **`custom/`** first, then port to `www/` and `htmx/` only if you want all three versions to stay in sync.
+- AI example prompts are provided at the end of this document.
 
 ## Project Layout (Simplified)
 
@@ -166,3 +180,40 @@ Or under a group in the **custom** version:
 ## Security Policies
 
 Default security headers (including CSP) are in `cms.lua`. If you add new external scripts/styles, update CSP accordingly.
+
+## Example AI Prompts
+
+Below are example AI prompts you can use when working with an AI to modify the dashboards. For the complete AI workflow, file map, and rules for updates, refer to [AGENTS.md](AGENTS.md).
+
+### UI style change for the custom theme.
+
+You can use AI to change the theme of any of the three dashboard versions, but the custom version is usually the best starting point. It is also the preferred choice for professional web developers who want to fine-tune the styling manually, which is the recommended approach. In the following example, we provided a screenshot of an existing user interface found on the Internet from a Schneider Electric embedded web server, which serves as visual inspiration for the AI's theme update.
+
+```
+Update the custom/ version to match the look and feel of Schneider
+Electric's (SE) website (se.com).
+
+"I'm providing a screenshot of an embedded SE UI. Use it as a visual
+reference to restyle the **custom** version. Make sure to analyze this
+image before proceeding.
+
+Requirements
+
+- Match the screenshot's overall theme: colors, contrast, spacing, typography feel, and component styling.
+- Keep the existing layout, two‑level menu, and HTMX behavior intact.
+- Replace the top‑left "Company" brand text with the logo in custom/static/se-logo.svg.
+- Keep the logo sized to fit the nav height and width.
+
+Scope
+
+- Modify **only** files under custom/.
+- Update styles.css for palette, typography, nav, buttons, panels, and focus states.
+- Update template.lsp only for the brand/logo slot (no routing or content changes).
+- Update any other file that may need UI changes.
+
+Notes
+
+- Keep CSS readable and well‑commented.
+- Do not change page content or menu structure.
+- If any external assets are needed, call them out explicitly and update CSP (but prefer local assets).
+```
