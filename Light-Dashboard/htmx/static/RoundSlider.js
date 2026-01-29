@@ -19,7 +19,11 @@ $(function() {
     }
   }
   
-  smq.subscribe("self",{datatype:"json",onmsg:onSmqMsg});
+  // Subscribe to one-to-one message sent from server directly to client
+  smq.subscribe("self","slider",{datatype:"json",onmsg:onSmqMsg});
+  // Request broker to send us the slider angle pos: triggers above.
+  smq.publish("", 1, "getSlider");
+  // Subscribe to one-to-many, the message the server sends to all clients
   smq.subscribe("slider",{datatype:"json",onmsg:onSmqMsg});
 
   function onChange (e) {

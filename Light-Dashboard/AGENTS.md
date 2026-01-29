@@ -7,6 +7,11 @@ Purpose
 AI usage
 - This project has been tested with **Codex**, but other AI engines should work.
 - Always point AI to this file (AGENTS.md) and specify the target version.
+- For SMQ client behavior, treat the official SMQ JavaScript docs as source of truth: https://realtimelogic.com/ba/doc/en/JavaScript/SMQ.html
+- For SMQ broker behavior, treat the official SMQ Lua docs as source of truth: https://realtimelogic.com/ba/doc/en/lua/SMQ.html
+- For the Barracuda App Server Lua/LSP API, treat the official Lua API documentation as source of truth: https://realtimelogic.com/ba/doc/en/lua/lua.html
+- For the Barracuda App Server Auxiliary Lua APIs (HTTP client, sockets, ByteArray, UBJSON, etc.), treat the official AuxLua API documentation as source of truth: https://realtimelogic.com/ba/doc/en/lua/auxlua.html
+- SMQ publish signatures: broadcast is `smq:publish(data, "topic")`, direct is `smq:publish(data, ptid, "topic")`.
 
 Key files and what they do (custom/ default)
 - custom/.lua/www/template.lsp: Layout shell (left nav + main pane). Calls lspPage() to inject page content. Updates here affect every page.
@@ -15,7 +20,7 @@ Key files and what they do (custom/ default)
 - custom/.lua/www/*.html: Individual page fragments (can contain LSP). Use .header and .content wrappers for consistent styling.
 - custom/static/styles.css: Global styling for layout, nav, and forms.
 - custom/static/ui.js: Handles hamburger menu toggle and nav group expand/collapse.
-- custom/static/*.js|*.css: Page-specific assets (e.g., WebSockets.css/WebSockets.js).
+- custom/static/*.js|*.css: Page-specific assets (e.g., RoundSlider.css/RoundSlider.js).
 
 Equivalent paths for the other versions
 - Replace `custom/` with `www/` (SSR + Pure.css) or `htmx/` (CSR/HTMX + Pure.css).

@@ -16,9 +16,10 @@ $(function() {
       active=false;
     }
   }
-  
-  smq.subscribe("self",{datatype:"json",onmsg:onSmqMsg});
+
+  // Subscribe to broadcast and messages sent directly to this client.
   smq.subscribe("slider",{datatype:"json",onmsg:onSmqMsg});
+  smq.subscribe("self",{datatype:"json",onmsg:onSmqMsg});
 
   function onChange (e) {
     if(!active)

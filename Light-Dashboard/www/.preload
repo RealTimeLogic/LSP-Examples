@@ -3,7 +3,7 @@
 -- We call cmsOnunload when app is stopped
 local cmsOnunload=io:dofile(".lua/cms.lua",app)
 
--- The following SMQ broker 'smq' is used by .lua/www/WebSockets.html
+-- The following SMQ broker 'smq' is used by .lua/www/RoundSlider.html
 trace"Starting SMQ broker for the slider example"
 
 local smq -- Broker set below
@@ -27,7 +27,7 @@ end
 smq = require"smq.hub".create{onconnect=newClient,onclose=clientDisconnected}
 smq:subscribe("slider",{json=true,onmsg=slider})
 
--- .lua/www/WebSockets.html calls this function when new client
+-- .lua/www/RoundSlider.html calls this function when new client
 -- connects.
 function connectClientSlider(cmd)
    smq:connect(cmd)
