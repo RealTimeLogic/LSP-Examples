@@ -4,8 +4,8 @@ This repository includes ready-to-use Lua modules, tools, Lua scripts, and Lua S
 
 ### New to Lua? Check out the [online Lua tutorial](https://tutorial.realtimelogic.com/).
 
-
-* [Basic HTML form](html-form) - Source code for the tutorial [HTML Forms and LSP for Beginners](https://makoserver.net/articles/HTML-Forms-and-LSP-for-Beginners).
+* [AGENTS.md](AGENTS.md) - If you are using **AI**, add this file to your project
+* [Basic HTML form](html-form) - Source code for the tutorial [HTML Forms and LSP for Beginners](https://makoserver.net/articles/HTML-Forms-and-LSP-for-Beginners)
 * [Authentication: General](authentication) - Introduction to the Barracuda App Server's authentication mechanism
 * [Authentication and Authorization](JSON-File-Server) - Shows how to use the **[JSON Authenticator](https://realtimelogic.com/ba/doc/en/lua/lua.html#ba_create_jsonuser)** with a File Server
 * [Authentication: OAuth 2.0](oauth) - Shows how to access GitHub using OAuth 2.0
@@ -14,8 +14,8 @@ This repository includes ready-to-use Lua modules, tools, Lua scripts, and Lua S
 * [Authentication: RADIUS](RADIUS) - Remote Authentication Dial-In User Service Lua authentication integration
 * [AJAX: For Beginners](AJAX)
 * [AJAX: Over WebSockets](AJAX-Over-WebSockets)
-* [htmx Examples](htmx) - htmx lets you update web pages with server-rendered HTML, making it the perfect match for LSP's lightweight, dynamic backend.
-* [Website Template Engine for Embedded](Light-Dashboard) - Fast track your web app design with this engine. Includes TPM-protected user database.
+* [htmx Examples](htmx) - htmx lets you update web pages with server-rendered HTML, making it the perfect match for LSP's lightweight, dynamic backend
+* [Website Template Engine for Embedded](Light-Dashboard) - Fast track your web app design with this engine. Includes TPM-protected user database
 * [Dynamic Navigation Menu](Dynamic-Nav-Menu)
 * [Debug Lua](Lua-Debug) - How to Debug Lua Code Using Visual Studio Code
 * [GitHub IO](GitHubIo) - How to make a GitHub repository look and behave like a file system
