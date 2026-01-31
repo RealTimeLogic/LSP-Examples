@@ -12,8 +12,8 @@ This repository includes ready-to-use Lua modules, tools, Lua scripts, and Lua S
 * [Authentication: WebAuthn](WebAuthn) - Passwordless, FIDO2-compliant security with public-key cryptography
 * [Authentication: Single Sign On](fs-sso) - Prevent Pre-Installed Password Vulnerabilities with Single Sign-On
 * [Authentication: RADIUS](RADIUS) - Remote Authentication Dial-In User Service Lua authentication integration
-* [AJAX: For Beginners](AJAX)
-* [AJAX: Over WebSockets](AJAX-Over-WebSockets)
+* [AJAX / REST: For Beginners](AJAX)
+* [AJAX / REST / RPC Over WebSockets](AJAX-Over-WebSockets)
 * [htmx Examples](htmx) - htmx lets you update web pages with server-rendered HTML, making it the perfect match for LSP's lightweight, dynamic backend
 * [Website Template Engine for Embedded](Light-Dashboard) - Fast track your web app design with this engine. Includes TPM-protected user database
 * [Dynamic Navigation Menu](Dynamic-Nav-Menu)

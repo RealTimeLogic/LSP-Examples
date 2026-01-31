@@ -10,7 +10,7 @@ The [SMQ documentation](https://realtimelogic.com/ba/doc/?url=SMQ.html) provides
 ## Lua and JavaScript Examples
 
 * [One-to-One communication](one2one/README.md) - A foundational guide demonstrating direct communication between a browser and the server. This example serves as a versatile base for establishing browser-server interactions.
-* [RPC (aka AJAX) over SMQ](RPC/README.md) - Extends the `One-to-One communication` example and includes browser-to-server RPC calls.
+* [REST / AJAX / RPC over SMQ](RPC/README.md) - Extends the `One-to-One communication` example and includes browser-to-server REST calls.
 * [a light bulb app and a light switch app](LightSwitch-And-LightBulb-App/README.md) - The companion example for the [Modern Approach to Embedding a Web Server in a Device](https://realtimelogic.com/articles/Modern-Approach-to-Embedding-a-Web-Server-in-a-Device)
 tutorial.
 
