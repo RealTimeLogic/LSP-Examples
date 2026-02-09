@@ -19,6 +19,10 @@ Although this example uses an **RPC-style programming model** (calling named ser
 
 [SMQ](https://realtimelogic.com/products/simplemq/) is a lightweight, message-based communication layer designed for low-latency, bidirectional messaging between browsers and servers. It avoids HTTP request overhead and is well suited for interactive applications where responsiveness matters.
 
+### How the SMQ RPC Library Works
+
+From a high-level perspective, the SMQ RPC plugin follows the same fundamental approach described in the [AJAX over WebSockets tutorial](https://makoserver.net/articles/AJAX-over-WebSockets), but uses SMQ instead of raw WebSockets. With SMQ, you get both asynchronous publish/subscribe messaging and AJAX-style method calls from the browser to the server, all within a single, unified communication model.
+
 ---
 
 ## REST / RPC over SMQ
