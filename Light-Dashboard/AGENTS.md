@@ -1,12 +1,12 @@
 # AGENTS.md - Light Dashboard (Default: custom/)
 
 Purpose
-- This repo ships three versions of the dashboard. The **default target for new work is `custom/`**, which uses CSR/HTMX + custom CSS + a two-level menu.
-- The `www/` (SSR + Pure.css) and `htmx/` (CSR/HTMX + Pure.css) versions are maintained for reference or parity. Update them only if you need all versions in sync.
+- This repo ships three variants of the dashboard. The **default target for new work is `custom/`**, which uses CSR/HTMX + custom CSS + a two-level menu.
+- The `www/` (SSR + Pure.css) and `htmx/` (CSR/HTMX + Pure.css) variants are maintained for reference or parity. Update them only if you need all variants in sync.
 
 AI usage
 - This project has been tested with **Codex**, but other AI engines should work.
-- Always point AI to this file (AGENTS.md) and specify the target version.
+- Always point AI to this file (AGENTS.md) and specify the target variant.
 - For SMQ client behavior, treat the official SMQ JavaScript docs as source of truth: https://realtimelogic.com/ba/doc/en/JavaScript/SMQ.html
 - For SMQ broker behavior, treat the official SMQ Lua docs as source of truth: https://realtimelogic.com/ba/doc/en/lua/SMQ.html
 - For the Barracuda App Server Lua/LSP API, treat the official Lua API documentation as source of truth: https://realtimelogic.com/ba/doc/en/lua/lua.html
@@ -22,7 +22,7 @@ Key files and what they do (custom/ default)
 - custom/static/ui.js: Handles hamburger menu toggle and nav group expand/collapse.
 - custom/static/*.js|*.css: Page-specific assets (e.g., RoundSlider.css/RoundSlider.js).
 
-Equivalent paths for the other versions
+Equivalent paths for the other variants
 - Replace `custom/` with `www/` (SSR + Pure.css) or `htmx/` (CSR/HTMX + Pure.css).
 
 How routing works (quick mental model)

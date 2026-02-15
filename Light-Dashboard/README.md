@@ -14,10 +14,10 @@ The article explains the design and behavior of this dashboard without requiring
 - **MVC-style structure:** `menu.json` defines pages, the CMS builds the response, and `template.lsp` wraps each page fragment.
 - **Dynamic assembly:** pages are composed at runtime (template + fragment), which makes it easy to add or change pages.
 - **Navigation + HTMX behavior:** HTMX requests return fragments while full requests return the complete layout.
-- **WebSockets behavior:** SSR navigation closes sockets, while CSR can keep them alive if managed carefully. The CSR versions include code in RoundSlider.js to explicitly close the SMQ connection on navigation; if you want persistent sockets, move SMQ loading into `template.lsp`.
+- **WebSockets behavior:** SSR navigation closes sockets, while CSR can keep them alive if managed carefully. The CSR variants include code in RoundSlider.js to explicitly close the SMQ connection on navigation; if you want persistent sockets, move SMQ loading into `template.lsp`.
 - **Compression + authentication:** responses are compressed, and a TPM-backed user database is included for authentication.
 
-## Versions at a glance
+## Variants at a glance
 
 - **`www/`** - **SSR + Pure.css** (original server-side rendered version)
 - **`htmx/`** - **CSR/HTMX + Pure.css** (HTML fragments assembled in the client)
@@ -27,27 +27,27 @@ The article explains the design and behavior of this dashboard without requiring
 
 All three use the same CMS flow: `menu.json` defines pages, `cms.lua` routes requests, and `template.lsp` renders the shell around each page fragment.
 
-The Pure.css–based versions are well suited for developers who are not CSS experts, as most of the layout and styling are handled by Pure.css with minimal customization required.
+The Pure.css–based variants are well suited for developers who are not CSS experts, as most of the layout and styling are handled by Pure.css with minimal customization required.
 
-The custom version is the most flexible option. It is designed for creating a dashboard that closely matches your company’s visual identity, whether you prefer to work with a CSS designer or use AI to assist with theming and styling.
+The custom variant is the most flexible option. It is designed for creating a dashboard that closely matches your company’s visual identity, whether you prefer to work with a CSS designer or use AI to assist with theming and styling.
 
 ## Quick Start
 
-Run the **SSR + Pure.css** version:
+Run the **SSR + Pure.css** variant:
 
 ```
 cd Light-Dashboard
 mako -l::www
 ```
 
-Run the **CSR/HTMX + Pure.css** version:
+Run the **CSR/HTMX + Pure.css** variant:
 
 ```
 cd Light-Dashboard
 mako -l::htmx
 ```
 
-Run the **CSR/HTMX + custom CSS** version (recommended):
+Run the **CSR/HTMX + custom CSS** variant (recommended):
 
 ```
 cd Light-Dashboard
@@ -74,8 +74,8 @@ Authentication is **disabled by default**.
 This project is AI-friendly. It has been tested with [Codex](https://openai.com/codex/), but other AI engines should work as well.
 
 - See [AGENTS.md](AGENTS.md) for the exact file map and update workflow.
-- When using AI, say which version you want updated.
-- For most changes, target **`custom/`** first, then port to `www/` and `htmx/` only if you want all three versions to stay in sync.
+- When using AI, say which variant you want updated.
+- For most changes, target **`custom/`** first, then port to `www/` and `htmx/` only if you want all three variants to stay in sync.
 - [AI example prompts are provided at the end of this document](#example-ai-prompts).
 
 ## Project Layout (Simplified)
@@ -123,7 +123,7 @@ Light-Dashboard/
 3. `template.lsp` renders the shared layout and injects the fragment.
 4. The response is compressed before it is sent to the browser.
 
-In the HTMX/CSR versions, HTMX requests return only the fragment; normal requests return the full layout.
+In the HTMX/CSR variants, HTMX requests return only the fragment; normal requests return the full layout.
 
 ## Add / Modify / Remove Pages
 
@@ -145,7 +145,7 @@ In the HTMX/CSR versions, HTMX requests return only the fragment; normal request
 { "name": "Diagnostics", "href": "Diagnostics.html" }
 ```
 
-Or under a group in the **custom** version:
+Or under a group in the **custom** variant:
 
 ```
 {
@@ -156,7 +156,7 @@ Or under a group in the **custom** version:
 }
 ```
 
-3) Apply the change in the version(s) you want to keep in sync:
+3) Apply the change in the variant(s) you want to keep in sync:
 - `custom/.lua/www/` (recommended default)
 - `www/.lua/www/`
 - `htmx/.lua/www/`
@@ -164,7 +164,7 @@ Or under a group in the **custom** version:
 ### Modify a page
 - Edit the fragment in `.lua/www/`.
 - If the menu label or location changes, update `.lua/menu.json`.
-- Apply the change in the version(s) you want to keep in sync.
+- Apply the change in the variant(s) you want to keep in sync.
 
 ### Remove a page
 - Delete the fragment file.
@@ -187,14 +187,14 @@ Below are example AI prompts you can use when working with an AI to modify the d
 
 ### UI style change for the custom theme.
 
-You can use AI to change the theme of any of the three dashboard versions, but the custom version is usually the best starting point. It is also the preferred choice for professional web developers who want to fine-tune the styling manually, which is the recommended approach. In the following example, we provided a screenshot of an existing user interface found on the Internet from a Schneider Electric embedded web server, which serves as visual inspiration for the AI's theme update. As part of the prompt below, **copy and paste a screenshot of an existing user interface**.
+You can use AI to change the theme of any of the three dashboard variants, but the custom variant is usually the best starting point. It is also the preferred choice for professional web developers who want to fine-tune the styling manually, which is the recommended approach. In the following example, we provided a screenshot of an existing user interface found on the Internet from a Schneider Electric embedded web server, which serves as visual inspiration for the AI's theme update. As part of the prompt below, **copy and paste a screenshot of an existing user interface**.
 
 ```
-Update the custom/ version to match the look and feel of Schneider
+Update the custom variant to match the look and feel of Schneider
 Electric's (SE) website (se.com).
 
 "I'm providing a screenshot of an embedded SE UI. Use it as a visual
-reference to restyle the **custom** version. Make sure to analyze this
+reference to restyle the **custom** variant. Make sure to analyze this
 image before proceeding.
 
 Requirements
@@ -225,11 +225,11 @@ Notes
 
 ### Preparing the Dashboard for Persistent Real-Time Data
 
-The following prompts are designed for the two HTMX-based dashboard versions and are best suited for the custom version.
+The following prompts are designed for the two HTMX-based dashboard variants and are best suited for the custom variant.
 
 When designing dashboards for embedded systems, a persistent real-time connection to the server is preferred because it allows the server to push live data to the client. This works naturally in Single Page Applications (SPAs), where the application shell typically remains loaded during use. In a traditional server-side rendered design, the connection must be re-established each time a new page is loaded.
 
-The two HTMX dashboard versions behave similarly to a SPA because the page frame is not reloaded when navigating between pages. To take advantage of this, the SMQ WebSocket connection should not live inside individual page code. Instead, it should be part of the page frame so the connection remains persistent and can be shared by page fragments that are loaded on demand.
+The two HTMX dashboard variants behave similarly to a SPA because the page frame is not reloaded when navigating between pages. To take advantage of this, the SMQ WebSocket connection should not live inside individual page code. Instead, it should be part of the page frame so the connection remains persistent and can be shared by page fragments that are loaded on demand.
 
 The following prompt implements this design and prepares the dashboard for the next prompt, where a [Solar Dashboard Plugin](#solar-dashboard) is added.
 
@@ -264,7 +264,7 @@ Scope
 - Create WebSockets.js and update RoundSlider.js
 - Update template.lsp to include WebSockets.js
 - Update RoundSlider.html to include only RoundSlider.js
-- Dashboard version to use: custom/
+- Dashboard variant to use: custom/
 ```
 
 ### Solar Dashboard
@@ -288,7 +288,7 @@ bottom bar chart). Use a warm gold accent for primary numbers and
 bars, light gray for labels, and charcoal/black with subtle gradients
 for everything else.
 
-Target version: custom/
+Target variant: custom/
 
 - Page fragment: solar.html
 - JS: solar.js
