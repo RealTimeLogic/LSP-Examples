@@ -23,6 +23,12 @@ Although this example uses an **RPC-style programming model** (calling named ser
 
 From a high-level perspective, the SMQ RPC plugin follows the same fundamental approach described in the [AJAX over WebSockets tutorial](https://makoserver.net/articles/AJAX-over-WebSockets), but uses SMQ instead of raw WebSockets. With SMQ, you get both asynchronous publish/subscribe messaging and AJAX-style method calls from the browser to the server, all within a single, unified communication model.
 
+### Limitations
+
+SMQ is designed for messaging, not for large payloads. The maximum SMQ payload size is 2^16 - 15. In addition, the SMQ RPC plugin incurs some overhead; thus, a recommended maximum size is 65,400 bytes.
+
+If you need to send larger chunks of data, use LSP pages or the [REST plugin](https://realtimelogic.com/articles/Designing-RESTful-Services-in-Lua).
+
 ---
 
 ## REST / RPC over SMQ
