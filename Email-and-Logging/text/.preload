@@ -1,0 +1,73 @@
+
+-- Clone smtp in mako.conf and do a basic sanity check.
+local smtpCfg={} -- SMTP config data copied from mako.conf
+if not pcall(function()
+   local conf=require"loadconf"
+   for k,v in pairs(conf.log.smtp) do smtpCfg[k]=v end -- Clone
+   if smtpCfg.consec then -- Translate to settings used by socket.mail()
+      if "starttls" == smtpCfg.consec then
+         smtpCfg.starttls = true
+         -- smtpCfg.shark is auto set by socket.mail().
+      elseif "tls" == smtpCfg.consec then
+         smtpCfg.shark=ba.sharkclient() -- Must enable TLS
+      else
+         trace"Invalid log.smtp.consec settings"
+         error()
+      end
+   end
+end)
+then -- pcall failed
+   trace"See the README file for how to configure smtp in mako.conf"
+   mako.exit()
+end
+
+-- The following is done by mako.zip: require"socket.mail"
+assert(socket.mail) -- Verify that is was loaded by mako.zip
+
+-- We use the same message as found in the C code example:
+-- https://github.com/RealTimeLogic/SharkSSL/blob/main/examples/SMTP-example.c
+local message=[[
+Two roads diverged in a yellow wood,
+And sorry I could not travel both
+And be one traveler, long I stood
+And looked down one as far as I could
+To where it bent in the undergrowth;
+
+Then took the other, as just as fair,
+And having perhaps the better claim
+Because it was grassy and wanted wear,
+Though as for that the passing there
+Had worn them really about the same,
+
+And both that morning equally lay
+In leaves no step had trodden black.
+Oh, I marked the first for another day!
+Yet knowing how way leads on to way
+I doubted if I should ever come back.
+
+I shall be telling this with a sigh
+Somewhere ages and ages hence:
+Two roads diverged in a wood, and I,
+I took the one less traveled by,
+And that has made all the difference.
+]]
+
+-- Create a Simplified SMTP Client object.
+local smtp=socket.mail(smtpCfg)
+
+trace("Sending email.....")
+local ok,err=smtp:send{ -- This blocks until message sent
+   from=smtpCfg.from,
+   to=smtpCfg.to,
+   subject="Text email sent by BAS",
+   txtbody=message
+}
+
+
+if ok then
+   trace("Email sent to:",smtpCfg.to)
+else
+   trace("Sending email failed:", err)
+end
+
+trace"mako.exit()" mako.exit()

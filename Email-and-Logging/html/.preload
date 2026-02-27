@@ -1,0 +1,62 @@
+
+-- Clone smtp in mako.conf and do a basic sanity check.
+local smtpCfg={} -- SMTP config data copied from mako.conf
+if not pcall(function()
+   local conf=require"loadconf"
+   for k,v in pairs(conf.log.smtp) do smtpCfg[k]=v end -- Clone
+   if smtpCfg.consec then -- Translate to settings used by socket.mail()
+      if "starttls" == smtpCfg.consec then
+         smtpCfg.starttls = true
+         -- smtpCfg.shark is auto set by socket.mail().
+      elseif "tls" == smtpCfg.consec then
+         smtpCfg.shark=ba.sharkclient() -- Must enable TLS
+      else
+         trace"Invalid log.smtp.consec settings"
+         error()
+      end
+   end
+end)
+then -- pcall failed
+   trace"See the README file for how to configure smtp in mako.conf"
+   mako.exit()
+end
+
+-- The following is done by mako.zip: require"socket.mail"
+assert(socket.mail) -- Verify that is was loaded by mako.zip
+
+-- We use the same message as found in this tutorial:
+-- https://realtimelogic.com/articles/How-to-Send-Emails-with-Xedge-IDE-A-StepbyStep-Guide
+local message=[[
+<html>
+  <body>
+    <h1>Barracuda App Server Logo</h1>
+    <img src="cid:the-unique-id" alt="BAS logo">
+  </body>
+</html>
+]]
+
+-- Create a Simplified SMTP Client object.
+local smtp=socket.mail(smtpCfg)
+
+trace("Sending email.....")
+local ok,err=smtp:send{ -- This blocks until message sent
+   from=smtpCfg.from,
+   to=smtpCfg.to,
+   subject="HTML email sent by BAS",
+   txtbody="The email can only be viewed by an HTML enabled client",
+   htmlbody=message,
+   htmlimg={
+      id="the-unique-id",
+      name="logo.png",
+      source=ba.openio"home":open"data/BAS-Logo.png"
+   }
+}
+
+
+if ok then
+   trace("Email sent to:",smtpCfg.to)
+else
+   trace("Sending email failed:", err)
+end
+
+trace"mako.exit()" mako.exit()

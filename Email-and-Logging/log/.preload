@@ -1,0 +1,17 @@
+
+function log(msg,op)
+   op = op or {}
+   op.ts=true -- Add time stamp
+   if not mako.log(msg,op) then
+      trace"Data logging not enabled"
+   end
+end
+
+log("My first log message") -- Not flushing
+
+-- Change two second timeout below to more than one minute to see time
+-- stamp changes.
+ba.timer(function()
+   log("My second log message",{flush=true}) -- Flushing
+   trace"Log messages sent"
+end):set(2000,true)

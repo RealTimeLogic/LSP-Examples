@@ -1,0 +1,56 @@
+-- Clone smtp in mako.conf and do a basic sanity check.
+local smtpCfg={} -- SMTP config data copied from mako.conf
+if not pcall(function()
+   local conf=require"loadconf"
+   for k,v in pairs(conf.log.smtp) do smtpCfg[k]=v end -- Clone
+   if smtpCfg.consec then -- Translate to settings used by socket.mail()
+      if "starttls" == smtpCfg.consec then
+         smtpCfg.starttls = true
+         -- smtpCfg.shark is auto set by socket.mail().
+      elseif "tls" == smtpCfg.consec then
+         smtpCfg.shark=ba.sharkclient() -- Must enable TLS
+      else
+         trace"Invalid log.smtp.consec settings"
+         error()
+      end
+   end
+end)
+then -- pcall failed
+   trace"See the README file for how to configure smtp in mako.conf"
+   mako.exit()
+end
+
+-- makes the following below work: require'eml/EmailMessage'
+mako.createloader(io)
+
+-- Load the main EML module
+local eml = require'eml/EmailMessage'
+
+-- Open and read the EML email
+local emlFile=require"rwfile".file(ba.openio"home","data/BAS-Info.eml")
+assert(emlFile, "Cannot open the EML file")
+
+local m,err = eml(emlFile) -- parse
+-- We assume it parses without errors
+assert(m,err)
+assert("string" == type(m.htmlbody))
+assert("table" == type(m.htmlimg))
+
+-- Add required fields not set by the EML file.
+m.txtbody="The email can only be viewed by an HTML enabled client"
+m.from=smtpCfg.from
+m.to=smtpCfg.to
+m.subject="EML (HTML) email sent by BAS"
+
+-- Create a Simplified SMTP Client object.
+local smtp=socket.mail(smtpCfg)
+
+trace("Sending email.....")
+local ok,err=smtp:send(m)
+if ok then
+   trace("Email sent to:",smtpCfg.to)
+else
+   trace("Sending email failed:", err)
+end
+
+trace"mako.exit()" mako.exit()
