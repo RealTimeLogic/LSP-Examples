@@ -18,6 +18,7 @@ This repository includes ready-to-use Lua modules, tools, Lua scripts, and Lua S
 * [Website Template Engine for Embedded](Light-Dashboard) - Fast track your web app design with this engine. Includes TPM-protected user database
 * [Dynamic Navigation Menu](Dynamic-Nav-Menu)
 * [Debug Lua](Lua-Debug) - How to Debug Lua Code Using Visual Studio Code
+* [Email + Logging](Email-and-Logging) - How to send emails and data logs via email
 * [GitHub IO](GitHubIo) - How to make a GitHub repository look and behave like a file system
 * [IoT: SMQ Examples](SMQ-examples) - Easy and secure device management using [SMQ](https://realtimelogic.com/ba/doc/?url=SMQ.html)
 * [IoT: MQTT and AWS](AWS-MQTT) - How to Connect to AWS IoT Core using MQTT & ALPN

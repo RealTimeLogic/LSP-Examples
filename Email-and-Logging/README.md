@@ -1,3 +1,98 @@
+# SMTP Examples
+
+These examples show how to use the SMTP send email function [socket.mail()](https://realtimelogic.com/ba/doc/en/lua/auxlua.html#smtp). Although the examples are designed to run "as is" using the [Mako Server](https://makoserver.net/), they can also be used by other [Barracuda App Server](https://realtimelogic.com/products/barracuda-application-server/) products such as Xedge.
+
+Note that [Xedge](https://realtimelogic.com/products/xedge/) has built-in email configuration via the IDE, as explained in the tutorial [How to Send Emails with Xedge IDE](https://realtimelogic.com/articles/How-to-Send-Emails-with-Xedge-IDE-A-StepbyStep-Guide).
+
+Before running the examples using the Mako Server, edit [`mako.conf`](mako.conf) and configure [log.smtp](https://realtimelogic.com/ba/doc/en/Mako.html#oplog) with valid SMTP settings.
+
+The `text`, `html`, and `eml` examples all use the Mako Server's log settings in `mako.conf` as their SMTP configuration. In each [`.preload`](text/.preload) script, the code loads `require"loadconf"`, clones `conf.log.smtp` into a local `smtpCfg` table, and then translates `consec = "starttls"` or `consec = "tls"` into the settings expected by `socket.mail()`. This means the same `from`, `to`, `server`, `port`, `user`, `password`, and transport security settings used for emailed logs are also used when these examples send email directly.
+
+Run the email examples in this order:
+
+1. `mako -l::text`
+2. `mako -l::html`
+3. `mako -l::eml`
+
+All examples except `log` exit the Mako Server after the email is sent.
+
+# Text Email Example
+
+This example shows the smallest complete `socket.mail()` usage pattern: create an SMTP client from `mako.conf`, send a plain text body, print the result, and exit.
+
+The [`.preload`](text/.preload) script performs the following steps:
+
+1. Loads and clones the SMTP settings from `mako.conf`.
+2. Converts `log.smtp.consec` into the transport settings used by `socket.mail()`.
+3. Verifies that `socket.mail` was loaded by `mako.zip`.
+4. Creates a plain text message body.
+5. Creates an SMTP client with `socket.mail(smtpCfg)`.
+6. Sends the message with `smtp:send{...}`.
+7. Calls `mako.exit()` after the send attempt completes.
+
+The message body is the [Robert Frost Poem](https://www.poetryfoundation.org/poems/44272/the-road-not-taken) used by the [SharkSSL SMTP C example](https://github.com/RealTimeLogic/SharkSSL/blob/main/examples/SMTP-example.c), but the send operation itself is pure Lua:
+
+```lua
+local smtp=socket.mail(smtpCfg)
+local ok,err=smtp:send{
+   from=smtpCfg.from,
+   to=smtpCfg.to,
+   subject="Text email sent by BAS",
+   txtbody=message
+}
+```
+
+Use this example first when validating your SMTP settings because it removes HTML, inline images, and template parsing from the test.
+
+# HTML Email Example
+
+This example sends an HTML email with an inline image by using `htmlbody`, a plain text fallback, and `htmlimg`.
+
+Like the text example, [`.preload`](html/.preload) clones `conf.log.smtp` from `mako.conf`, normalizes the `consec` setting, creates an SMTP client, sends one message, and exits with `mako.exit()`.
+
+The main difference is the message table passed to `smtp:send(...)`:
+
+```lua
+local ok,err=smtp:send{
+   from=smtpCfg.from,
+   to=smtpCfg.to,
+   subject="HTML email sent by BAS",
+   txtbody="The email can only be viewed by an HTML enabled client",
+   htmlbody=message,
+   htmlimg={
+      id="the-unique-id",
+      name="logo.png",
+      source=ba.openio"home":open"data/BAS-Logo.png"
+   }
+}
+```
+
+The HTML body references the image with `src="cid:the-unique-id"`, and `htmlimg` attaches [`data/BAS-Logo.png`](data/BAS-Logo.png) as the corresponding inline MIME part.
+
+This example is useful after the plain text example succeeds because it confirms that your SMTP configuration also works for multipart HTML messages with embedded content.
+
+# Log Email Example
+
+This example indirectly sends email by using [mako.log()](https://realtimelogic.com/ba/doc/en/Mako.html#mako_log) instead of calling `socket.mail()` directly.
+
+The [`.preload`](log/.preload) script defines a small helper that enables timestamps and then writes two log messages:
+
+1. The first call queues a log entry without flushing.
+2. A `ba.timer(...)` callback runs two seconds later.
+3. The second call uses `{flush=true}` so the buffered log data is flushed immediately.
+4. If logging is not enabled, the helper reports that by calling `trace`.
+
+This example uses the same email-related configuration in [`mako.conf`](mako.conf), but through Mako's logging system instead of through `socket.mail()`. The `log.smtp` table defines where log emails are sent, `log.signature` adds the message footer, and `log.logerr = true` enables emailed Lua exception reports.
+
+The crash-report part of the example is triggered by [`index.lsp`](log/index.lsp) (http://localhost). When that page is requested while the server is running in the background, the page intentionally raises an error if `mako.daemon` is true. With `log.logerr = true`, that exception is turned into a log email containing the stack trace.
+
+Background mode means:
+
+1. On Windows, the server must be installed as a service.
+2. On Linux, you can run `mako -s -l::log`, which keeps the server attached to the console while still running in background mode.
+
+Unlike the `text`, `html`, and `eml` examples, the `log` example does not call `mako.exit()` because it is meant to demonstrate ongoing logging and request-triggered error reporting.
+
 # EML Email Example
 
 This example shows how to parse an `.eml` file, modify the parsed message, and send it with `socket.mail()`.
