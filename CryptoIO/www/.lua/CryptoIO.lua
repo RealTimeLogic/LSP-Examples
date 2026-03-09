@@ -169,7 +169,9 @@ local function files(io,name)
    local name,isdir,mtime,size
    return {
       read=function()
-	 name,isdir,mtime,size=iter()
+	 repeat	 
+	    name,isdir,mtime,size=iter()
+	 until name ~= "." and name ~= ".."
 	 return name and true or false
       end,
       stat=function()
