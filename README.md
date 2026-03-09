@@ -32,6 +32,7 @@ This repository includes ready-to-use Lua modules, tools, Lua scripts, and Lua S
 * [SQL: PostgreSQL Example](PostgreSQL) - Database example
 * [File Upload, including drag and drop](upload) - HTML based file upload
 * [WebDAV and Web-File-Server](File-Server) - Network drive and secure file sharing
+* [CryptoIO - AES-GCM file encryption](CryptoIO) - Encrypted IO + WebDAV and Web-File-Server with Encrypted File System
 * [How to add 'require' search path to an app](require-test)
 * [Sockets and webSockets examples](socket-examples)
 * [Web Shell](Web-Shell) - web based alternative to SSH

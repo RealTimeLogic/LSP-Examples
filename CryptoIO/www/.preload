@@ -1,0 +1,83 @@
+local keyname = "The keyname cannot be stored as plaintext; See the README file"
+
+mako.createloader(io)
+
+---------------- Example 1: Begin encrypt/decrypt test
+local hio=ba.openio"home"
+local cio=require"CryptoIO"(hio,keyname)
+
+local rfp = hio:open("README.md")
+if not rfp then
+   trace"This example is designed to be run by mako in the CryptoIO directory"
+   mako.exit()
+end
+local readme=rfp:read"a"
+rfp:close()
+
+local wfp = cio:open("README.encrypted","w")
+assert(wfp)
+wfp:write(readme)
+wfp:close()
+
+trace("README.encrypted file size:",
+      hio:stat"README.encrypted".size,
+      "Original (non encrypted) size",
+      cio:stat"README.encrypted".size)
+
+rfp = cio:open("README.encrypted")
+trace(".preload encrypt/decrypt test:",
+      readme == rfp:read"a" and "OK" or "Failed")
+rfp:close()
+---------------- End encrypt/decrypt test
+
+
+---------------- Example 2: Begin Web File Manager and WebDAV
+--- The following code is similar to: root/File-Server
+local ok = hio:stat"encrypted" or hio:mkdir"encrypted"
+if not ok then
+   trace"Cannot create directory 'encrypted'"
+   mako.exit(1)
+end
+
+-- The WebDAV encrypted IO
+local wdio=require"CryptoIO"(ba.mkio(hio,"encrypted"),keyname)
+assert(wdio)
+local ldir="/.LOCK" -- The directory used for storing WebDAV locks;
+
+-- Create lock directory if it does not exist.
+if not wdio:stat(ldir) then
+   if not wdio:mkdir(ldir) then
+      trace("Cannot open WebDAV lock directory:",ldir)
+      ldir=nil -- WebDAV may be in read only mode when used by some clients
+   end
+end
+
+if ldir then trace("WebDAV lock directory:",wdio:realpath(ldir)) end
+local maxUploads = mako and 200 or 10 -- Assume embedded if not mako
+local maxLocks=100
+require"wfs" -- install ba.create.wfs
+local fsdir=ba.create.wfs("fs",10,wdio,ldir,maxUploads,maxLocks)
+fsdir:insert() -- Insert as a root node with name 'fs' in the VFS
+
+-- The username/password callback function.
+local function getpassword(username)
+   if username == "admin" then return "admin" end
+end
+-- Create the username database from our getpassword func.
+local authuser=ba.create.authuser(getpassword)
+-- Create authenticator by using the username database.
+local authenticator=ba.create.authenticator(authuser)
+-- Enable authentication for the directory.
+fsdir:setauth(authenticator)
+
+function onunload()
+   trace"Uninstalling file server"
+   fsdir:unlink()
+end
+---------------- End Web File Manager and WebDAV
+
+-- List files:
+trace("Encrypted files directory:")
+for name, isdir, mtime, size in wdio:files("/",true) do
+   trace("\t->",name, isdir, mtime, size)
+end
