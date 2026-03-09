@@ -1,6 +1,10 @@
 local keyname = "The keyname cannot be stored as plaintext; See the README file"
 
-mako.createloader(io)
+mako.createloader(io) -- makes require"CryptoIO" work
+if 5746 > ba.version() then
+   trace"Server must be upgraded to run this example"
+   mako.exit()
+end
 
 ---------------- Example 1: Begin encrypt/decrypt test
 local hio=ba.openio"home"
