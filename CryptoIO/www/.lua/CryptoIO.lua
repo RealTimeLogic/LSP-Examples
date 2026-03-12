@@ -38,9 +38,6 @@ local function estat(fp,st,err,noClose)
 end
 
 local function read(self,size)
-   if not size then size=512 end
-   if "number"~=type(size) then size=(self.size-self.rwsize)+bsize end -- assume "a"
-   if size <= 0 then error("size > 0",2) end
    if not self.fp then return nil,"closed" end
    local buffer=self.buffer
    self.buffer=nil
