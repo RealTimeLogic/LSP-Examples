@@ -159,6 +159,10 @@ Each block is written as `TAG` (16 bytes) followed by `CIPHERTEXT` (up to `op.si
 
 ## Keyname Security Note
 
-Do not store `keyname` as plaintext. Anyone who has that key name and can run a Barracuda App Server instance on the same computer may be able to decrypt your files.
+`CryptoIO` derives its AES key from [ba.tpm.uniquekey(keyname, 32)](https://realtimelogic.com/ba/doc/en/lua/auxlua.html#ba_tpm_globalkey). This means the `keyname` alone is not sufficient to decrypt files on another device, because the derived key is also bound to the local softTPM state.
 
-For a properly hardened deployment, store `keyname` in an AES-encrypted ZIP file. Keep only one encrypted file (e.g. settings.json.encrypted) in the deployed application ZIP, then sign the ZIP and use a custom-built Barracuda App Server as described in the tutorial [Signed and Encrypted ZIP files](https://realtimelogic.com/ba/doc/en/C/reference/html/SignEncZip.html).
+In deployments where the Barracuda App Server is configured to run only manufacturer-signed ZIP applications, storing `keyname` as plaintext is normally acceptable in practice. Since untrusted Lua code cannot be installed or executed, an attacker cannot simply supply the same `keyname` to `ba.tpm.uniquekey()` and recover the encryption key.
+
+If the product allows end users or third parties to add their own Lua code, then protecting `keyname` becomes more important, because code running on the same device may be able to request the same TPM-derived key. In that type of deployment, you should combine signed application control with any additional protections appropriate for your design.
+
+Keeping `keyname` inside an AES-encrypted ZIP file is therefore optional defense in depth, not a strict requirement for normal CryptoIO deployments based on signed ZIP applications. For more information, see the tutorial [Signed and Encrypted ZIP files](https://realtimelogic.com/ba/doc/en/C/reference/html/SignEncZip.html).
