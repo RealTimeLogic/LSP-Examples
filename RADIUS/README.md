@@ -1,57 +1,43 @@
 # RADIUS Authentication
 
-This tutorial shows you how to integrate RADIUS authentication into your web application using Lua. You'll build a custom RADIUS client module and wire it into your application's startup script (`.preload` ) to enable centralized, external user validation.
+## Overview
 
-**Note:** This example is a copy of the [LSP-Examples/authentication/root]([../../../authentication/README.md#example-root) example, with RADIUS integration modifications. We recommend starting with this example, as it includes introductory authentication information.
+This example shows how to integrate RADIUS authentication into a BAS web application by building a small Lua RADIUS client and wiring it into the application's startup script. It is based on the `authentication/root` example, with the authentication callback replaced by a RADIUS-backed implementation.
 
-* * *
+RADIUS is a lightweight UDP-based protocol commonly used for centralized authentication, authorization, and accounting. In this example, the BAS application acts as the RADIUS client and delegates username/password validation to a RADIUS server.
 
-## What is RADIUS?
+When a user logs in, the application sends a RADIUS `Access-Request` packet and then waits for one of the standard outcomes:
 
-**RADIUS** (Remote Authentication Dial-In User Service) is a lightweight, UDP-based protocol designed for centralized authentication, authorization, and accounting. It's used in enterprise networks, VPNs, and wireless infrastructure, and embedded devices and custom applications that need to delegate authentication securely.
+- `Access-Accept`
+- `Access-Reject`
+- `Access-Challenge` (not used by this demo)
 
-When a user logs in, your application sends a RADIUS `Access-Request` to a centralized server, which replies with:
+## Files
 
-- `Access-Accept` : login success
+- `www/.preload` - Configures the RADIUS client, creates the BAS authenticator, and applies it to the application directory.
+- `www/.lua/radius.lua` - Lua RADIUS client module.
+- `www/index.lsp` - Protected landing page shown after a successful login.
+- `www/.login/form.lsp` and `www/.login/failed.lsp` - Form-based login UI and failure page.
+- `www/public/` - Public static assets for the login flow.
 
-- `Access-Reject` : login failed
+## How to run
 
-- `Access-Challenge` : more input required (not used in this tutorial)
+To test locally, one simple option is FreeRADIUS on Linux or WSL:
 
-
-In this setup, the app becomes a **RADIUS client** \- sending login credentials to the RADIUS server, validating the response, and controlling access accordingly.
-
-* * *
-
-## ⚙️ Setting Up a Local RADIUS Server (FreeRADIUS on Linux or WSL)
-
-If you want to test the Lua RADIUS client locally, the easiest option is to use **FreeRADIUS** on a Linux system or Windows Subsystem for Linux (WSL).
-
-### ✅ Step-by-Step Setup
+1. Install FreeRADIUS:
 
 ```bash
-# Step 1: Install FreeRADIUS
 sudo apt update
 sudo apt install freeradius
-
-# Step 2: Add a test user
-sudo nano /etc/freeradius/3.0/users
 ```
 
-Add this line at the top:
+2. Add a test user to `/etc/freeradius/3.0/users`:
 
 ```text
 testuser Cleartext-Password := "testpass"
 ```
 
-Save and exit the Nano editor.
-
-```bash
-# Step 3: Allow your Lua client to talk to FreeRADIUS
-sudo nano /etc/freeradius/3.0/clients.conf
-```
-
-Add this block:
+3. Allow the BAS client to talk to FreeRADIUS by adding this block to `/etc/freeradius/3.0/clients.conf`:
 
 ```ini
 client localhost {
@@ -60,134 +46,86 @@ client localhost {
 }
 ```
 
-🔒 Make sure the `secret` matches the value used in your Lua `.preload` file.
+4. Start FreeRADIUS in debug mode:
 
 ```bash
-# Step 4: Start the server in debug mode
 sudo freeradius -X
 ```
 
-You should see:
+5. Start the BAS example:
 
-```text
-Ready to process requests
-```
-
-At this point, your Mako Server can authenticate users via RADIUS using:
-
-- Username: `testuser`
-
-- Password: `testpass`
-
-- Shared secret: `myradiussecret`
-
-- Server IP: `127.0.0.1`
-
-- Port: `1812`
-
-**Note:** The above settings can be found in [www/.preload](www/.preload)
-
-* * *
-
-## ✅ Next Step
-
-Once the RADIUS server is running, launch the mako Server.
-
-``` bash
+```bash
 cd LSP-Examples/RADIUS
 mako -l::www
 ```
 
-For detailed instructions on starting the Mako Server, check out our
-[command line video tutorial](https://youtu.be/vwQ52ZC5RRg) and review
-the server\'s [command line
-options](https://realtimelogic.com/ba/doc/en/Mako.html#loadapp) in our
-documentation.
+For more detail on starting the Mako Server, see the [command line video tutorial](https://youtu.be/vwQ52ZC5RRg) and the [command line options documentation](https://realtimelogic.com/ba/doc/en/Mako.html#loadapp).
 
-The `.preload` script will use the RADIUS Lua module to send credentials to the RADIUS server and process the reply. Authentication succeeds only if the server returns a valid, hash-verified `Access-Accept` response.
+Then open `http://localhost` and log in with:
 
-After starting the Mako Server, open your browser and navigate to: `http://localhost`
+- Username: `testuser`
+- Password: `testpass`
 
-Log in using the following test credentials:
-
-- **Username**: `testuser`
-
-- **Password**: `testpass`
-
-
-The server-side authenticator uses **form-based authentication** when accessed via a browser. However, **HTTP Basic authentication** is also supported and can be useful for API clients (machine-to-machine).
-
-To test basic authentication using `curl` , run:
+HTTP Basic authentication is also supported. You can test it with:
 
 ```bash
 curl -i -u "testuser:testpass" http://localhost
 ```
 
+## How it works
 
-## The application's `.preload`
-
-The [www/.preload](www/.preload) script integrates a **RADIUS-based login mechanism** into the web application. It:
-
-- Loads a custom Lua RADIUS client module and configures it with server connection info.
-
-- Implements a `getpassword()` callback that delegates username/password authentication to the RADIUS server.
-
-- Sets up a custom login response handler ( `loginresponse` ) to manage redirects and error pages for form-based logins.
-
-- Creates a Mako `authuser` and `authenticator` instance using the callback and response handler.
-
-- Applies the authenticator to the app's directory via `dir:setauth()` , effectively securing access behind RADIUS authentication.
-
-## The RADIUS Lua Module
-
-### require"radius".create(radiusServerIP, radiusServerPort, sharedSecret)
-
-Creates and returns a RADIUS client instance configured to communicate with a specific RADIUS server.
-
-#### **Parameters**
-
-- radiusServerIP (string): IP address of the RADIUS server (e.g., "192.168.0.1" or "127.0.0.1").
-- radiusServerPort (number): UDP port used by the RADIUS server (usually 1812).
-- sharedSecret (string): The pre-shared secret is configured on both the client and server for authentication and hashing.
-
-#### **Returns**
-
-- A table representing a RADIUS client instance, with a login(username, password) method.
-
-#### **Usage**
+`www/.preload` creates a RADIUS client with:
 
 ```lua
-local rad = require"radius".create("127.0.0.1", 1812, "mysecret")
+local rad = require"radius".create("127.0.0.1", 1812, "myradiussecret")
 ```
 
-### rad:login(username, password)
+The authenticator's password callback forwards the submitted username and password to `rad:login(...)`. If the RADIUS server returns `Access-Accept`, the BAS authenticator treats the login as successful; otherwise the login fails and the normal BAS response handler sends the user to the failure flow.
 
-Sends a RADIUS Access-Request packet to the configured server and waits (blocking) for a response.
+Inside `www/.lua/radius.lua`, the module:
 
-#### **Parameters**
+- builds the RADIUS Access-Request packet
+- obfuscates the password according to the RADIUS protocol
+- sends the packet over UDP
+- waits for the response
+- validates the response authenticator before accepting the result
 
-- username (string): The username to authenticate.
-- password (string): The user's plaintext password.
+### `require"radius".create(radiusServerIP, radiusServerPort, sharedSecret)`
 
-#### **Returns**
+This function creates the RADIUS client instance. The parameters are:
 
-- On success: true
-- On failure: false, errorMessage
+- `radiusServerIP` - IP address of the RADIUS server
+- `radiusServerPort` - UDP port, normally `1812`
+- `sharedSecret` - pre-shared secret configured on both client and server
 
-#### **Behavior**
+The returned object provides `rad:login(username, password)`, which performs a blocking authentication round trip and returns either `true` or `false, err`.
 
-- Internally builds the RADIUS packet with User-Name and User-Password attributes.
-- Encodes the password using MD5 as specified by RFC 2865.
-- Validates the server's response authenticator to ensure integrity.
-- Blocks for up to 3 seconds while waiting for a server response.
+### `rad:login(username, password)`
 
-#### **Usage**
+`rad:login(...)` sends one Access-Request packet to the configured server and then waits for the reply. In this example, the method:
 
-```lua
-local ok, err = rad:login("testuser", "testpass")
-if ok then
-   trace("Login successful!")
-else
-   trace("Login failed:", err)
-end
-```
+- builds the `User-Name` and `User-Password` AVPs
+- encodes the password using the MD5-based scheme defined by RFC 2865
+- sends the packet over UDP
+- waits for the response
+- accepts the login only when the response code and authenticator both validate
+
+That makes the BAS side a thin client for the centralized RADIUS service rather than a separate password database.
+
+### What `.preload` sets up
+
+The `.preload` file does five important things:
+
+- loads the custom Lua RADIUS client
+- creates the BAS `authuser` callback around it
+- configures the login-response flow for form-based login
+- creates the BAS authenticator
+- applies the authenticator to the application directory with `dir:setauth()`
+
+## Notes / Troubleshooting
+
+- The shared secret in `www/.preload` must match the `secret` configured in FreeRADIUS.
+- This example supports form-based and basic-style flows, but digest authentication is not supported by the RADIUS callback setup used here.
+- The current Lua RADIUS module logs credentials through `trace(...)`, which is a security issue in real deployments. I did not change the code, but you should remove that logging before using the module outside a demo environment.
+- This example is easiest to understand if you first review the generic [authentication](../authentication/README.md) examples, because the BAS authenticator flow is the same and only the password backend changes.
+- The demo server settings are intentionally visible in `.preload` so you can quickly point the example at a different RADIUS server during testing.

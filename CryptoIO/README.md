@@ -1,12 +1,17 @@
 # CryptoIO
 
-A Lua module that wraps a [Barracuda IO](https://realtimelogic.com/ba/doc/en/lua/lua.html#ba_ioinfo) with transparent **AES-GCM file encryption** so applications can keep normal file I/O APIs while storing data encrypted at rest.
+## Overview
 
-## 1. What This Module Is
+A Lua module that wraps a [Barracuda IO](https://realtimelogic.com/ba/doc/en/lua/lua.html#ba_ioinfo) with transparent **AES-GCM file encryption** so applications can keep normal file I/O APIs while storing data encrypted at rest.
 
 Module CryptoIO ([www/.lua/CryptoIO.lua](www/.lua/CryptoIO.lua)) is a Lua module that wraps an existing IO instance and exposes a new encrypted IO via [ba.create.luaio](https://realtimelogic.com/ba/doc/en/lua/auxlua.html#luaio). It encrypts file content with `ba.crypto.symmetric("GCM", ...)` and keeps directory operations delegated to the wrapped `io`.
 
-## 2. CryptoIO Examples
+## Files
+
+- `www/.lua/CryptoIO.lua` - The reusable encrypted IO module.
+- `www/.preload` - Startup script that demonstrates both the smoke test and the encrypted WebDAV/file-server setup.
+
+## How to run
 
 The [www/.preload](www/.preload) script includes two examples showing how to use CryptoIO. Run the examples with the Mako Server:
 
@@ -15,7 +20,9 @@ cd CryptoIO
 mako -l::www
 ```
 
-#### Example 1: Basic Encrypt/Decrypt Smoke Test
+## How it works
+
+### Example 1: Basic Encrypt/Decrypt Smoke Test
 
 The first section in `.preload` verifies that `CryptoIO.lua` can round-trip file data correctly.
 
@@ -32,7 +39,7 @@ The first section in `.preload` verifies that `CryptoIO.lua` can round-trip file
 
 If the comparison matches, encryption + decryption are working as expected.
 
-#### Example 2: Encrypted Web File Manager + WebDAV
+### Example 2: Encrypted Web File Manager + WebDAV
 
 The second section in `.preload` sets up an encrypted file service mounted at `/fs/`. The example is similar to the [WebDAV and Web File Server example](../File-Server/README.md), but it uses CryptoIO to encrypt all files stored on the file system. It creates an `encrypted` sub-directory and uses it as the base for all encrypted resources.
 
@@ -54,7 +61,7 @@ After starting the Mako Server, open a browser and go to `http://localhost:portn
 7. Print a directory listing by iterating `wdio:files("/", true)`.
 
 
-## 3. API
+### API
 
 The module does not return a Lua table, but a factory function:
 
@@ -89,7 +96,7 @@ Opened file handle methods:
 - `close()`: write mode writes trailer and closes; read mode closes
 - `seek()`: not implemented (raises error)
 
-## 4. Basic Example
+### Basic Example
 
 ```lua
 local CryptoIO = require "CryptoIO"
@@ -130,7 +137,7 @@ do
 end
 ```
 
-## 5. Encrypted File Format
+### Encrypted File Format
 
 File layout:
 
@@ -157,7 +164,9 @@ Each block is written as `TAG` (16 bytes) followed by `CIPHERTEXT` (up to `op.si
 - On success returns table `st` with `st.size = plaintext_size`
 - On failure (not encrypted/corrupt trailer): returns `nil, "enoent"`.
 
-## Keyname Security Note
+## Notes / Troubleshooting
+
+### Keyname Security Note
 
 `CryptoIO` derives its AES key from [ba.tpm.uniquekey(keyname, 32)](https://realtimelogic.com/ba/doc/en/lua/auxlua.html#ba_tpm_globalkey). This means the `keyname` alone is not sufficient to decrypt files on another device, because the derived key is also bound to the local softTPM state.
 

@@ -1,53 +1,51 @@
 # WebDAV and Web File Server
 
-This example provides a Web File Server + WebDAV endpoint mounted at `/fs/`.
-It is compatible with [Barracuda App Server](https://realtimelogic.com/products/barracuda-application-server/) derivatives that have a file system, including Mako Server and Xedge32.
+## Overview
 
+This example creates a Web File Server plus WebDAV endpoint mounted at `/fs/`. It is compatible with BAS products that have a file system, including the Mako Server and Xedge32.
 
-![Web File Manager and WebDAV](https://makoserver.net/images/Win-WebDAV.png "[Web File Manager and WebDAV")
+![Web File Manager and WebDAV](https://makoserver.net/images/Win-WebDAV.png "Web File Manager and WebDAV")
 
-## References
+Reference material:
 
-- [WebDAV overview](https://realtimelogic.com/products/webdav/)  
-  A quick product-level introduction to Real Time Logic's WebDAV support and use cases.
+- [WebDAV overview](https://realtimelogic.com/products/webdav/)
+- [How to Create a Cloud Storage Server](https://makoserver.net/articles/How-to-Create-a-Cloud-Storage-Server)
 
-- [How to Create a Cloud Storage Server](https://makoserver.net/articles/How-to-Create-a-Cloud-Storage-Server)  
-  Step-by-step tutorial this example is based on (this repo corresponds to Example 1 from that article).
+## Files
 
-## Quick Start (Mako Server)
+- `www/.preload` - Creates the WebDAV IO, configures the lock directory, mounts the web file server at `/fs/`, and applies basic authentication.
+
+## How to run
+
+Start the example with the Mako Server:
 
 ```bash
 cd File-Server
 mako -l::www
 ```
 
-If you need more detail on startup options, see:
+For more detail on startup options, see the [Mako command line video](https://youtu.be/vwQ52ZC5RRg) and the [Mako command line options documentation](https://realtimelogic.com/ba/doc/?url=Mako.html#loadapp).
 
-- [Mako Server command line video](https://youtu.be/vwQ52ZC5RRg)
-- [Mako Server command line options](https://realtimelogic.com/ba/doc/?url=Mako.html#loadapp)
-
-## Access the File Server
-
-Open:
+Then open:
 
 - `http://localhost:portno/fs/`
 
-`portno` is the HTTP port shown in the Mako Server console.
+where `portno` is the HTTP port printed by the server.
 
 Login credentials:
 
 - Username: `admin`
 - Password: `admin`
 
-For WebDAV drive mapping guidance:
+For WebDAV drive mapping guidance, see:
 
 - https://youtu.be/i5ubScGwUOc
 
-## Notes
+## How it works
 
-- Windows: avoid mapping `http://localhost/fs/` directly; use a specific drive path such as `http://localhost/fs/C/` to avoid recursive lookup issues.
-- This app does not include extra pages/resources beyond the WebDAV/file-server at `/fs/`.
-- See `www/.preload` for implementation details.
+The startup script opens a writable IO, creates a lock directory, loads the `wfs` support, and mounts a Web File Server instance at `/fs/`. It then creates a small username/password callback that authenticates `admin` / `admin`, wraps that callback in a BAS authenticator, and applies the authenticator to the mounted directory. When the app unloads, the `/fs/` mount is removed cleanly.
 
+## Notes / Troubleshooting
 
-
+- On Windows, avoid mapping `http://localhost/fs/` directly. Use a more specific path such as `http://localhost/fs/C/` to avoid recursive lookup issues.
+- This app intentionally focuses on the `/fs/` endpoint and does not add extra HTML pages around it.

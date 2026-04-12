@@ -1,34 +1,46 @@
 # RESTful Services in Lua
 
-This directory contains the example source code for the tutorial [Designing RESTful Services in Lua](https://realtimelogic.com/articles/Designing-RESTful-Services-in-Lua), which shows how to implement a RESTful API using the [Barracuda Application Server](https://realtimelogic.com/products/barracuda-application-server/) library.
+## Overview
 
----
+This directory contains the example source code for the tutorial [Designing RESTful Services in Lua](https://realtimelogic.com/articles/Designing-RESTful-Services-in-Lua). The example implements a small in-memory user API on top of a reusable Lua router module.
 
-## 🛠️ Running the example code
+## Files
 
-Run the example, using the Mako Server, as follows:
+- `www/.lua/rest.lua` - Reusable REST-style router module. See also [REST-API.md](REST-API.md).
+- `www/.preload` - Example application that mounts the router under `/api` and defines the user endpoints.
+- `TestApi.py` - Simple client script that exercises the example API.
 
-```
+## How to run
+
+Start the example with the Mako Server:
+
+```bash
 cd LSP-Examples/REST
 mako -l::www
 ```
 
-## Testing the Service
-
-A Python script is included to test the RESTful API implementation. Before running the script, ensure that the server is listening on **port 80** (on Linux run: sudo mako -u \`whoami\` -l::www).
-
-To run the test:
+To test the API with the included Python script, make sure the server is reachable on port `80`. On Linux, one way is:
 
 ```bash
+sudo mako -u "$(whoami)" -l::www
 python TestApi.py
 ```
 
----
+## How it works
 
-## 📂 File Overview
+The router module in `www/.lua/rest.lua` lets you register exact and wildcard routes by HTTP method, then installs those routes into the BAS virtual file system as a directory function.
 
-| File Path             | Description                    |
-|-----------------------|--------------------------------|
-| `www/.lua/rest.lua`   | The [RESTful service Lua module](REST-API.md) |
-| `www/.preload`        | The RESTful example code       |
+The example app in `www/.preload` mounts the router under `/api` and defines these endpoints:
 
+- `GET /api/users`
+- `POST /api/users`
+- `GET /api/users/{id}`
+- `PUT /api/users/{id}`
+- `DELETE /api/users/{id}`
+
+The example keeps the user records in memory, validates the submitted JSON, and returns JSON responses with appropriate HTTP status codes. `TestApi.py` then creates, queries, updates, and deletes users against that API.
+
+## Notes / Troubleshooting
+
+- The example uses in-memory storage only. Restarting the app resets the user list.
+- The Python test script assumes `http://localhost/api/users`, so make sure the server is listening on the port the script expects.

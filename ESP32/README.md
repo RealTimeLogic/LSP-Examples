@@ -1,26 +1,56 @@
-### ESP32 Lua Examples
+# ESP32 Lua Examples
 
-The Barracuda App Server, running on the ESP32 microcontroller, is packaged as a ready-to-use Integrated Development Environment (IDE) known as [Xedge32](https://realtimelogic.com/downloads/bas/ESP32/). With Xedge32, programming embedded systems becomes accessible to all, not just to embedded C/C++ experts.
+## Overview
+
+The Barracuda App Server running on the ESP32 is packaged as the ready-to-use [Xedge32](https://realtimelogic.com/downloads/bas/ESP32/) development environment. These examples show how Lua, LSP, and XLua can be used for typical embedded tasks such as sensor access, camera streaming, audio capture, servo control, and MQTT integration.
 
 ![Xedge32 is built upon the Barracuda App Server C Code Library](https://realtimelogic.com/images/bas-esp32.png)
 
-**Examples:**
+## Files
 
-- [blinkled.xlua](blinkled.xlua): The source code for the tutorial [Your First Xedge32 Project](https://realtimelogic.com/articles/Your-First-Xedge32-Project)
-- [CheckWiFi.lsp](CheckWiFi.lsp): The source code for the tutorial [Debugging Wi-Fi Signal Strength with ESP32 and Xedge32](https://realtimelogic.com/articles/Debugging-WiFi-Signal-Strength-with-ESP32-and-Xedge32)
-- [camread.lsp](camread.lsp): This LSP (Lua Server Pages) file returns and displays a new camera image in the browser each time the browser window is refreshed.
-- [wscam.lsp](wscam.lsp): The source code for the tutorial [Streaming ESP32-CAM Images to Multiple Browsers using WebSockets](https://realtimelogic.com/articles/Creating-Browser-Video-Streams-with-WebSockets-using-ESP32CAM).
-- [mqttcam.xlua](mqttcam.xlua) and [mqttcam.html](mqttcam.html): The source code for the tutorial [Streaming ESP32-CAM Images to Multiple Browsers via MQTT](https://realtimelogic.com/articles/Streaming-ESP32CAM-Images-to-Multiple-Browsers-via-MQTT).
-- [pcmplayer.lsp](pcmplayer.lsp): This example activates the analog-to-digital converter and samples data at 20 kHz. Next, the data is sent via WebSockets to connected browsers, where a JavaScript-powered PCM player plays the incoming data.
-- [servo.lsp](servo.lsp): Introductory servo example with detailed explanation.
-- [uiservo.lsp](uiservo.lsp): This LSP script controls a servo motor through a real time web user interface.
-- [bme280.xlua](bme280.xlua): XLua script for interacting with the BME280 sensor. The BME280 sensor is a digital pressure, temperature, and humidity sensor that is often used in weather station projects.
+- `blinkled.xlua` - Source code for the tutorial [Your First Xedge32 Project](https://realtimelogic.com/articles/Your-First-Xedge32-Project).
+- `CheckWiFi.lsp` - Source code for the tutorial [Debugging Wi-Fi Signal Strength with ESP32 and Xedge32](https://realtimelogic.com/articles/Debugging-WiFi-Signal-Strength-with-ESP32-and-Xedge32).
+- `camtest.lsp` - Captures one camera image and returns it as JPEG each time the page is requested.
+- `wscam.lsp` - Source code for the tutorial [Streaming ESP32-CAM Images to Multiple Browsers using WebSockets](https://realtimelogic.com/articles/Creating-Browser-Video-Streams-with-WebSockets-using-ESP32CAM).
+- `mqttcam.xlua` and `mqttcam.html` - Source code for the tutorial [Streaming ESP32-CAM Images to Multiple Browsers via MQTT](https://realtimelogic.com/articles/Streaming-ESP32CAM-Images-to-Multiple-Browsers-via-MQTT).
+- `pcmplayer.lsp` - Samples audio through the ADC at 20 kHz and streams it to the browser over WebSockets.
+- `servo.lsp` - Introductory servo-control example.
+- `uiservo.lsp` - Real-time web UI for servo control.
+- `bme280.xlua` - BME280 temperature, humidity, and pressure example.
+- `simulator/` - Supporting simulator assets for selected examples.
 
-**How to upload the examples:**
+## How to run
 
-Copy the files to an [Xedge-powered ESP32](https://realtimelogic.com/downloads/bas/ESP32/) by creating an LSP-enabled app and then uploading the files to the ESP32 by navigating to http://ip-address/rtl/apps/app-name/. Then drop the files into the Web File Manager window. Do not upload xlua files you do not intend to run since xlua files automatically run when the application starts. LSP files, on the other hand, only run when accessed by a browser or any other HTTP client. See the [Xedge documentation](https://realtimelogic.com/ba/doc/?url=Xedge.html) for details. See the tutorial [Your First Xedge32 Project](https://realtimelogic.com/articles/Your-First-Xedge32-Project) for how to create Xedge applications.
+Upload the files to an [Xedge-powered ESP32](https://realtimelogic.com/downloads/bas/ESP32/) by creating an LSP-enabled app and then navigating to:
 
-**Documentation:**
+```text
+http://ip-address/rtl/apps/app-name/
+```
+
+From there, drag and drop the example files into the Web File Manager.
+
+Important upload note:
+
+- `.xlua` files run automatically when the application starts.
+- `.lsp` files run only when a browser or other HTTP client requests them.
+
+See the [Xedge documentation](https://realtimelogic.com/ba/doc/?url=Xedge.html) and the tutorial [Your First Xedge32 Project](https://realtimelogic.com/articles/Your-First-Xedge32-Project) for the complete app-creation workflow.
+
+## How it works
+
+These examples demonstrate both request-driven and startup-driven execution:
+
+- LSP pages such as `camtest.lsp`, `wscam.lsp`, `pcmplayer.lsp`, `servo.lsp`, and `uiservo.lsp` respond to HTTP requests from the browser.
+- XLua apps such as `blinkled.xlua`, `mqttcam.xlua`, and `bme280.xlua` start automatically when the app launches and are better suited for persistent device logic.
+
+Together, they show how BAS can be used as both the embedded device runtime and the browser-facing application layer.
+
+## Notes / Troubleshooting
+
+- Do not upload `.xlua` files you do not intend to run, because they start automatically.
+- `camtest.lsp` is the still-image camera example in this repo. Older references to `camread.lsp` are stale and have been corrected here.
+
+Additional documentation:
 
 - [What is Xedge32?](https://realtimelogic.com/downloads/bas/ESP32/)
 - [Xedge Intro Video](https://youtu.be/1w_NDxzESo8)

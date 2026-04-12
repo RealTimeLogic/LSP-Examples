@@ -1,16 +1,26 @@
 # How to Debug Lua Code Using Visual Studio Code
 
+## Overview
+
 This is the companion example for the tutorial:
 [Lua and LSP Debugging](https://makoserver.net/articles/Lua-and-LSP-Debugging).
 
-## Prerequisites
+### Prerequisites
 
 1. Download the latest [Mako Server](https://makoserver.net/download/overview/)
 2. Download and install [Visual Studio Code](https://code.visualstudio.com/) for your platform
 3. Download and install [Lua Debug](https://marketplace.visualstudio.com/items?itemName=actboy168.lua-debug) for Visual Studio Code
 4. Follow the instructions below:
 
-## Debugging Instructions
+## Files
+
+- `www/.vscode/launch.json` - Visual Studio Code debug configuration.
+- `www/.preload` - App startup script that loads the BAS debug monitor.
+- `www/.lua/Markow-Chain.lua` - Lua module used for stepping and breakpoints.
+- `www/index.lsp` - LSP page you can debug from the browser.
+- `FileServer/` - Helper app for remote debugging and auto-generating `launch.json`.
+
+## How to run
 
 Run the example, using the Mako Server, as follows:
 
@@ -93,7 +103,7 @@ may run into.
 3. After approximately one second, the Run button appears in the debugger
 4. Click the Run button to resume debugging
 
-## The example's Source Code Files:
+### The example's Source Code Files:
 * www/.vscode/launch.json - Visual Studio Code launch (debug) config file.
 * www/.lua/Markow-Chain.lua  - File to step into and set breakpoints in.
 * www/.preload - The app's Lua startup script including code for
@@ -102,7 +112,9 @@ may run into.
 * index.lsp -- Example LSP file. You can also set breakpoints in and
   step through LSP files.
 
-## Mapping Directories (required)
+## How it works
+
+### Mapping Directories (required)
 
 For the VS debugger to be in sync with the server, the working
 directory (or directories) must be mapped. All applications running in
@@ -182,7 +194,9 @@ how the NetIo works.
 
 See the [Lua debug instructions for NXP's RT 1020 development board](https://realtimelogic.com/downloads/bas/rt1020/#LuaDebug) for information on how to debug Lua on an embedded RTOS powered board.
 
-## Gotchas
+## Notes / Troubleshooting
+
+### Gotchas
 
 The debug monitor embedded in the Mako Server implements the
 [Debug Adapter Protocol](https://microsoft.github.io/debug-adapter-protocol/

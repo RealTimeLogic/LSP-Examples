@@ -1,86 +1,92 @@
 # Light Dashboard Templates
 
-Three ready-to-run dashboard UIs for embedded devices (routers, gateways, RTOS/firmware).
+## Overview
 
-### What the Article Covers (High-Level)
+This directory contains three ready-to-run dashboard UIs for embedded devices such as routers, gateways, and firmware-backed products.
 
-**For a step-by-step walkthrough, diagrams, and acronyms, see the introductory article:**
+The introductory article for the design is:
 
 - https://makoserver.net/articles/How-to-Build-an-Interactive-Dashboard-App
 
-The article explains the design and behavior of this dashboard without requiring deep framework knowledge:
+All three variants use the same CMS-style flow: `menu.json` defines the pages, `cms.lua` routes requests, and `template.lsp` renders the shared shell around each page fragment.
 
-- **Two dashboard styles:** a default SSR flow and a lightweight HTMX-based CSR flow that uses partial updates but still falls back to SSR when JavaScript is off.
-- **MVC-style structure:** `menu.json` defines pages, the CMS builds the response, and `template.lsp` wraps each page fragment.
-- **Dynamic assembly:** pages are composed at runtime (template + fragment), which makes it easy to add or change pages.
-- **Navigation + HTMX behavior:** HTMX requests return fragments while full requests return the complete layout.
-- **WebSockets behavior:** SSR navigation closes sockets, while CSR can keep them alive if managed carefully. The CSR variants include code in RoundSlider.js to explicitly close the SMQ connection on navigation; if you want persistent sockets, move SMQ loading into `template.lsp`.
-- **Compression + authentication:** responses are compressed, and a TPM-backed user database is included for authentication.
+Available variants:
 
-## Variants at a glance
+- `www/` - SSR + Pure.css
+- `htmx/` - CSR/HTMX + Pure.css
+- `custom/` - CSR/HTMX + custom CSS, two-level navigation, and the default target for new work
 
-- **`www/`** - **SSR + Pure.css** (original server-side rendered version)
-- **`htmx/`** - **CSR/HTMX + Pure.css** (HTML fragments assembled in the client)
-- **`custom/`** - **CSR/HTMX + custom CSS** (two-level menu + modern design)
+Authentication is optional and disabled by default. In the default `custom/` variant, user management is backed by a TPM-enabled encrypted user database when TPM support is available.
 
-**Default for new work:** `custom/` (modern CSS and two-level navigation).
+## Files
 
-All three use the same CMS flow: `menu.json` defines pages, `cms.lua` routes requests, and `template.lsp` renders the shell around each page fragment.
+- `custom/.lua/cms.lua`, `htmx/.lua/cms.lua`, `www/.lua/cms.lua` - Mini CMS/router for each variant.
+- `custom/.lua/menu.json`, `htmx/.lua/menu.json`, `www/.lua/menu.json` - Menu and routing source of truth.
+- `custom/.lua/www/template.lsp`, `htmx/.lua/www/template.lsp`, `www/.lua/www/template.lsp` - Shared layout shells.
+- `custom/.lua/www/*.html`, `htmx/.lua/www/*.html`, `www/.lua/www/*.html` - Page fragments rendered inside the layout.
+- `custom/static/`, `htmx/static/`, `www/static/` - Variant-specific CSS and JavaScript assets.
+- `AGENTS.md` - Detailed file map and update guidance, with `custom/` as the default variant for new work.
 
-The Pure.css–based variants are well suited for developers who are not CSS experts, as most of the layout and styling are handled by Pure.css with minimal customization required.
+## How to run
 
-The custom variant is the most flexible option. It is designed for creating a dashboard that closely matches your company’s visual identity, whether you prefer to work with a CSS designer or use AI to assist with theming and styling.
+Run the SSR + Pure.css variant:
 
-## Quick Start
-
-Run the **SSR + Pure.css** variant:
-
-```
+```bash
 cd Light-Dashboard
 mako -l::www
 ```
 
-Run the **CSR/HTMX + Pure.css** variant:
+Run the CSR/HTMX + Pure.css variant:
 
-```
+```bash
 cd Light-Dashboard
 mako -l::htmx
 ```
 
-Run the **CSR/HTMX + custom CSS** variant (recommended):
+Run the CSR/HTMX + custom CSS variant:
 
-```
+```bash
 cd Light-Dashboard
 mako -l::custom
 ```
 
-Then open your browser at:
+Then open `http://localhost:portno`.
 
-```
-http://localhost:portno
-```
+Authentication behavior:
 
-## Authentication (Optional)
+- Add at least one user on the `Users` page to enable authentication.
+- Remove all users to disable authentication again.
 
-Authentication is **disabled by default**.
+## How it works
 
-- **Enable:** Open **Users** in the left navigation and add at least one user. Once a user exists, authentication is enforced.
-- **Add users:** You can add multiple users.
-- **Remove a user:** Enter an existing username and leave the password blank.
-- **Disable:** Remove all users; authentication is automatically disabled again.
+Each variant inserts a CMS directory function alongside the resource reader so that static assets still take precedence. The CMS callback:
 
-## AI-Assisted Changes
+1. resolves directory requests to `index.html`
+2. checks whether the requested page exists in `menu.json`
+3. loads the page fragment from `.lua/www/`
+4. returns either the fragment alone for HTMX requests or the full `template.lsp` shell for normal requests
+5. applies security headers and compressed responses
 
-This project is AI-friendly. It has been tested with [Codex](https://openai.com/codex/), but other AI engines should work as well.
+The `custom/` variant adds nested menu support through `children` arrays in `menu.json` and renders a two-level menu in the template. If TPM support is available, the CMS also enables a form authenticator dynamically when at least one user exists in the encrypted user database.
 
-- See [AGENTS.md](AGENTS.md) for the exact file map and update workflow.
-- When using AI, say which variant you want updated.
-- For most changes, target **`custom/`** first, then port to `www/` and `htmx/` only if you want all three variants to stay in sync.
-- [AI example prompts are provided at the end of this document](#example-ai-prompts).
+### Why the variants differ
 
-## Project Layout (Simplified)
+The introductory article explains the tradeoffs in more detail, but the high-level split is:
 
-```
+- **SSR + Pure.css** for a classic server-rendered experience
+- **CSR/HTMX + Pure.css** for fragment-based updates with a familiar CSS framework
+- **CSR/HTMX + custom CSS** for the most flexible visual design and a two-level menu
+
+The article also calls out a few practical details that matter in real products:
+
+- HTMX requests return fragments, while full requests return the complete layout.
+- Pages are composed dynamically at runtime from `template.lsp` plus the requested fragment.
+- SSR navigation closes real-time connections, while the CSR variants can preserve them if you move socket-loading code into the shared shell instead of page-specific code.
+- Responses are compressed, and authentication can be layered in without changing each individual page.
+
+### Project layout
+
+```text
 Light-Dashboard/
 
   -www     -- SSR + Pure.css
@@ -100,37 +106,28 @@ Light-Dashboard/
     |           logout.html -- Sign out page
     |           Users.html -- Add or remove users
     |
-    \---static -- Pure.css files: See https://purecss.io/
-            pure-min.css --  pure-min.css + grids-responsive-min.css
-            styles.css -- For the dashboard
-            ui.js -- Manages the Hamburger button logic. This button is visible on
-             smaller devices or if you narrow the browser window. Details: https://purecss.io/
+    \---static -- Pure.css files
+            pure-min.css -- pure-min.css + grids-responsive-min.css
+            styles.css -- Dashboard styles
+            ui.js -- Hamburger/menu logic
 
   -htmx/     -- CSR/HTMX + Pure.css
-     -- (Similar to the www/ layout)
+     -- Similar to the www/ layout
 
   -custom/   -- CSR/HTMX + custom CSS + 2-level menu
-     -- (Similar to the www/ layout)
+     -- Similar to the www/ layout
 
   - README.md
   - AGENTS.md
 ```
 
-## How the CMS Routing Works (Short Version)
+### Add, modify, and remove pages
 
-1. The CMS directory function in `cms.lua` checks whether the URL exists in `menu.json`.
-2. It loads the corresponding page fragment from `.lua/www/`.
-3. `template.lsp` renders the shared layout and injects the fragment.
-4. The response is compressed before it is sent to the browser.
+To add a new page:
 
-In the HTMX/CSR variants, HTMX requests return only the fragment; normal requests return the full layout.
+1. Create a fragment in `.lua/www/`, for example `Diagnostics.html`:
 
-## Add / Modify / Remove Pages
-
-### Add a new page
-1) Create a new fragment in `.lua/www/`, e.g. `Diagnostics.html`:
-
-```
+```html
 <div class="header">
   <h1>Diagnostics</h1>
 </div>
@@ -139,15 +136,15 @@ In the HTMX/CSR variants, HTMX requests return only the fragment; normal request
 </div>
 ```
 
-2) Add it to `.lua/menu.json`:
+2. Register it in `.lua/menu.json`:
 
-```
+```json
 { "name": "Diagnostics", "href": "Diagnostics.html" }
 ```
 
-Or under a group in the **custom** variant:
+For the `custom/` variant, you can also place it under a group:
 
-```
+```json
 {
   "name": "System",
   "children": [
@@ -156,85 +153,97 @@ Or under a group in the **custom** variant:
 }
 ```
 
-3) Apply the change in the variant(s) you want to keep in sync:
-- `custom/.lua/www/` (recommended default)
+3. Apply the change in whichever variant or variants you want to keep in sync:
+
+- `custom/.lua/www/`
 - `www/.lua/www/`
 - `htmx/.lua/www/`
 
-### Modify a page
-- Edit the fragment in `.lua/www/`.
-- If the menu label or location changes, update `.lua/menu.json`.
-- Apply the change in the variant(s) you want to keep in sync.
+To modify a page, update the fragment and adjust the matching menu entry if the label or location changes. To remove a page, delete the fragment and remove the matching entry from `.lua/menu.json`.
 
-### Remove a page
-- Delete the fragment file.
-- Remove the matching entry from `.lua/menu.json`.
+### Styling and UI behavior
 
-## Styling & UI
+- `www/` and `htmx/` use **Pure.css** for most of the layout and utility styling.
+- `custom/` uses a custom CSS design with a two-level menu and is the most flexible choice if you want to align the UI with a specific brand.
+- Global styles live in `static/styles.css`, and layout/menu behavior lives in `static/ui.js`.
+- Keep page markup consistent by using the `.header` and `.content` wrappers already used by the included pages.
 
-- `www/` and `htmx/` use **Pure.css**.
-- `custom/` uses a **custom CSS design** with a two-level menu.
-- Global styles live in `static/styles.css` and layout/menu behavior in `static/ui.js`.
-- Keep page markup consistent by using `.header` and `.content` wrappers.
+## Notes / Troubleshooting
 
-## Security Policies
+- For AI-assisted updates, see [AGENTS.md](AGENTS.md) and target `custom/` first unless you specifically want parity across all three variants.
+- If you add new external scripts or styles, update the Content Security Policy in the relevant `cms.lua`.
+- Keep page fragments wrapped in `.header` and `.content` for consistent styling across variants.
 
-Default security headers (including CSP) are in `cms.lua`. If you add new external scripts/styles, update CSP accordingly.
+### Authentication
 
-## Example AI Prompts
+Authentication is intentionally optional:
 
-Below are example AI prompts you can use when working with an AI to modify the dashboards. For the complete AI workflow, file map, and rules for updates, refer to [AGENTS.md](AGENTS.md).
+- Add at least one user on the `Users` page to enable it.
+- Add multiple users if needed.
+- Remove a user by entering an existing username and leaving the password blank.
+- Remove all users to disable authentication again.
 
-### UI style change for the custom theme.
+### Security policies
 
-You can use AI to change the theme of any of the three dashboard variants, but the custom variant is usually the best starting point. It is also the preferred choice for professional web developers who want to fine-tune the styling manually, which is the recommended approach. In the following example, we provided a screenshot of an existing user interface found on the Internet from a Schneider Electric embedded web server, which serves as visual inspiration for the AI's theme update. As part of the prompt below, **copy and paste a screenshot of an existing user interface**.
+Default security headers, including the Content Security Policy, are defined in `cms.lua`. If you add CDN assets or any new external scripts or styles, update the CSP to match.
 
-```
+### AI-assisted changes
+
+This project is intentionally AI-friendly. It has been tested with Codex, but the same workflow can be used with other tools as long as you keep the variant boundaries clear:
+
+- say which variant you want changed
+- target `custom/` first for new work
+- port the same change to `www/` and `htmx/` only if you need parity
+
+### Example AI prompts
+
+Below are the original example prompts that ship with the project. They are intentionally detailed because real dashboard changes often span layout, CSS, runtime behavior, and security headers at the same time.
+
+#### UI style change for the custom theme
+
+You can use AI to change the theme of any of the three dashboard variants, but the custom variant is usually the best starting point. It is also the preferred choice for professional web developers who want to fine-tune the styling manually. In the original example, a screenshot from a Schneider Electric embedded web server was used as the visual reference.
+
+```text
 Update the custom variant to match the look and feel of Schneider
 Electric's (SE) website (se.com).
 
 "I'm providing a screenshot of an embedded SE UI. Use it as a visual
-reference to restyle the **custom** variant. Make sure to analyze this
+reference to restyle the custom variant. Make sure to analyze this
 image before proceeding.
 
 Requirements
 
 - Match the screenshot's overall theme: colors, contrast, spacing, typography feel, and component styling.
-- Keep the existing layout, two‑level menu, and HTMX behavior intact.
-- Replace the top‑left "Company" brand text with the logo in custom/static/se-logo.svg.
+- Keep the existing layout, two-level menu, and HTMX behavior intact.
+- Replace the top-left "Company" brand text with the logo in custom/static/se-logo.svg.
 - Keep the logo sized to fit the nav height and width.
 
 Scope
 
-- Modify **only** files under custom/.
+- Modify only files under custom/.
 - Update styles.css for palette, typography, nav, buttons, panels, and focus states.
 - Update template.lsp only for the brand/logo slot (no routing or content changes).
 - Update any other file that may need UI changes.
 
 Notes
 
-- Keep CSS readable and well‑commented.
+- Keep CSS readable and well-commented.
 - Do not change page content or menu structure.
 - If any external assets are needed, call them out explicitly and update CSP (but prefer local assets).
 ```
 
-#### The Generated UI:
+Reference image:
 
 ![Schneider Electric UI](https://makoserver.net/blogmedia/dashboard/se.jpg)
 
+#### Preparing the dashboard for persistent real-time data
 
-### Preparing the Dashboard for Persistent Real-Time Data
+The two HTMX dashboard variants behave similarly to a SPA because the page shell stays loaded while fragments are swapped. That makes them a good fit for persistent SMQ or WebSocket connections, but the connection code needs to live in the shell, not in the individual page fragment.
 
-The following prompts are designed for the two HTMX-based dashboard variants and are best suited for the custom variant.
+The original prompt used for that change was:
 
-When designing dashboards for embedded systems, a persistent real-time connection to the server is preferred because it allows the server to push live data to the client. This works naturally in Single Page Applications (SPAs), where the application shell typically remains loaded during use. In a traditional server-side rendered design, the connection must be re-established each time a new page is loaded.
-
-The two HTMX dashboard variants behave similarly to a SPA because the page frame is not reloaded when navigating between pages. To take advantage of this, the SMQ WebSocket connection should not live inside individual page code. Instead, it should be part of the page frame so the connection remains persistent and can be shared by page fragments that are loaded on demand.
-
-The following prompt implements this design and prepares the dashboard for the next prompt, where a [Solar Dashboard Plugin](#solar-dashboard) is added.
-
-```
-I want the SMQ connection to remain persistent across HTMX‑loaded page fragments.
+```text
+I want the SMQ connection to remain persistent across HTMX-loaded page fragments.
 
 Requirements
 - Split the current RoundSlider.js into two files:
@@ -245,19 +254,18 @@ Requirements
 - RoundSlider.js should:
   - Subscribe on load, full page load and HTMX swap (fragment load)
   - Unsubscribe when the RoundSlider fragment is unloaded by using HTMX lifecycle event htmx:beforeSwap
-  - Request the initial slider state **only once per full-page/fragment load**, and **only after subscribe is complete** (so the broker response isn't missed)
+  - Request the initial slider state only once per full-page/fragment load, and only after subscribe is complete
 - Do not break SSR or normal full-page loads
 
 Behavior details
 - The SMQ connection should stay alive across HTMX navigation
 - The slider fragment should not leave stale subscriptions behind
-- The slider position stored by the broker/server must NOT be overwritten on client initialization:
-  the client slider should publish only on actual user interaction
+- The slider position stored by the broker/server must not be overwritten on client initialization
 
 jQuery constraint
-- Only RoundSlider.js may use jQuery (needed for the RoundSlider plugin)
-- WebSockets.js must be native JS only (no jQuery)
-- Any non‑plugin logic that can be native should stay in WebSockets.js
+- Only RoundSlider.js may use jQuery
+- WebSockets.js must be native JS only
+- Any non-plugin logic that can be native should stay in WebSockets.js
 
 Scope
 - Modify only custom/ files
@@ -267,19 +275,24 @@ Scope
 - Dashboard variant to use: custom/
 ```
 
-### Solar Dashboard
+#### Solar dashboard prompt
 
-The following prompt enables the AI to design a fully functional solar dashboard. The dashboard is implemented as a new page and integrated into the existing dashboard framework.
+The repo also includes a more advanced prompt for creating a full solar dashboard page, including charting, live data, server-side publishing, and CSP updates. The original documentation keeps that prompt because it shows how a single feature request can affect:
 
-The following image shows the AI generated Solar Dashboard:
+- menu registration
+- page fragments
+- CSS and JavaScript
+- real-time subscriptions
+- server-side simulation data
+- security headers
+
+Reference image:
 
 ![Solar Dashboard](https://makoserver.net/blogmedia/dashboard/solar.jpg)
 
-The following prompt is detailed because it reflects real production work and real design decisions. Even when using AI, the developer must understand the full design process and how a feature spans multiple layers. A single change affects UI layout, charting, data models, live updates, security headers, and server-side publishing. If these relationships are not specified explicitly, an AI or a human, for that matter, will fill in the gaps with assumptions that often break the implementation.
+The full original prompt is preserved here for reference:
 
-**Note:** You must execute the above prompt before this one. You can use a screenshot of a solar panel as part of this prompt.
-
-```
+```text
 Task: Create Solar Dashboard Page
 
 Create a new solar dashboard page using vanilla HTML/CSS/JS, inspired
@@ -296,7 +309,7 @@ Target variant: custom/
 
 Menu
 
-- Add a new top‑level menu item at the end of menu.json: name: Solar, link solar.html
+- Add a new top-level menu item at the end of menu.json: name: Solar, link solar.html
 
 Libraries
 
@@ -317,7 +330,7 @@ Layout / Components
    - Label: Broken Clouds
    - Smaller line: October 13, 2022 02:18 pm
    - Simple cloud icon via inline SVG
-   - The temperature must be updated using real-time data from Open‑Meteo
+   - The temperature must be updated using real-time data from Open-Meteo
 3. Bottom chart: Daily kWh bars
    - Full-width ECharts bar chart
    - X-axis = days, Y-axis = kWh
@@ -346,7 +359,7 @@ Client Data Model + Updates
 
 Weather Data
 
-- Use the Open‑Meteo endpoint to retrieve the current temperature, weather code, and time/date.
+- Use the Open-Meteo endpoint to retrieve the current temperature, weather code, and time/date.
 - Automatic location detection:
   1. Try browser geolocation (permission prompt)
   2. If denied/unavailable, use IP-based geolocation via https://ipapi.co/json/

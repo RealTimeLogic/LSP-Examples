@@ -1,107 +1,103 @@
 # Authentication and Authorization Example
 
-This example shows how to enable both authentication and authorization using an Access Control List (ACL). The **Barracuda App Server (BAS)** provides several API functions for managing authentication and, optionally, authorization. See the [authenticator documentation](https://realtimelogic.com/ba/doc/en/lua/lua.html#auth_overview) for details.
+## Overview
 
-## Authentication vs. Authorization
+This example shows how to enable both authentication and authorization with an Access Control List (ACL). It uses the BAS [JSON Authenticator](https://realtimelogic.com/ba/doc/en/lua/lua.html#ba_create_jsonuser), which can authenticate users and optionally authorize access based on:
 
-- **Authentication** verifies the identity of a user.
-- **Authorization** determines what resources a user can access after authentication.
+- the authenticated user
+- a predefined set of URIs
+- the HTTP method used
 
-While applications may implement their own ACL directly, this example utilizes both authentication and authorization APIs provided by BAS. We use the easy-to-use **[JSON Authenticator](https://realtimelogic.com/ba/doc/en/lua/lua.html#ba_create_jsonuser)**, which includes an optional authorizer that assigns permissions based on the following:
-- The authenticated user
-- A predefined set of URIs
-- The HTTP method used
+The example applies that combined authenticator and authorizer to a [File Server object](https://realtimelogic.com/ba/doc/en/lua/lua.html#ba_create_wfs), so the same setup protects both the Web File Manager and WebDAV access.
 
-## File Server Integration
+Authentication and authorization serve different roles here:
 
-This example applies the combined authenticator and authorizer to a **[File Server object](https://realtimelogic.com/ba/doc/en/lua/lua.html#ba_create_wfs)**, which integrates:
-- **WebDAV**, enabling file management through WebDAV clients.
-- **Web File Manager**, allowing users to browse and manage files through a web interface.
+- **Authentication** verifies who the user is.
+- **Authorization** decides which resources that user may access after logging in.
 
-For details on using WebDAV, refer to the tutorial [How to Create a Cloud Storage Server](https://makoserver.net/articles/How-to-Create-a-Cloud-Storage-Server).
+The JSON authenticator is convenient because it supports both concerns in one BAS-native setup.
 
-**Note:** The **JSON Authenticator** is not restricted to use with a **File Server** object. It can also be used in standard web applications, offering an easy to implement authentication mechanism. Additionally, its built-in authorization capabilities provide a convenient way to manage access control within your application.
+The same JSON-based authenticator is not limited to file servers. It can also be used in ordinary BAS applications when you want an easy way to define users and optional authorization constraints without building a custom user store first.
 
+## Files
 
-## User Database and ACL Configuration
+- `www/.preload` - Creates the file server, user database, optional authorizer, and ACL rules.
+- `www/index.lsp` - Lets you access the file server through digest authentication or test programmatic login through `request:login()`.
+- `www/logout.lsp` - Handles logout behavior and shows the relevant logout notes.
+- `mako.conf` - Optional configuration flag used to disable the authorizer for testing.
 
-The user database and ACL setup are also covered in the tutorial **How to Create a Cloud Storage**, section **[Creating a User Database](https://makoserver.net/articles/How-to-Create-a-Cloud-Storage-Server#udb)**.
+## How to run
 
-To keep the example concise, user credentials and ACL rules are **hardcoded** within the [.preload](www/.preload) script.
+Start the example with the Mako Server:
 
-## Authentication and Authorization
-
-### HTTP Digest Authentication
-
-This example uses **[HTTP Digest Authentication](https://realtimelogic.com/ba/doc/en/authentication.html#authtypes)**, which prompts users for credentials via a browser pop-up. Note that:
-- Browsers **cache** the HTTP credentials until they are completely closed.
-- Some browsers may keep processes in memory even after closing all windows, retaining authentication.
-
-### Hardcoded User Credentials
-
-The following credentials are preconfigured in this example:
-
-| Username | Password |
-|----------|----------|
-| guest    | guest    |
-| kids     | kids     |
-| mom      | mom      |
-| dad      | dad      |
-
-
-### Server-Side Authentication via request:login()
-
-This example also shows how to use the [request:login()](https://realtimelogic.com/ba/doc/en/lua/lua.html#request_login) method, which allows server-side code to authenticate a user without relying on **HTTP authentication** or the web-based authentication mechanisms provided by **BAS**. This method is designed for integrating authentication systems not natively supported by the server, such as **[Single Sign-On](../fs-sso/README.md) (SSO)** or **WebAuthn**.
-
-#### Using `request:login()` with an Authorizer
-
-In this example, `request:login()` is used alongside an **authorizer**. When an authorizer is enabled:
-- `request:login()` **must** be called with valid user credentials.
-- Attempting to log in without arguments or with a non-existent user will be denied.
-
-The `index.lsp` page demonstrates this by allowing authentication with the registered users: **mom, dad, kids, and guest**. It also provides options to:
-- Attempt authentication with `nil` (Lua's equivalent of "no value").
-- Logging in as an unregistered user.
-
-When using an unregistered user, authentication succeeds, but the authorizer **blocks access** and returns a "No Access" message.
-
-#### Testing Without an Authorizer
-
-The included `mako.conf` file contains a setting that is read by the `.preload` script. This setting allows you to **disable the authorizer** for testing purposes. Without an authorizer, `request:login()` grants access to the protected **File Server** resource regardless of the username provided.
-
-
-
-
-## How to Use the Example
-
-This example is designed to run on the **[Mako Server](https://makoserver.net/download/overview/)**. To start the example, navigate to the project directory and launch the server with the following command:
-
-```sh
+```bash
 cd JSON-File-Server
 mako -l::www
 ```
 
-For detailed instructions on starting the Mako Server, please refer to our [Mako Server command line video tutorial](https://youtu.be/vwQ52ZC5RRg) and review the [server's command line options](https://realtimelogic.com/ba/doc/?url=Mako.html#loadapp) in our documentation.
+For more detail on starting the Mako Server, see the [command line video tutorial](https://youtu.be/vwQ52ZC5RRg) and the [command line options documentation](https://realtimelogic.com/ba/doc/?url=Mako.html#loadapp).
 
-Once you have successfully started the Mako Server, open a web browser and navigate to http://localhost:portno, where 'portno' represents the HTTP port number used by the Mako Server (this number is displayed in the console).
+After the server starts, open `http://localhost:portno`, where `portno` is the HTTP port shown in the console.
 
-On this page, you can:
-- **Access the File Server** at `fs/` and log in using **HTTP Digest Authentication**.
-- **Test `request:login()`** to authenticate users programmatically.
+Hardcoded users:
 
-Try the different login methods and observe how authentication works. When using **HTTP Digest Authentication**, the browser's login dialog will prompt for credentials - enter one of the **usernames and passwords** [listed above](#hardcoded-user-credentials).
+| Username | Password |
+| --- | --- |
+| `guest` | `guest` |
+| `kids` | `kids` |
+| `mom` | `mom` |
+| `dad` | `dad` |
 
-After testing the login methods, stop the server and open [mako.conf](mako.conf) in an editor, remove the comment to disable the authorizer, and re-start the server.
+On the page, you can:
 
-## Files in the `www` Directory
+- open `fs/` and log in through HTTP Digest authentication
+- use `request:login()` to test programmatic authentication
 
-- **`.preload`** - The [.preload startup script](https://realtimelogic.com/ba/doc/en/Mako.html#preload) configures the **authenticator** and **authorizer** using hardcoded values. It initializes a **File Server instance** and integrates it into the **[Virtual File System](https://realtimelogic.com/ba/doc/en/VirtualFileSystem.html) (VFS)**. Additionally, the script sets up a directory structure on your hard drive for use by the File Server.
+To test the version without an authorizer, stop the server, edit `mako.conf`, remove the comment that disables the authorizer, and restart the app.
 
-- **`index.lsp`** - Provides navigation options:
-  - Access the **File Server** at `fs/` and log in using **Digest Authentication**.
-  - Authenticate using `request:login()`.
-  - If already authenticated, accessing this page will redirect you to `logout.lsp`.
+## How it works
 
-- **`logout.lsp`** - Handles user logout:
-  - Logs the user out and redirects the users back to `index.lsp`, except for those using **Digest Authentication** (due to browser-based credential caching).
-  - Displays additional logout-related details when not redirected.
+`www/.preload` creates a writable root for the file server, mounts a WebDAV/Web File Manager instance at `/fs/`, builds a JSON-backed user database, and optionally creates an authorizer with path- and method-based constraints. If the authorizer is enabled, the ACL restricts write access and family-directory access according to the configured roles.
+
+`index.lsp` demonstrates two different flows:
+
+- regular HTTP Digest authentication against the mounted file server
+- server-side login with [`request:login()`](https://realtimelogic.com/ba/doc/en/lua/lua.html#request_login)
+
+That second flow is useful when the actual authentication source is not one of the built-in HTTP browser mechanisms, for example when integrating SSO or WebAuthn.
+
+### Digest authentication and `request:login()`
+
+The file-server side of the example uses **HTTP Digest Authentication**, which means the browser shows its own login dialog. `index.lsp` also demonstrates `request:login()` as a server-side API. With an authorizer enabled, `request:login()` must identify a user the authorizer recognizes. The page lets you try valid users, `nil`, and unregistered usernames so you can see how the authorizer changes the outcome.
+
+### ACL setup
+
+The ACL rules in `.preload` cover:
+
+- read-only guest access
+- shared family access
+- role-specific access for `mom` and `dad`
+- separate child access under `/family/kids/`
+
+This makes the example useful both as a file-server demo and as a concrete ACL pattern you can adapt.
+
+### Included users and roles
+
+The demo keeps the user database simple on purpose. Each user's password is the same as the username, and each user receives a role set that makes the ACL behavior easy to test:
+
+- `guest` has guest access
+- `kids` adds family access
+- `dad` and `mom` add parent-specific roles and writable areas
+
+This lets you test both the authentication flow and the role-based authorization flow without any external setup.
+
+The example also doubles as a concrete reminder that `request:login()` is a BAS login API, not just a file-server helper. That is why this README points to SSO and WebAuthn as natural follow-on examples.
+
+## Notes / Troubleshooting
+
+- Browsers cache Digest credentials aggressively. In some cases you must fully close the browser before you can test a different Digest user cleanly.
+- With an authorizer installed, `request:login()` must identify a user that the authorizer recognizes. Without an authorizer, the file server can be opened more freely for testing.
+- For broader WebDAV background, see [How to Create a Cloud Storage Server](https://makoserver.net/articles/How-to-Create-a-Cloud-Storage-Server).
+- `logout.lsp` can only do a full logout for the programmatic-login flow. Digest credentials are still controlled by the browser.
+- The authorizer toggle in `mako.conf` is there specifically so you can compare plain authentication behavior with full role-based authorization behavior.
+- That side-by-side comparison is intentional.

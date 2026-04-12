@@ -1,12 +1,26 @@
 # SMTP Examples
 
+## Overview
+
 These examples show how to use the SMTP send email function [socket.mail()](https://realtimelogic.com/ba/doc/en/lua/auxlua.html#smtp). Although the examples are designed to run "as is" using the [Mako Server](https://makoserver.net/), they can also be used by other [Barracuda App Server](https://realtimelogic.com/products/barracuda-application-server/) products such as Xedge.
 
 Note that [Xedge](https://realtimelogic.com/products/xedge/) has built-in email configuration via the IDE, as explained in the tutorial [How to Send Emails with Xedge IDE](https://realtimelogic.com/articles/How-to-Send-Emails-with-Xedge-IDE-A-StepbyStep-Guide).
 
 Before running the examples using the Mako Server, edit [`mako.conf`](mako.conf) and configure [log.smtp](https://realtimelogic.com/ba/doc/en/Mako.html#oplog) with valid SMTP settings.
 
+## Files
+
+- `text/.preload` - Plain-text email example.
+- `html/.preload` - HTML email example with inline image support.
+- `log/.preload` and `log/index.lsp` - Logging and emailed-error example.
+- `eml/.preload` and `eml/.lua/eml/` - EML parser example and supporting module.
+- `data/BAS-Info.eml` - Sample EML template.
+- `data/BAS-Logo.png` - Inline image used by the HTML and EML examples.
+- `mako.conf` - Shared SMTP and logging configuration.
+
 The `text`, `html`, and `eml` examples all use the Mako Server's log settings in `mako.conf` as their SMTP configuration. In each [`.preload`](text/.preload) script, the code loads `require"loadconf"`, clones `conf.log.smtp` into a local `smtpCfg` table, and then translates `consec = "starttls"` or `consec = "tls"` into the settings expected by `socket.mail()`. This means the same `from`, `to`, `server`, `port`, `user`, `password`, and transport security settings used for emailed logs are also used when these examples send email directly.
+
+## How to run
 
 Run the email examples in this order:
 
@@ -16,7 +30,9 @@ Run the email examples in this order:
 
 All examples except `log` exit the Mako Server after the email is sent.
 
-# Text Email Example
+## How it works
+
+### Text Email Example
 
 This example shows the smallest complete `socket.mail()` usage pattern: create an SMTP client from `mako.conf`, send a plain text body, print the result, and exit.
 
@@ -44,7 +60,7 @@ local ok,err=smtp:send{
 
 Use this example first when validating your SMTP settings because it removes HTML, inline images, and template parsing from the test.
 
-# HTML Email Example
+### HTML Email Example
 
 This example sends an HTML email with an inline image by using `htmlbody`, a plain text fallback, and `htmlimg`.
 
@@ -71,7 +87,7 @@ The HTML body references the image with `src="cid:the-unique-id"`, and `htmlimg`
 
 This example is useful after the plain text example succeeds because it confirms that your SMTP configuration also works for multipart HTML messages with embedded content.
 
-# Log Email Example
+### Log Email Example
 
 This example indirectly sends email by using [mako.log()](https://realtimelogic.com/ba/doc/en/Mako.html#mako_log) instead of calling `socket.mail()` directly.
 
@@ -93,7 +109,7 @@ Background mode means:
 
 Unlike the `text`, `html`, and `eml` examples, the `log` example does not call `mako.exit()` because it is meant to demonstrate ongoing logging and request-triggered error reporting.
 
-# EML Email Example
+### EML Email Example
 
 This example shows how to parse an `.eml` file, modify the parsed message, and send it with `socket.mail()`.
 
@@ -108,7 +124,7 @@ The `eml` module is useful when you want to design and store an email as a singl
 
 This approach is practical for HTML emails because the original formatting, inline images, and MIME structure can stay in one consistent source file.
 
-## The `eml` Module
+#### The `eml` Module
 
 The `eml` module is part of this example. It is not included with the Barracuda App Server as a built-in module.
 
@@ -120,7 +136,7 @@ local eml = require'eml/EmailMessage'
 
 If you want to reuse the parser in another BAS application, copy the `eml` module files into that application's Lua module path and set up loading in the same way.
 
-## What Is an EML File?
+#### What Is an EML File?
 
 An EML file is a raw email message stored as text. It normally contains:
 
@@ -140,7 +156,7 @@ For example, an HTML body could contain placeholders such as:
 
 After parsing the EML file, your Lua code can replace these tags before calling `smtp:send(...)`.
 
-## How the Example Works
+#### How the Example Works
 
 The [.preload script](eml/.preload) performs the following steps:
 
@@ -154,7 +170,7 @@ The [.preload script](eml/.preload) performs the following steps:
 8. Creates an SMTP client with `socket.mail(smtpCfg)`.
 9. Sends the parsed and modified message with `smtp:send(m)`.
 
-## Example Walkthrough
+#### Example Walkthrough
 
 The core flow in [`.preload`](/a:/Email-and-Logging/eml/.preload) is:
 
@@ -171,7 +187,7 @@ local smtp=socket.mail(smtpCfg)
 local ok,err=smtp:send(m)
 ```
 
-## What the Parser Returns
+#### What the Parser Returns
 
 `require "eml/EmailMessage"` returns a function that parses the raw EML text:
 
@@ -193,7 +209,7 @@ On success, the returned table may include:
 
 This return value is shaped so it can be extended and then sent through `socket.mail()`.
 
-## Using the Parsed Message with `socket.mail()`
+#### Using the Parsed Message with `socket.mail()`
 
 After parsing, the example adds the fields typically required by the SMTP client:
 
@@ -206,11 +222,11 @@ The parsed `m.htmlbody` and `m.htmlimg` values are preserved and passed directly
 
 This means the EML file can hold the HTML design and any inline images, while the runtime code supplies delivery-specific values such as recipient and subject.
 
-## Runtime Template Replacement
+#### Runtime Template Replacement
 
 One of the main advantages of storing an email as EML is that you can keep one approved template and update only the dynamic values before sending.
 
-### Option 1: Simple Tag Replacement
+##### Option 1: Simple Tag Replacement
 
 This is the simplest option and works well when the template only needs a few values replaced.
 
@@ -240,7 +256,7 @@ This pattern is ideal when:
 - the same email structure is reused many times
 - only a small number of fields need to change at runtime
 
-### Option 2: Render Dynamic Content with `ba.parselsp()`
+##### Option 2: Render Dynamic Content with `ba.parselsp()`
 
 For more advanced systems, especially embedded systems, the email can still be stored as one stable EML template while selected sections are generated dynamically by Lua.
 
@@ -254,7 +270,7 @@ This is useful when the email includes generated data such as:
 
 The BAS function [ba.parselsp()](https://realtimelogic.com/ba/doc/en/lua/lua.html#ba_parselsp) parses Lua Server Page content and returns Lua source code that can be compiled with `load()`. Note that ba.parselsp()can be used with any text format, including HTML. The parser simply converts text into Lua code and preserves the embedded Lua code within <?lsp ?> and <?lsp= ?> tags.
 
-## Notes
+## Notes / Troubleshooting
 
 - The parser normalizes message structure internally and decodes quoted-printable and base64 body content.
 - Inline MIME parts with `Content-ID` are collected in `m.htmlimg`.

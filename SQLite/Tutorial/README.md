@@ -1,20 +1,34 @@
 # Lua SQLite Database Tutorial
 
-This is the companion example for the [Lua SQLite Database Tutorial](https://makoserver.net/articles/Lua-SQLite-Database-Tutorial) tutorial.
+## Overview
 
-Documentation: [SQLite Lua API](https://realtimelogic.com/ba/doc/?url=luasql.html)
+This example is the companion code for the [Lua SQLite Database Tutorial](https://makoserver.net/articles/Lua-SQLite-Database-Tutorial). It demonstrates a simple form-driven SQLite workflow with Lua Server Pages.
 
-Run the example, using the Mako Server, as follows:
+Documentation reference: [SQLite Lua API](https://realtimelogic.com/ba/doc/?url=luasql.html)
 
-```
+## Files
+
+- `www/.preload` - Initializes the example's SQLite environment.
+- `www/index.lsp` - Displays the form and performs the example database operations.
+- `www/style.css` - Styling for the example page.
+
+## How to run
+
+Start the example with the Mako Server:
+
+```bash
 cd SQLite/Tutorial
 mako -l::www
 ```
 
-See the [Mako Server command line video tutorial](https://youtu.be/vwQ52ZC5RRg) for more information on how to start the Mako Server.
+For more detail on starting the Mako Server, see the [command line video tutorial](https://youtu.be/vwQ52ZC5RRg).
 
-After starting the Mako Server, use a browser and navigate to
-http://localhost:portno, where portno is the HTTP port number used by
-the Mako Server (printed in the console).
+After the server starts, open `http://localhost:portno`, where `portno` is the HTTP port printed in the console. Enter data into the form and click `Submit`.
 
-Enter data into the HTML form and click the Submit button.
+## How it works
+
+The example uses a standard LSP page as both the HTML frontend and the request handler. The startup script prepares the SQLite resources, and `index.lsp` accepts the submitted data, performs the database work, and renders the updated page.
+
+## Notes / Troubleshooting
+
+- If the page opens but inserts do not appear, confirm that the startup script ran and that the application has permission to create or update its SQLite files.

@@ -1,38 +1,53 @@
-# Easy CSRF prevention using the 'referer' header
+# Easy CSRF Prevention Using the `Referer` Header
 
-Cross-Site Request Forgery (CSRF) prevention is a security measure employed by web applications to safeguard against unauthorized commands issued from a trusted user (authenticated user). CSRF attacks exploit the trust a site has in a user's browser, enabling an attacker to execute unwanted actions in a web application in which the user is authenticated. Without CSRF prevention mechanisms in place, a malicious actor could potentially manipulate a user into performing actions they did not intend.
+## Overview
 
-CSRF attacks are more commonly associated with public-facing web applications and not so much with servers running within an Intranet since the attacker would need to know the Intranet address for the server.
+This example shows how to reduce the risk of Cross-Site Request Forgery (CSRF) by combining a trusted handshake with validation of the browser's `Referer` header. It is designed primarily for local or Intranet-style deployments, where the application needs to discover the server's effective host name at runtime instead of assuming a fixed IP address or DNS name.
 
-This example shows how to implement CSRF prevention using the browser's "referer" header. The example also shows how to implement a CSRF token, but this token is only used for the initial handshake. However, you may optionally choose to use the CSRF token for general CSRF prevention. The token is generated as follows:
+The example also demonstrates an encrypted CSRF token for the initial handshake. That token is mainly used to discover the server name dynamically, but the same token mechanism can also be used more broadly for CSRF protection if you choose.
 
-``` Lua
---Create token
-encryptedtoken = ba.aesencode(secret, ba.json.encode{time=ba.datetime"NOW":tostring()})
+## Files
 
---Decode token
-token = ba.json.decode(ba.aesdecode(secret, encryptedtoken)
+- `.preload` - Provides the helper logic used during the initial handshake, including token generation and server-name discovery.
+- `index.lsp` - Starts the trusted handshake in the browser and redirects the user to the protected form page.
+- `myapp/index.lsp` - Contains the form example that uses the discovered server name together with the `Referer` header check.
+
+## How to run
+
+Start the example with the Mako Server:
+
+```bash
+mako -l::CSRF-Prevention
 ```
 
-The above encrypted token includes a timestamp which the server side can use to verify that the token has not expired.
+For more detail on starting the Mako Server, see the [command line video tutorial](https://youtu.be/vwQ52ZC5RRg) and the [command line options documentation](https://realtimelogic.com/ba/doc/?url=Mako.html#loadapp).
 
-See the documentation for more information on:
+## How it works
+
+The first page the user visits is [`index.lsp`](index.lsp). That page performs a trusted handshake with help from the startup logic in [`.preload`](.preload). The server creates an encrypted token, stores the discovered server name, and sends the browser on to [`myapp/index.lsp`](myapp/index.lsp), where the form request can be checked against the expected host information.
+
+The token itself is built with AES and JSON:
+
+```lua
+-- Create token
+encryptedtoken = ba.aesencode(secret, ba.json.encode{time=ba.datetime"NOW":tostring()})
+
+-- Decode token
+token = ba.json.decode(ba.aesdecode(secret, encryptedtoken))
+```
+
+The embedded timestamp can be used on the server side to reject expired tokens. This is helpful during the initial handshake and can also be reused if you want token-based CSRF validation in additional flows.
+
+Useful BAS references:
+
 - [ba.aesencode](https://realtimelogic.com/ba/doc/?url=lua/lua.html#ba_aesencode)
 - [ba.aesdecode](https://realtimelogic.com/ba/doc/?url=lua/lua.html#ba_aesdecode)
 - [ba.json.encode](https://realtimelogic.com/ba/doc/?url=lua/lua.html#json_encode)
 - [ba.json.decode](https://realtimelogic.com/ba/doc/?url=lua/lua.html#json_decode)
 - [ba.datetime](https://realtimelogic.com/ba/doc/?url=lua/lua.html#ba_datetime)
 
-When using the browser's referrer header for CSRF prevention, you need to be aware of your server's name. For an Intranet server, it might be tempting to hard-code this to the server's IP address, but in practice, this can change due to factors like Intranet DNS services or [SharkTrustX](https://realtimelogic.com/products/SharkTrustX/) providing dynamic names. Therefore, simply using the server's IP address for comparison with the referrer header is not reliable.
+## Notes / Troubleshooting
 
-In our example, we use the CSRF token primarily to discover the server's name dynamically. This could be an IP address or any other identifier; the server could even have multiple names provided by DNS.
-
-The first page the user visits, the [main index page](index.lsp), initiates a trusted handshake to automatically discover the server's name. This page uses support functions from the [.preload](.preload) script to generate a CSRF token and store the server's name. JavaScript in the index page handles this handshake and then redirects the user to [myapp/index.lsp](myapp/index.lsp), which includes an HTML form that is protected using the referrer header.
-
-Run the example, using the Mako Server, as follows:
-
-``` shell
-mako -l::CSRF-Prevention
-```
-
-For detailed instructions on starting the Mako Server, check out our [command line video tutorial](https://youtu.be/vwQ52ZC5RRg) and review the server's [command line options](https://realtimelogic.com/ba/doc/?url=Mako.html#loadapp) in our documentation.
+- This technique is especially useful when the server name can vary because of DNS, local naming, or services such as SharkTrustX.
+- CSRF attacks are more common on public-facing systems, but internal systems still benefit from explicit request validation.
+- If your deployment has multiple valid hostnames, make sure the handshake stores the hostname the browser actually used.

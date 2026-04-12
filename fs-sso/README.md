@@ -1,5 +1,7 @@
 # Single Sign-On (SSO) with OpenID Connect for Microsoft Entra ID
 
+## Overview
+
 This example shows how to implement Single Sign-On (SSO) using
 [OpenID Connect](https://openid.net/connect/). The example is designed
 specifically for [Microsoft Azure](https://portal.azure.com/) Entra ID.
@@ -22,8 +24,32 @@ significantly enhances overall system security and integrity.
 >    which includes an easy-to-use web interface that enables Microsoft
 >    Entra ID Single Sign-On as an option.
 
+## Files
 
-## Azure Instructions
+### Files Overview
+
+This section details the key files in the `LSP-Examples/fs-sso/www` directory and explains their roles in the Single Sign-On (SSO) example application.
+
+- **.preload**:
+  This application startup file is responsible for loading the `ms-sso.lua` module. It also creates the authenticator and initializes the Web File Manager (WFS), setting up the core SSO functionality for the application.
+
+- **index.lsp**:
+  This LSP file manages the login user interface. It serves as the primary entry point where users are prompted to log in, enabling them to access protected resources.
+
+- **help.lsp**:
+  Invoked by the Web File Manager (WFS), this file is linked to the Help button in the UI.
+
+- **logout.lsp**:
+  Also part of the Web File Manager (WFS), this file handles the logout button functionality.
+
+### The SSO Module
+
+- **ms-sso.lua** (located in the `.lua` subdirectory):
+  This generic SSO module encapsulates the Single Sign-On logic used across the application. Designed for reusability, it simplifies the integration of SSO by handling core authentication tasks, making it easy to incorporate into your own projects.
+
+## How to run
+
+### Azure Instructions
 
 Follow these steps to configure your application in the Azure portal:
 
@@ -50,7 +76,7 @@ Follow these steps to configure your application in the Azure portal:
 15. Insert the **Directory (tenant) ID**, **Application (client) ID**,
     and **client secret Value** into your `mako.conf` file (details below).
 
-## Granting Users Access
+### Granting Users Access
 
 Once your application is set up, grant access to individual users within
 your organization by following these steps:
@@ -74,7 +100,7 @@ tutorial](https://docs.microsoft.com/en-us/azure/active-directory/develop/quicks
 which includes the section on [adding permissions to access Microsoft
 Graph](https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-configure-app-access-web-apis#add-permissions-to-access-microsoft-graph).
 
-## How to Run the Example
+### Start the Example
 
 1.  Open your preferred editor and create the file
     `LSP-Examples/fs-sso/mako.conf`.
@@ -124,6 +150,8 @@ configured correctly.
 After loging in you will be able to access the Web File Manager by clicking the `File Server` button.
 
 
+## How it works
+
 ### Session URL
 
 Client applications, such as [WebDAV](https://realtimelogic.com/products/webdav/), that cannot use Single Sign-On can still be granted access by creating a session URL. The code in the `.preload` file sets this up. After logging in, you should see a session URL. You can then copy this URL and test it in another browser that isn't authenticated; you should be able to access all the resources without having to authenticate.
@@ -139,31 +167,7 @@ A session URL is essentially a secret key that grants access to authenticated re
 Without HTTPS, the session URL could be intercepted or exposed, potentially giving unauthorized users access to your system.
 
 
-## Files
-
-## Files Overview
-
-This section details the key files in the `LSP-Examples/fs-sso/www` directory and explains their roles in the Single Sign-On (SSO) example application.
-
-- **.preload**:
-  This application startup file is responsible for loading the `ms-sso.lua` module. It also creates the authenticator and initializes the Web File Manager (WFS), setting up the core SSO functionality for the application.
-
-- **index.lsp**:
-  This LSP file manages the login user interface. It serves as the primary entry point where users are prompted to log in, enabling them to access protected resources.
-
-- **help.lsp**:
-  Invoked by the Web File Manager (WFS), this file is linked to the Help button in the UI.
-
-- **logout.lsp**:
-  Also part of the Web File Manager (WFS), this file handles the logout button functionality.
-
-### The SSO Module
-
-- **ms-sso.lua** (located in the `.lua` subdirectory):
-  This generic SSO module encapsulates the Single Sign-On logic used across the application. Designed for reusability, it simplifies the integration of SSO by handling core authentication tasks, making it easy to incorporate into your own projects.
-
-
-## The SSO Module's API
+### The SSO Module's API
 
 Before diving into the API details, let's review the complete messaging sequence, which illustrates how the browser, the Mako Server, and Microsoft Entra (MS Entra) interact during the login process.
 
@@ -253,7 +257,9 @@ sso = ssoModule.init(openid, login [, log])
          + **errorMessage:** A string detailing the error, which can be presented to the user.
          + **errorCodes:** An array of [error codes](https://learn.microsoft.com/en-us/entra/identity-platform/reference-error-codes) returned by MS Entra. The index.lsp example page manages the two error codes 7000215 and 7000222 related to invalid client secret.
 
-## Redirect URI Requirements
+## Notes / Troubleshooting
+
+### Redirect URI Requirements
 
 For testing purposes, using HTTP on `localhost` is acceptable. However, in real-world deployments, MS Entra mandates using HTTPS to redirect URI. This requirement ensures that all communications are securely encrypted and that sensitive authentication tokens remain protected during transmission.
 

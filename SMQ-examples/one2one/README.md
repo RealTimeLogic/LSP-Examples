@@ -1,42 +1,28 @@
-## One-to-One Communication
+# One-to-One Communication
 
-This example demonstrates one-to-one communication between a browser
-and a server using the SMQ protocol. It showcases the essentials of
-setting up a client in the browser to subscribe to specific
-[subtopics](https://realtimelogic.com/ba/doc/?url=SMQ.html#SubTopics)
-and how to publish messages to the server. Below is a breakdown of the
-key components and their functionalities:
+## Overview
 
-### SMQ Client Initialization
+This example demonstrates one-to-one communication between a browser and a server using the SMQ protocol. It focuses on the basics: how a browser subscribes to messages addressed specifically to itself and how it publishes messages back to the server.
 
-*
-**Description**: The SMQ client is instantiated with a
-        clean start configuration, indicating that each connection starts afresh
-        without any retained subscriptions or messages.
+## Files
 
-### Subscriptions
+- `.preload` - Starts the SMQ broker-side support used by the example.
+- `index.html` - Browser-side example showing the one-to-one publish and subscribe flow.
 
-*
-**Function sSub**: Illustrates how to subscribe to messages
-        targeted at the client itself, leveraging the 'self' keyword. This
-        function handles one-to-one message delivery, ensuring that messages are
-        directed to and processed by the only intended recipient.
+## How to run
 
-### Publishing Messages
+Start the example with the Mako Server:
 
-*
-**Function sPub**: Outlines the process of publishing JSON
-        payloads to the broker. This is done after successfully subscribing to
-        the relevant subtopics, demonstrating a sequential flow of operations
-        where the client first ensures it's ready to receive messages before
-        initiating communication.
-
-
-## Running the Example
-
-Start the example, using the Mako Server, as follows:
-
-```
+```bash
 cd LSP-Examples/SMQ-examples
-mako -l::one2one 
+mako -l::one2one
 ```
+
+## How it works
+
+The browser creates an SMQ client with a clean start so each connection begins without retained local state. It then subscribes to messages addressed to `self`, which lets the server send one-to-one replies back to that specific browser instance. After the subscription is in place, the client publishes JSON messages to the broker to complete the round trip.
+
+## Notes / Troubleshooting
+
+- This example is a good foundation for the more advanced SMQ RPC example in the sibling `RPC/` directory.
+- See the [SMQ documentation](https://realtimelogic.com/ba/doc/?url=SMQ.html) if you want a deeper explanation of subtopics and topic addressing.

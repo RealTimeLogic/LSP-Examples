@@ -1,50 +1,61 @@
-## GitHub IO
+# GitHub IO
 
-**GitHub IO** is a [LuaIo-compatible filesystem driver](https://realtimelogic.com/ba/doc/en/lua/auxlua.html#luaio) that makes a GitHub repository look and behave like a file system inside the Barracuda App Server (BAS).
+## Overview
+
+**GitHub IO** is a [LuaIO-compatible filesystem driver](https://realtimelogic.com/ba/doc/en/lua/auxlua.html#luaio) that makes a GitHub repository look and behave like a file system inside the Barracuda App Server.
 
 ![GitHub IO](https://realtimelogic.com/images/GitHubIO.jpg "GitHub IO")
 
-Instead of reading and writing from local disk, all file operations are translated into GitHub REST API calls:
+Instead of reading and writing local disk files, the driver translates file operations into GitHub API calls:
 
-- **Read files** → fetched via the GitHub "raw" API
-- **Write/update files** → uploaded with PUT /contents/{path}
-- **Delete files and directories** → handled with DELETE /contents/{path}, with recursive directory removal
-- **List directories** → mapped to GitHub's JSON directory listings
-- **Create directories** → emulated with .keep files since Git doesn't support empty folders
+- reading files uses GitHub's raw-content support
+- writing files uses the repository contents API
+- deleting files and directories uses the contents API, including recursive directory removal
+- directory listings come from GitHub JSON directory metadata
+- empty directories are emulated with `.keep` files because Git does not store empty folders
 
-In practice, this means you can mount a GitHub repo as if it were a local filesystem and use regular [BAS IO]((https://realtimelogic.com/ba/doc/en/lua/lua.html#ba_ioinfo)) calls (open, stat, files, etc.) to manage content, while under the hood, everything is **versioned and committed** to GitHub.
+Because the returned object follows the BAS IO model, you can use it anywhere a BAS IO is accepted, including with the WebDAV/Web File Server. That means a GitHub repository can be exposed as a versioned network file system. Keep in mind that WebDAV clients can generate a lot of file traffic, so this pattern is best suited for small repositories and source files rather than large binary payloads.
 
-In addition to calling the Lua IO interface methods directly, the object can also be passed to any BAS component that accepts an IO interface, such as the [WebDAV server](https://realtimelogic.com/ba/doc/en/lua/lua.html#ba_create_dav). By doing so, you can expose a GitHub repository as a versioned network file system. Note that many WebDAV clients, including the one built into Windows, generate a high volume of file I/O operations, which can result in substantial traffic to GitHub. When using WebDAV, limit it to small repositories and avoid transferring large files. It is best suited for working with source code files only.
+When used from [Xedge](https://realtimelogic.com/ba/doc/en/Xedge.html), the same GitHub-backed IO can also be mounted into the IDE through [`xedge.auxapp()`](https://realtimelogic.com/ba/doc/en/Xedge.html#auxapp), which makes the repository appear like a local project inside the UI.
 
-> **&#x1F449; Tip:**
-> When using the **[Xedge IDE](https://realtimelogic.com/ba/doc/en/Xedge.html)**, you can integrate a GitHub-backed file system directly into the Xedge UI by calling the **[xedge.auxapp() function](https://realtimelogic.com/ba/doc/en/Xedge.html#auxapp)**.
-> This allows you to mount a GitHub IO instance as an auxiliary app, making the repository appear in the IDE just like a local project. From there, you can browse, edit, and manage files while keeping them versioned in GitHub.
+## Files
 
-## Testing the GitHub IO
+- `www/.lua/GitHubIo.lua` - GitHub IO driver module.
+- `www/.preload` - Example startup script that creates the GitHub-backed file system and mounts it at `/git/`.
 
-To test the code, first create a new empty GitHub repository and generate a fine-grained personal access token with permissions limited to that repository. Next, edit the `GitHubIo/www/.preload` file and update the initialization code with the repository owner, the repository name, and token.
+## How to run
 
-When configured, run the example, using the Mako Server, as follows:
+Before running the example:
 
-```
+1. Create a new empty GitHub repository.
+2. Generate a fine-grained personal access token limited to that repository.
+3. Open `GitHubIo/www/.preload`.
+4. Replace the placeholder values for:
+   - repository owner
+   - repository name
+   - GitHub token
+5. Remove the intentional `error(...)` line at the top of `.preload`.
+
+Then start the example:
+
+```bash
 cd GitHubIo
 mako -l::www
 ```
 
-For detailed instructions on starting the Mako Server, check out our [command line video tutorial](https://youtu.be/vwQ52ZC5RRg) and review the server's [command line options](https://realtimelogic.com/ba/doc/?url=Mako.html#loadapp) in our documentation.
+For more detail on starting the Mako Server, see the [command line video tutorial](https://youtu.be/vwQ52ZC5RRg) and the [command line options documentation](https://realtimelogic.com/ba/doc/?url=Mako.html#loadapp).
 
-After starting the Mako Server, use a browser and navigate to
-http://localhost/git/. You can now use the Web File Manager for uploading and downloading files. You can also mount http://localhost/git/ as a WebDAV drive.
+After the server starts, open:
 
-## Source Code
+```text
+http://localhost/git/
+```
 
-- Lua module: [GitHubIo.lua](www/.lua/GitHubIo.lua)
-- Example code [.preload](www/.preload)
+You can then use the Web File Manager for upload and download operations, or mount `http://localhost/git/` as a WebDAV drive.
 
+## How it works
 
-## `create` Function
-
-The `create` function instantiates and returns an [IO interface object](https://realtimelogic.com/ba/doc/en/lua/lua.html#ba_ioinfo) that can be used like any other BAS IO interface (e.g. `open`, `files`, `stat`, `mkdir`, `rmdir`, `remove`).
+The example startup script creates the driver with:
 
 ```lua
 local ghio = require"GitHubIo".create{
@@ -57,110 +68,67 @@ local ghio = require"GitHubIo".create{
 }
 ```
 
-* * *
+It then creates a Web File Server on top of that IO and mounts it at `/git/`.
 
-## Options
+### `create` function
 
-### `owner` _(string, required)_
+`create(...)` returns a BAS [IO interface object](https://realtimelogic.com/ba/doc/en/lua/lua.html#ba_ioinfo) that supports common methods such as `open`, `files`, `stat`, `mkdir`, `rmdir`, and `remove`.
+
+That is what makes the module practical: code written against the BAS IO abstraction can often be reused with minimal change, even though the backing storage is now GitHub instead of a local disk.
+
+### Options
+
+#### `owner` `(string, required)`
 
 GitHub username or organization name that owns the repository.
 
-Example:
+#### `repo` `(string, required)`
 
-`owner = "RealTimeLogic"`
+Repository name.
 
-* * *
+#### `token` `(string, required)`
 
-### `repo` _(string, required)_
+GitHub Personal Access Token used for authentication.
 
-The name of the repository to access.
+The original example text assumed a PAT with repository access only, which is still the recommended way to test the driver safely.
 
-Example:
+#### `branch` `(string, optional)`
 
-`repo = "GitHubIoTest"`
+Branch to operate on. Defaults to `main`.
 
-* * *
+#### `api` `(string, optional)`
 
-### `token` _(string, required)_
+GitHub API base URL. Use this for GitHub Enterprise installations.
 
-A **GitHub Personal Access Token (PAT)** with `repo` scope.
+#### `log` `(boolean or function, optional)`
 
-Used for authentication. Sent as a Bearer token in every request.
+Controls error reporting:
 
-Example:
+- `true` prints GitHub errors to the trace buffer
+- a function receives `(url, code, message)` for each reported error
 
-`token = "github_pat_xxxxx""`
+#### `mtime` `(number, optional)`
 
-* * *
+GitHub does not provide normal filesystem modification timestamps through this interface, so you can assign a normalized value to all returned nodes.
 
-### `branch` _(string, optional)_
+#### `lockdir` `(string, optional)`
 
-The branch to operate on. Defaults to `"main"`.
+Lock-directory name used when the IO is mounted behind WebDAV. The default is `.LOCK`.
 
-Example:
+### Behavior
 
-`branch = "develop"`
+- Empty directories are represented with `.keep` files.
+- `open("r")` reads raw file content.
+- `open("w")` buffers the data and uploads it on `close()`.
+- `flush()` is effectively a no-op for write mode in this driver.
+- `rmdir()` removes complete directory trees recursively.
+- Each GitHub request creates its own HTTP client, which makes the driver safe for concurrent BAS cooperative threads.
+- `mtime` is normalized because the GitHub contents API does not expose normal filesystem timestamps in the same way a local file system does.
+- The `lockdir` value should match the WebDAV lock-directory configuration if you combine the driver with a WebDAV server.
 
-* * *
+## Notes / Troubleshooting
 
-### `api` _(string, optional)_
-
-The GitHub API base URL. Defaults to `https://api.github.com`.
-
-Use this if you are working with a **GitHub Enterprise** instance.
-
-Example:
-
-`api = "https://github.mycompany.com/api/v3"`
-
-
-### `log` _(boolean or function, optional)_
-
-Any GitHub error (for example, invalid credentials) causes the IO object operation to fail. The error returned by methods such as `open` may not contain useful details.
-
-- If `log` is set to **`true`**, error messages are printed to the trace buffer.
-- If `log` is set to a **function**, the function is called with three arguments:
-  1. The request URL
-  2. The HTTP response code
-  3. The error message returned by GitHub
-
-* * *
-
-### `mtime` _(number, optional)_
-
-GitHub does not provide file modification timestamps. You can normalize and assign a fixed `mtime` value to all nodes. For example:
-
-``` lua
-mtime=os.time()
-```
-
-### `lockdir` _(string, optional)_
-
-The `lockdir` name (default: `.LOCK`) should match the value passed to the WebDAV create function when using GitHub IO with a WebDAV instance. This directory is used internally to maintain a cache and prevent non-essential files from being pushed to GitHub.
-
-* * *
-
-## Behavior
-
-- **Directories**
-
-
-  GitHub doesn't store empty directories. This driver simulates them by creating a `.keep` file in empty folders.
-
-- **`mtime`**
-
-
-  Always set to a normalized value (GitHub doesn't provide standard filesystem timestamps in this API).
-
-- **Concurrency**
-
-  Each GitHub request creates its own `httpc` client. Safe for use across multiple BAS cooperative threads.
-
-- **Recursive Deletion**
-
-  `rmdir` removes entire directory trees (including nested files and subdirectories).
-
-- **File Operations**
-  - `open("r")`: reads a file's raw content.
-
-  - `open("w")`: Base64-encode the data and uploads it on `close`. The `flush` function is a no-op.
+- The shipped `.preload` intentionally stops with an error until you edit it. That prevents accidental use with placeholder credentials.
+- If you use this driver with WebDAV, keep the repository small and expect a higher GitHub API call volume than with direct browser editing.
+- In Xedge, the same driver can also be integrated into the IDE through [`xedge.auxapp()`](https://realtimelogic.com/ba/doc/en/Xedge.html#auxapp).
+- For routine testing, start with a new empty repository so you can clearly see how file operations map to Git commits and repository contents.

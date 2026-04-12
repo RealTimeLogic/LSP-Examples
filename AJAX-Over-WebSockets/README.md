@@ -1,87 +1,66 @@
-# REST / AJAX / RPC – different names, same idea
-## REST / AJAX / RPC over WebSockets
+# REST / AJAX / RPC Over WebSockets
 
-This repository contains example code for the [AJAX over WebSockets](https://makoserver.net/articles/AJAX-over-WebSockets) tutorial. Despite the different terminology, this example demonstrates the same fundamental interaction model as REST and RPC APIs: a browser calling server-side logic asynchronously without reloading the page.
+## Overview
 
-At a conceptual level, **REST**, **AJAX**, and **RPC (Remote Procedure Calls)** all describe ways for a browser to communicate with a server in the background:
+This example accompanies the tutorial [AJAX over WebSockets](https://makoserver.net/articles/AJAX-over-WebSockets). Even though the names REST, AJAX, and RPC come from different traditions, this example shows the same underlying pattern: the browser calls server-side logic asynchronously and updates the page without a full reload.
 
-- **AJAX** describes *how* the browser sends requests (asynchronously, without page reloads)
-- **REST** and **RPC** describe *how the API is modeled*
-- The runtime behavior is the same: request → server processing → response
+WebSockets are used here as the transport layer, which makes the connection persistent and bidirectional. That removes the repeated setup cost of individual HTTP requests while still giving the browser a familiar request/response programming model.
 
-This example uses an **RPC-style programming model** implemented over **WebSockets**, but it fulfills the same role as traditional HTTP-based REST or AJAX APIs. The main difference is that WebSockets provide a persistent, bidirectional connection, eliminating repeated HTTP request overhead.
+## Files
 
----
+- `www/.preload` - Startup logic for the example app.
+- `www/index.html` - Original browser example based on jQuery and the AJAX WebSocket client library.
+- `www/promise.html` - Modernized browser example using native DOM APIs, Promises, and `async` / `await`.
+- `www/service.lsp` - Server-side LSP page that upgrades the request to a WebSocket and exposes the example RPC-style service.
 
-## Why WebSockets?
+## How to run
 
-WebSockets establish a long-lived connection between the browser and server, making them ideal for:
-
-- Low-latency, interactive applications
-- Real-time updates
-- Efficient request/response exchanges without repeated connection setup
-
-In this example, WebSockets are used as a transport layer. On top of that transport, the API behaves like a familiar AJAX or RPC interface.
-
----
-
-## Getting started
-
-To run the example, start the Mako Server in the project directory:
+Start the example with the Mako Server:
 
 ```bash
 cd AJAX-Over-WebSockets
 mako -l::www
 ```
 
-For more details on starting the Mako Server, see:
+For more detail on starting the Mako Server, see the [command line video tutorial](https://youtu.be/vwQ52ZC5RRg) and the [command line options documentation](https://realtimelogic.com/ba/doc/en/Mako.html#cmdline).
 
-- The command-line video tutorial: https://youtu.be/vwQ52ZC5RRg  
-- Mako Server command-line options: https://realtimelogic.com/ba/doc/en/Mako.html#cmdline
+After the server starts, open:
 
-Once the server is running, open a browser and navigate to:
-
-```
-http://localhost:<port_number>
+```text
+http://localhost:portno
 ```
 
-The port number is displayed in the Mako Server console output.
+where `portno` is the HTTP port printed in the Mako console.
 
----
+## How it works
 
-## Example files
+`service.lsp` upgrades eligible HTTP requests to a WebSocket by calling `ba.socket.req2sock(request)`. Once the socket is established, the page runs a loop that reads JSON messages, resolves the requested service path against a Lua table of exported functions, executes the function with `pcall(...)`, and writes back a JSON response containing the result or error.
 
-The following files demonstrate AJAX / RPC-style communication over WebSockets:
+The browser examples then use that WebSocket channel as if it were an AJAX or RPC endpoint. In practical terms, the browser sends a request, the server runs Lua code, and the browser receives structured data it can use to update the UI.
 
-- **www/index.html**  
-  The original example, based on jQuery, demonstrating the AJAX WebSocket client library.
+### Why WebSockets?
 
-- **www/promise.html**  
-  A modernized version using the native DOM APIs, Promises, and `async / await` for clearer asynchronous code.
+WebSockets establish a long-lived connection between the browser and the server, making them well suited for:
 
-- **www/service.lsp**  
-  The server-side Lua Server Pages (LSP) script implementing the WebSocket-based service logic.
+- low-latency interactive applications
+- real-time updates
+- efficient request/response exchanges without repeated connection setup
 
----
+In this example, WebSockets are used as the transport. On top of that transport, the programming model still feels like AJAX or RPC.
 
-## How this relates to REST
+### How this relates to REST
 
 Although the API is not expressed as REST-style URLs, the interaction pattern is equivalent:
 
-- The browser sends a request for server-side processing
-- The server executes logic and returns structured data
-- The browser updates the UI without a page reload
+- the browser sends a request for server-side processing
+- the server executes the logic and returns structured data
+- the browser updates the UI without a full reload
 
-Many real-world REST APIs are effectively RPC expressed through HTTP verbs and URLs. This example shows the same pattern implemented more directly using WebSockets as the transport.
+Many real-world REST APIs are effectively RPC expressed through HTTP verbs and URLs. This example shows the same pattern implemented more directly using a persistent WebSocket channel.
 
----
+## Notes / Troubleshooting
 
-## Learn more
-
-For a detailed walkthrough of the concepts and code, see the full tutorial:
-
-https://makoserver.net/articles/AJAX-over-WebSockets
-
-## See Also
-
-- [REST / AJAX / RPC over SMQ](../SMQ-examples/RPC/README.md)
+- If you access `service.lsp` without a WebSocket handshake, the page returns `404` because it is meant to act as a socket endpoint, not as a regular HTML page.
+- `promise.html` is the easier version to study if you want the modern browser-side flow first.
+- Full tutorial: https://makoserver.net/articles/AJAX-over-WebSockets
+- Related example: [REST / AJAX / RPC over SMQ](../SMQ-examples/RPC/README.md)

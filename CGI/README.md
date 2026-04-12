@@ -1,77 +1,68 @@
 # CGI Plugin and Examples
 
-The Barracuda App Server and Mako Server do not come with a CGI
-plugin. The CGI implementation in this example is implemented in Lua
-and uses the
-[forkpty plugin](https://realtimelogic.com/ba/doc/?url=auxlua.html#forkptylib)
-for the external process management. Note that the forkpty plugin is
-only available on the following platforms: Linux, Mac, and QNX.
+## Overview
 
-## Instructions:
+The Barracuda App Server and Mako Server do not include a CGI plugin by default. This example provides a CGI implementation written in Lua. It uses the [forkpty plugin](https://realtimelogic.com/ba/doc/?url=auxlua.html#forkptylib) for external process management, so it is intended for platforms where that plugin is available: Linux, macOS, and QNX.
 
-1. Copy the CGI scripts in the 'scripts' directory to /tmp/cgi-test/
-```console
-   mkdir -p /tmp/cgi-test/
-   cp scripts/* /tmp/cgi-test/
+## Files
+
+- `www/.preload` - Creates the CGI directory object and inserts it into the application's [virtual file system](https://realtimelogic.com/ba/doc/?url=GettingStarted.html#VFS).
+- `www/.lua/cgi.lua` - CGI compatibility module.
+- `www/index.lsp` - Redirects the browser to the shell CGI example.
+- `scripts/sh.cgi` - Simple shell-based CGI script.
+- `scripts/python.cgi` - Python CGI script that accepts form data.
+
+## How to run
+
+1. Copy the CGI scripts to a test directory:
+
+```bash
+mkdir -p /tmp/cgi-test/
+cp scripts/* /tmp/cgi-test/
 ```
-2. Make sure the scripts are 'executable'
-   chmod +x /tmp/cgi-test/*
-3. Start the Mako Server and load the 'www' directory
-   mako -l::www
 
-For detailed instructions on starting the Mako Server, check out our [command line video tutorial](https://youtu.be/vwQ52ZC5RRg) and review the server's [command line options](https://realtimelogic.com/ba/doc/?url=Mako.html#loadapp) in our documentation.
+2. Make the scripts executable:
 
-After starting the Mako Server, use a browser and navigate to
-http://localhost:portno, where portno is the HTTP port number used by
-the Mako Server (printed in the console). You should be redirected to
-http://localhost/cgi/sh.cgi. The file 'sh.cgi' is a basic CGI
-shell script.
+```bash
+chmod +x /tmp/cgi-test/*
+```
 
-A Python script is also included. Execute the Python script as follows:
+3. Start the example:
 
+```bash
+cd CGI
+mako -l::www
+```
+
+For more detail on starting the Mako Server, see the [command line video tutorial](https://youtu.be/vwQ52ZC5RRg) and the [command line options documentation](https://realtimelogic.com/ba/doc/?url=Mako.html#loadapp).
+
+After the server starts, open `http://localhost:portno`, where `portno` is the HTTP port shown in the console. You should be redirected to `http://localhost/cgi/sh.cgi`.
+
+To test the Python CGI script directly, open:
+
+```text
 http://localhost/cgi/python.cgi?textcontent=Hello%20World
-
-
-## The example's Source Code Files:
-
-* www/index.lsp - Redirects to /cgi/sh.cgi
-* www/.preload - Loads the CGI Lua module, creates a CGI directory,
-  and inserts the directory into the
-  [virtual file system](https://realtimelogic.com/ba/doc/?url=GettingStarted.html#VFS)
-* www/.lua/cgi.lua - The CGI module
-
-### CGI scripts:
-
-* scripts/sh.cgi - Basic shell based script
-* scripts/python.cgi - Python script accepting 'form data'
-
-### Details:
-
-The .preload script, which is executed when the application is loaded, initializes the CGI plugin as follows:
-
-``` lua
-local cgidir=cgi.create("/tmp/cgi-test/","cgi")
-dir:insert(cgidir,true) -- Insert cgi directory as child object
 ```
 
-The above code creates a CGI directory with the base path
-"/tmp/cgi-test/". You should change this path to a path suitable for
-your application.
+## How it works
 
-All Mako server applications have a pre-defined
-[LSP directory object](https://realtimelogic.com/ba/doc/?url=ua.html#ba_create_resrdr)
-called 'dir' and the last line above inserts the CGI directory as a
-sub directory of the application's directory. See the
-[Virtual File System Documentation](https://realtimelogic.com/ba/doc/?url=GettingStarted.html#VFS)
-for details.
+The startup script enables module loading with `mako.createloader(io)`, loads `cgi.lua`, creates a CGI directory rooted at `/tmp/cgi-test/`, and inserts that directory into the app's VFS:
 
-## Security
+```lua
+local cgidir = cgi.create("/tmp/cgi-test/", "cgi")
+dir:insert(cgidir, true)
+```
 
-All forms of parent directory lookup such as '..' are removed by the
-server prior to searching the virtual file system for a directory
-object matching the URL pathname. For example,
-http://address/cgi/../somexec will be translated to
-http://address/somexec and the CGI directory object will not be called
-since the pathname does not match the CGI directory path name. In any
-event, CGI directories should preferably be protected by an
-[authentication object](https://realtimelogic.com/ba/doc/?url=lua.html#auth_overview).
+Inside `cgi.lua`, each incoming request is translated into CGI environment variables and launched with `ba.forkpty(...)`. The module captures the child process output, parses the CGI headers, forwards the headers to the BAS response object, and then streams the body back to the client.
+
+The three main source files each have a distinct role:
+
+- `index.lsp` redirects the browser into the example CGI endpoint
+- `.preload` mounts the CGI directory into the VFS
+- `.lua/cgi.lua` implements the CGI adapter itself
+
+## Notes / Troubleshooting
+
+- Change `/tmp/cgi-test/` in `www/.preload` if you want to use a different CGI root path.
+- BAS strips parent-directory traversal such as `..` before VFS lookup, which helps protect the CGI directory from path traversal attempts.
+- CGI directories should still preferably be protected with an [authentication object](https://realtimelogic.com/ba/doc/?url=lua.html#auth_overview) in real deployments.

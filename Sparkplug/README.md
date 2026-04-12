@@ -2,15 +2,34 @@
 
 ![Sparkplug Protocol Stack](https://realtimelogic.com/GZ/images/SparkplugStack.svg)
 
+## Overview
 
 This document details the Lua library for the Sparkplug 3.0 MQTT client.
-
-## Overview
 
 The Sparkplug client is a Lua library designed to facilitate communication with an MQTT Server as per the [Sparkplug 3.0 Specification](https://sparkplug.eclipse.org/specification/version/3.0/documents/sparkplug-specification-3.0.0.pdf). It primarily functions as an MQTT Edge of Network (EoN) Node.
 
 The [Sparkplug client library's source code](https://github.com/RealTimeLogic/BAS-Resources/blob/main/src/sparkplug/SparkplugB.lua) is included in the [Mako Server](https://makoserver.net/) and [Xedge](https://realtimelogic.com/ba/doc/?url=Xedge.html)
 
+## Files
+
+- `EoN/.preload` - Example Edge of Network node using the Sparkplug client library.
+- `SparkplugExplorer/.preload` - Console-based Sparkplug Explorer that listens for Sparkplug traffic.
+- `doc/wfm-sparkplug-modules.png` - Supporting image asset.
+
+## How to run
+
+### The Sparkplug Explorer
+
+The Sparkplug Explorer is an easy-to-use tool that monitors and displays incoming Sparkplug messages directly in the console. The MQTT settings are at the beginning of [`SparkplugExplorer/.preload`](SparkplugExplorer/.preload); adjust them as needed.
+
+```bash
+cd Sparkplug
+mako -l::SparkplugExplorer
+```
+
+For more detail on starting the Mako Server, see the [command line video tutorial](https://youtu.be/vwQ52ZC5RRg) and the [command line options documentation](https://realtimelogic.com/ba/doc/?url=Mako.html#loadapp).
+
+## How it works
 
 ### What is MQTT Sparkplug
 
@@ -45,14 +64,14 @@ Sparkplug uses specific types of messages for establishing and maintaining the s
 
 In addition to these life-cycle messages, Sparkplug maintains a continuous flow of operational data through "DATA" messages. These messages keep the network informed and updated, bridging the gap between the initial "BIRTH" and eventual "DEATH" messages.
 
-## Sparkplug Client Features
+### Sparkplug Client Features
 
 - **Publish Birth Certificates (NBIRTH):** Allows the node to publish its own birth certificates.
 - **Node Data Messages (NDATA):** Supports publishing of node data messages.
 - **Process Node Command Messages (NCMD):** Can process command messages from Sparkplug Primary Applications.
 - **API for Device Applications:** Enables MQTT device applications to publish device-specific messages such as birth (DBIRTH), data (DDATA), and death certificates (DDEATH), and to receive device command messages (DCMD).
 
-## Usage Instructions
+### Usage Instructions
 
 ### Creating and Configuring a New Sparkplug Client
 
@@ -348,7 +367,7 @@ end)
 });
 ```
 
-## Complete Example
+### Complete Example
 
 
 ```lua
@@ -435,14 +454,8 @@ end)
 ```
 
 
-## The Sparkplug Explorer
+## Notes / Troubleshooting
 
-The Sparkplug Explorer, an easy to use tool, monitors and displays incoming Sparkplug messages directly in the console. You'll find the MQTT settings at the beginning of the [.preload](SparkplugExplorer/.preload) script. Please modify these settings to suit your specific needs.
-
-```
-cd Sparkplug
-mako -l::SparkplugExplorer
-```
-
-For detailed instructions on starting the Mako Server, check out our [command line video tutorial](https://youtu.be/vwQ52ZC5RRg) and review the server's [command line options](https://realtimelogic.com/ba/doc/?url=Mako.html#loadapp) in our documentation.
+- The Sparkplug client library itself is included with Mako Server and Xedge; this directory mainly provides examples and the explorer.
+- Update the broker credentials in the relevant `.preload` before connecting to your own MQTT infrastructure.
 

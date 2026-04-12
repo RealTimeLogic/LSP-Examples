@@ -1,20 +1,30 @@
 # File Upload
 
-The two examples blocking and asynchronous show how to upload data
-using drag and drop and standard file upload. The drag and drop upload
-is powered by JavaScript on the client side, and the standard upload
-uses an HTML form with the input type "file".
+## Overview
 
-The examples focus on uploading firmware, but can be used as a
-template for uploading any type of data.
+This directory contains two upload examples:
 
-The asynchronous upload example uses a more complex API and should
-only be used if a large number of concurrent uploads is required.
+- a blocking example that is easier to understand and simpler to integrate
+- an asynchronous example designed for handling a larger number of concurrent uploads
 
-Note that you may also consider using the ready to use [Web File Manager](https://realtimelogic.com/ba/doc/?url=lua.html#ba_create_wfs). You may test the Web File Manager using the [online tutorial](https://tutorial.realtimelogic.com/fs/).
+Both examples support drag-and-drop uploads from the browser and standard HTML form uploads. The sample UI focuses on firmware uploads, but the same patterns can be adapted for other file types.
 
-Navigate to one of the two sub-directories:
+## Files
 
-* [Blocking upload example](blocking/) - Easy
-* [Asynchronous upload example](asynchronous/) - Complex
+- [Blocking upload example](blocking/) - Simpler example built around blocking request APIs.
+- [Asynchronous upload example](asynchronous/) - More advanced example built around the asynchronous upload directory object.
 
+## How to run
+
+Open the README in either `blocking/` or `asynchronous/` and run that specific example.
+
+## How it works
+
+The blocking example uses direct request-handling APIs and is a good starting point for most projects. The asynchronous example uses a more complex object-based design that can support many concurrent uploads.
+
+You may also want to consider the ready-to-use [Web File Manager](https://realtimelogic.com/ba/doc/?url=lua.html#ba_create_wfs), which already includes upload support. You can test that interface in the [online tutorial](https://tutorial.realtimelogic.com/fs/).
+
+## Notes / Troubleshooting
+
+- Choose the blocking example first unless you specifically need high upload concurrency.
+- The subdirectory READMEs contain the actual startup commands and implementation details.

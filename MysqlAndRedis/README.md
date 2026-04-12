@@ -1,47 +1,63 @@
 # MySQL and Redis Drivers
 
-The subdirectory MySQL provides ready-to-use driver packages for **MySQL** and **Redis**, adapted from the OpenResty drivers. The MySQL package is based on [lua-resty-mysql](https://github.com/openresty/lua-resty-mysql), and the Redis package on [lua-resty-redis](https://github.com/openresty/lua-resty-redis). These drivers are exact copies, with an additional enhancement to the MySQL driver. Designed for Cosocket functionality, both drivers support the **Barracuda App Server (BAS)** and **OpenResty**, which facilitate Cosockets. However, they distinguish themselves in usage and the intricacies of their internal APIs. For BAS, Cosockets require encapsulation within a [ba.socket.event()](https://realtimelogic.com/ba/doc/en/lua/auxlua.html#ba_socket_event) function call. We provide supporting Lua code that effectively bridges the OpenResty and BAS API functionalities to accommodate this.
+## Overview
 
-For an understanding of Cosockets and the differences between OpenResty's Cosockets and BAS, see the following links:
+The `MySQL` subdirectory contains ready-to-use driver packages for **MySQL** and **Redis**, adapted from the OpenResty drivers. The MySQL package is based on [lua-resty-mysql](https://github.com/openresty/lua-resty-mysql), and the Redis package is based on [lua-resty-redis](https://github.com/openresty/lua-resty-redis).
+
+These drivers are intended for Cosocket-style use. BAS supports the same general model, but the execution environment differs from OpenResty, so this example includes compatibility code that bridges the OpenResty-style APIs to BAS socket behavior.
+
+Background reading:
 
 - [OpenResty Cosockets](https://api7.ai/learning-center/openresty/the-core-of-openresty-cosocket)
 - [BAS Cosockets](https://realtimelogic.com/ba/doc/en/lua/SockLib.html#cosocket)
 
 ## Files
 
-```
-|   .config - Config file designed for Xedge
-|   .preload - Package configuration logic
+- `MySQL/.config` and `MySQL/.preload` - Packaging and module-loading support for the driver bundle.
+- `MySQL/.lua/resty/mysql.lua` - OpenResty MySQL driver with the added BAS-specific persistent-connection helpers.
+- `MySQL/.lua/resty/redis.lua` - OpenResty Redis driver.
+- `MySQL/.lua/resty.lua`, `rsa.lua`, `sha256.lua`, `bit.lua` - Compatibility support modules.
+- `www/.preload` - Startup message for the example pages.
+- `www/MySQL.lsp` - MySQL test page.
+- `www/Redis.lsp` - Redis test page.
+
+The reusable package layout inside `MySQL/` is intentionally close to the original OpenResty structure:
+
+```text
+|   .config
+|   .preload
 |
 \---.lua
-    |   bit.lua - Lua 5.1 bit simulator
-    |   resty.lua - OpenResty API to BAS API
+    |   bit.lua
+    |   resty.lua
     |
     \---resty
-            mysql.lua - OpenResty driver with one add-on
-            redis.lua - OpenResty driver used as-is
-            rsa.lua - OpenResty API to BAS API
-            sha256.lua - OpenResty API to BAS API
+            mysql.lua
+            redis.lua
+            rsa.lua
+            sha256.lua
 ```
 
-We recommend packaging these files into a ready-to-run BAS zip file (deployed app) as follows:
+Keeping that structure intact makes `require "resty.mysql"` and `require "resty.redis"` work the way OpenResty developers expect, while the BAS compatibility layer handles the runtime differences underneath.
+
+## How to run
+
+If you want to package the reusable drivers into a BAS ZIP app, create the ZIP from the `MySQL` directory:
 
 ```bash
 cd MySQL
 zip -D -q -u -r -9 ../MySQL.zip .
 ```
 
-The above commands work on both Linux and Windows. The zip parameters ensure that the hidden files and directories are included. You may change the ZIP file name and remove the Redis or MySQL driver if the driver is not used.
+The hidden files and directories are intentionally included.
 
-## Example program
-
-The www directory includes two LSP programs that let you test the MySQL and Redis drivers. To test using the Mako server, start the server as follows:
+To run the example pages with Mako Server:
 
 ```bash
 mako -l::MySQL.zip -l::www
 ```
 
-Two LSP files are included within the www directory: one for the MySQL driver and another for the Redis driver. However, setting up MySQL and Redis environments is required before proceeding with the tests. The provided Linux command line instructions below are also compatible with WSL2 (Windows Subsystem for Linux).
+Before testing, start Redis and MySQL. The Linux commands below also work on WSL2:
 
 ```bash
 sudo apt install docker
@@ -50,15 +66,15 @@ docker run -d --name some-redis -p 6379:6379 redis
 docker run --name some-mysql -e MYSQL_DATABASE=world -e MYSQL_ROOT_PASSWORD=qwerty -p 3306:3306 -d mysql
 ```
 
-The command **sudo dockerd** is only required on WSL2, as Linux should run the docker daemon automatically. On WSL2, run this command in a separate WSL2 console window.
+On WSL2, `sudo dockerd` must run in a separate WSL2 console. On most Linux systems, the Docker daemon already runs as a service.
 
-We need to create a table in the **world** database for the MySQL test. Start the MySQL command line client as follows:
+Create the sample table for the MySQL test:
 
 ```bash
 mysql -h 127.0.0.1 -u root -p
 ```
 
-After starting the client, paste in the following commands:
+Then execute:
 
 ```sql
 USE world;
@@ -81,25 +97,42 @@ insert into Persons (
 VALUES(1,"Bond","James"," Old Bond Street","London");
 ```
 
-You are now ready to run the two LSP examples; navigate to:
+Then open:
 
-- http://localhost:portno/MySQL.lsp
-- http://localhost:portno/Redis.lsp
+- `http://localhost:portno/MySQL.lsp`
+- `http://localhost:portno/Redis.lsp`
 
-**Note:** if you use WSL2, the Mako Server must also run on WSL2. It's possible to run the Mako Server on Windows, but you would need to set up a proxy using the netsh command. When using WSL2, you can use your browser on Windows, but do not navigate to localhost; navigate to the WSL2 IP address, which can be found by running the ipconfig command.
+If you use WSL2, the Mako Server should also run inside WSL2. It is possible to run Mako on Windows and proxy into WSL2, but that adds extra setup. When the server runs inside WSL2, use the WSL2 IP address in the browser rather than `localhost`.
 
-## Using the Database Drivers
+## How it works
 
-### Sockets in the Barracuda App server
+The example LSP pages show both execution styles:
 
-Sockets within BAS operate in a blocking mode by default. Consequently, the drivers will use blocking socket calls unless they are encapsulated within a [ba.socket.event()](https://realtimelogic.com/ba/doc/en/lua/auxlua.html#ba_socket_event) call. It is important to note that blocking sockets should only be used within an LSP ([Lua Server Page](https://realtimelogic.com/ba/doc/en/GettingStarted.html#LSPAndCSP)). The two LSP examples provided demonstrate the correct usage of blocking sockets. For any other cases, as previously discussed, it is imperative to wrap your code with a `ba.socket.event()` call, transforming the code execution into a non-blocking Cosocket operation.
+- direct blocking socket use inside an LSP page
+- OpenResty-style cosocket use wrapped in `ba.socket.event(...)`
 
-### MySQL Persistent Database Connection Example
+`MySQL.lsp` opens a connection, queries the `Persons` table, prints the result, then runs the same test again through `ba.socket.event(...)`. `Redis.lsp` performs a similar pattern with basic set/get operations plus a pipeline example.
 
-The MySQL driver features an enhancement that facilitates the use of a persistent database Cosocket connection, offering a more efficient and streamlined approach. Below is an example illustrating how to leverage this API:
+That side-by-side structure is useful because the examples show that the driver API itself does not need to change much when you move from blocking LSP execution to the BAS cosocket model.
+
+The Redis page is especially useful for checking the OpenResty compatibility layer because it exercises:
+
+- normal `connect`, `set`, and `get` calls
+- the `ngx.null` compatibility behavior
+- pipelined commands with `init_pipeline()` and `commit_pipeline()`
+
+The MySQL driver also includes two BAS-specific helper methods:
+
+- `db:async(config, callback)` - Starts a persistent asynchronous database connection and optionally retries through the callback.
+- `db:execute(function)` - Queues work to run inside the database cosocket environment.
+
+That persistent-connection logic is implemented near the end of `MySQL/.lua/resty/mysql.lua`.
+
+### Persistent MySQL connection example
+
+The added API makes it possible to keep one database cosocket alive and queue work onto it:
 
 ```lua
-
 local mysql = require"resty.mysql"
 local db,err = mysql:new()
 if not db then
@@ -107,76 +140,60 @@ if not db then
    return
 end
 
--- Flag to control the running state; remains true until 'onunload' is executed
 local running = true
-
--- Configuration settings for the database connection
 local cfg = {
    host = "localhost",
-   port = 3306, -- Default MySQL port number
-   database = "world", -- Name of the database
-   user = "root", -- Database username
-   password = "qwerty" -- Database password
+   port = 3306,
+   database = "world",
+   user = "root",
+   password = "qwerty"
 }
 
--- Callback function for handling the database connection response
 local function cb(ok, err, errno, sqlstate)
-   -- Log the connection status
    trace("Connect", ok, err, errno, sqlstate)
-   -- Continue attempting to connect until 'onunload' is called
    return running
 end
 
--- Initiates a persistent asynchronous connection to the database with
--- the provided configuration and callback
 db:async(cfg, cb)
 
--- Execute a query within the DB cosocket
 db:execute(function()
-   -- Perform a query to select the first 50 rows from the 'Persons'
-   -- table, ordered by 'PersonID'
    local res, err, errno, sqlstate =
       db:query("select * from Persons order by PersonID limit 50")
-   -- Check if the query was unsuccessful
    if not res then
-      -- Log the error details
       trace("bad result #1: ", err, ": ", errno, ": ", sqlstate, ".")
       return
    end
-
-   -- Iterate over each row in the query result
    for _, row in ipairs(res) do
-      -- Print each column key and value for the row
       for k, v in pairs(row) do
          trace('>', k, v)
       end
    end
 end)
 
--- 'onunload' function to gracefully shut down the database connection
 function onunload()
-   -- Update the running state to false to stop the connection attempts
    running = false
    db:close()
 end
 ```
 
-### MySQL Persistent Database Connection API
+### Persistent API summary
 
-The two methods, db:async and db:execute, have been added to the MySQL driver. We recommend studying the implementation of this logic, found at the end of [mysql.lua](MySQL/.lua/resty/mysql.lua).
+- `db:async(config, callback)` starts the persistent connection flow.
+- `callback` receives the same connection results as `db:connect(config)`.
+- If the callback returns `true` after a failure, the code retries the connection.
+- `db:execute(function)` queues work to run inside the same database cosocket environment.
+- Calling `db:execute()` without a function returns the queued-operation count.
 
-**db:async(config, callback)**
+The recommendation from the original example still applies: study the implementation at the end of `MySQL/.lua/resty/mysql.lua` if you plan to use the persistent connection pattern in your own app.
 
-Initiate a persistent database connection.
+That part of the file is where the BAS-specific enhancements live, so it is the best place to compare the original OpenResty driver design with the additional persistent-connection support added for this example.
 
-Arguments:
-- config is the parameter passed into the method db:connect(config). See the [Redis MySQL Lua API](https://github.com/openresty/lua-resty-redis) for details.
-- callback is a function called when the database connection succeeds or fails. It receives the three arguments returned by db:connect(). If the connection fails, the function may return true to re-try the connection. The callback is also called if the persistent connection should break.
+## Notes / Troubleshooting
 
-**Db:execute([function])**
-
-Queue the execution of the provided function and run the function within the Cosocket environment. The function returns the number of queued functions. You may call this function without arguments if you need to know the number of queued operations.
-
-## Limitations
-
-The OpenResty compatibility layer is currently not implementing the connection pool; thus a socket added to the pool is simply closed.
+- BAS sockets are blocking by default. Outside LSP pages, wrap database work in [`ba.socket.event()`](https://realtimelogic.com/ba/doc/en/lua/auxlua.html#ba_socket_event) so the code runs in a cosocket environment.
+- The OpenResty compatibility layer does not implement connection pooling. A socket added to the pool is simply closed.
+- If you use WSL2, run the Mako Server there as well unless you also configure Windows-to-WSL proxying.
+- The ZIP packaging command intentionally includes hidden files and directories, which is important because BAS apps depend on `.config`, `.preload`, and `.lua` resources.
+- The example pages are intentionally conservative and local-first. They are there to validate driver behavior and BAS compatibility, not to provide a production database abstraction layer.
+- If your own application only needs Redis or only needs MySQL, you can trim the packaged ZIP down to the parts you actually use, but keep the supporting compatibility files that the selected driver requires.
+- Review the packaged module paths carefully.
