@@ -39,18 +39,26 @@ Use these consolidated files as the primary references:
 - **Mako Server tutorials bundle (`tutorials.md`)**  
   https://makoserver.net/download/tutorials.md
 
+- **ESP32 API reference (`esp32api.md`)**  
+  http://realtimelogic.com/downloads/esp32api.md
+
+- **OPC UA API reference (`opcuaapi.md`)**  
+  http://realtimelogic.com/downloads/opcuaapi.md
+
 ### Protocols
 
 - SMQ JS client API: http://realtimelogic.com/downloads/basapi.md
 - SMQ broker API: http://realtimelogic.com/downloads/basapi.md
 - MQTT API: http://realtimelogic.com/downloads/basapi.md
 - Modbus API: http://realtimelogic.com/downloads/basapi.md
-- OPC UA API (index): http://realtimelogic.com/downloads/basapi.md
+- OPC UA API (index): http://realtimelogic.com/downloads/opcuaapi.md
 
 > Reference priority:
 > 1. `basapi.md` for API syntax, signatures, and behavior (source of truth)
 > 2. `tutorials.md` for architecture, patterns, examples, and security guidance
-> 3. If guidance conflicts with API details, trust `basapi.md`
+> 3. `esp32api.md` for ESP32-specific APIs and integration patterns
+> 4. `opcuaapi.md` for OPC UA-specific APIs and integration patterns
+> 5. If guidance conflicts with API details, trust `basapi.md`
 
 ## SMQ (Simple Message Queue)
 
@@ -132,3 +140,4 @@ It applies to:
 - Secure IoT gateways
 
 Any application-specific structure, UI framework, or project layout must be documented **separately**, and the AI must ask for this documentation, if needed.
+
