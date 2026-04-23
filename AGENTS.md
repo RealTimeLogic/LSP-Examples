@@ -31,27 +31,27 @@ The AI **must not invent APIs**. If something is unclear, the AI should consult 
 Use these consolidated files as the primary references:
 
 - **BAS documentation bundle (`basapi.md`)**  
-  http://realtimelogic.com/downloads/basapi.md
+  https://realtimelogic.com/downloads/basapi.md
 
 - **BAS tutorials bundle (`tutorials.md`)**  
-  http://realtimelogic.com/downloads/tutorials.md
+  https://realtimelogic.com/downloads/tutorials.md
 
 - **Mako Server tutorials bundle (`tutorials.md`)**  
   https://makoserver.net/download/tutorials.md
 
 - **ESP32 API reference (`esp32api.md`)**  
-  http://realtimelogic.com/downloads/esp32api.md
+  https://realtimelogic.com/downloads/esp32api.md
 
 - **OPC UA API reference (`opcuaapi.md`)**  
-  http://realtimelogic.com/downloads/opcuaapi.md
+  https://realtimelogic.com/downloads/opcuaapi.md
 
 ### Protocols
 
-- SMQ JS client API: http://realtimelogic.com/downloads/basapi.md
-- SMQ broker API: http://realtimelogic.com/downloads/basapi.md
-- MQTT API: http://realtimelogic.com/downloads/basapi.md
-- Modbus API: http://realtimelogic.com/downloads/basapi.md
-- OPC UA API (index): http://realtimelogic.com/downloads/opcuaapi.md
+- SMQ JS client API: https://realtimelogic.com/downloads/basapi.md
+- SMQ broker API: https://realtimelogic.com/downloads/basapi.md
+- MQTT API: https://realtimelogic.com/downloads/basapi.md
+- Modbus API: https://realtimelogic.com/downloads/basapi.md
+- OPC UA API (index): https://realtimelogic.com/downloads/opcuaapi.md
 
 > Reference priority:
 > 1. `basapi.md` for API syntax, signatures, and behavior (source of truth)
@@ -67,10 +67,10 @@ SMQ is the built-in publish/subscribe messaging system used by the Barracuda App
 ### Official SMQ documentation
 
 - **SMQ JavaScript API (client-side)**  
-  http://realtimelogic.com/downloads/basapi.md
+  https://realtimelogic.com/downloads/basapi.md
 
 - **SMQ Lua API (server-side broker and publishers)**  
-  http://realtimelogic.com/downloads/basapi.md
+  https://realtimelogic.com/downloads/basapi.md
 
 ### SMQ publish signatures (Lua)
 
@@ -118,8 +118,8 @@ The Barracuda App Server provides built-in primitives for these tasks; external 
 
 When asking an AI to generate code:
 
-- Always reference `http://realtimelogic.com/downloads/basapi.md`
-- For architecture/security/best-practice questions, also reference `http://realtimelogic.com/downloads/tutorials.md`
+- Always reference `https://realtimelogic.com/downloads/basapi.md`
+- For architecture/security/best-practice questions, also reference `https://realtimelogic.com/downloads/tutorials.md`
 - Specify whether the code targets:
   - Embedded RTOS environments
   - Embedded Linux
