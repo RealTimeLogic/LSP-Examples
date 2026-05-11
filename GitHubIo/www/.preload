@@ -3,10 +3,10 @@ mako.createloader(io)
 error"Oops, you forgot to edit www/.preload: Add your GIT repo details below and delete this code line"
 
 local ghio = require"GitHubIo".create{
-   owner  = "REPO-OWNER",
-   repo   = "REPO-NAME",
-   token  = "GITHUB-TOKEN",
-   branch = "main",
+   owner  = "REPO-OWNER", -- e.g. RealTimeLogic
+   repo   = "REPO-NAME", -- e,g, LSP-Examples
+   token  = "GITHUB-TOKEN", -- Required for write access, but not for read if repo is public
+   branch = "master", -- typically master or main
    log=function(url,code,message) trace(url,code,message) end,
    mtime=os.time()
 }

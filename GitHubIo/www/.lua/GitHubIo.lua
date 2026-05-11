@@ -6,6 +6,7 @@ local mtime=1759270202
 local json,sfind = ba.json,string.find
 local dirMeta={ mtime = mtime, size = 0, isdir = true }
 local function strip(path) return path:gsub("^/",""):gsub("/+$","") end
+local ua="BAS-LuaIo/1.4"
 
 local function readAPI(buf)
    local offset = 0
@@ -33,7 +34,7 @@ end
 
 local function create(op)
    local mtime = "number" == type(op.mtime) and op.mtime or mtime
-   assert(op and op.owner and op.repo and op.token, "owner/repo/token required")
+   assert(op and op.owner and op.repo, "owner/repo required")
    local log=op.log and ("function" == type(op.log) and
 			 op.log or function(u,c,m) tracep(false,1,"GitHubIo:",u,c,m) end)
       or function() end
@@ -71,9 +72,9 @@ local function create(op)
    local function ghReq(method, url, hdr, bodyStr, query)
       local httpc = hCreate()
       local header = {
-	 ["Authorization"] = "Bearer " .. op.token,
+	 ["Authorization"] = op.token and "Bearer " .. op.token,
 	 ["Accept"]	   = "application/vnd.github+json",
-	 ["User-Agent"]	   = "BAS-LuaIo/1.3",
+	 ["User-Agent"]	   = ua,
       }
       if hdr then for k,v in pairs(hdr) do header[k] = v end end
       local req = { url = url, method = method, header = header }
@@ -103,9 +104,9 @@ local function create(op)
 	 url	= urlFor(path),
 	 method = "GET",
 	 header = {
-	    ["Authorization"] = "Bearer " .. op.token,
-	    ["Accept"]	      = "application/vnd.github.raw",
-	    ["User-Agent"]    = "BAS-LuaIo/1.3",
+	    ["Authorization"] = op.token and "Bearer " .. op.token,
+	    ["Accept"]	      = "application/vnd.github.raw+json",
+	    ["User-Agent"]    = ua,
 	 },
 	 query	= ref and { ref = ref } or nil,
       }
@@ -123,9 +124,9 @@ local function create(op)
 	 url	= api .. "/repos/" .. op.owner .. "/" .. op.repo .. "/git/blobs/" .. sha,
 	 method = "GET",
 	 header = {
-	    ["Authorization"] = "Bearer " .. op.token,
-	    ["Accept"]	      = "application/vnd.github.raw",
-	    ["User-Agent"]    = "BAS-LuaIo/1.3",
+	    ["Authorization"] = op.token and "Bearer " .. op.token,
+	    ["Accept"]	      = "application/vnd.github.raw+json",
+	    ["User-Agent"]    = ua,
 	 }
       }
       if not ok then return nil, "noaccess" end

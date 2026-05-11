@@ -59,12 +59,12 @@ The example startup script creates the driver with:
 
 ```lua
 local ghio = require"GitHubIo".create{
-   owner  = "RealTimeLogic",
-   repo   = "GitHubIoTest",
-   token  = "github_pat_xxxxx",
-   branch = "main",
-   log=function(url,code,message) trace(url,code,message) end,
-   mtime=os.time()
+   owner  = "RealTimeLogic", -- required
+   repo   = "GitHubIoTest", -- required
+   token  = "github_pat_xxxxx", -- optional
+   branch = "main", -- optional
+   log=function(url,code,message) trace(url,code,message) end, -- optional
+   mtime=os.time()  -- optional
 }
 ```
 
@@ -86,11 +86,10 @@ GitHub username or organization name that owns the repository.
 
 Repository name.
 
-#### `token` `(string, required)`
+#### `token` `(string, optional)`
 
-GitHub Personal Access Token used for authentication.
+The GitHub Personal Access Token, used for authentication, is required for private repositories and write access. You do not need to set this token if you are accessing a public repository in read-only mode.
 
-The original example text assumed a PAT with repository access only, which is still the recommended way to test the driver safely.
 
 #### `branch` `(string, optional)`
 
