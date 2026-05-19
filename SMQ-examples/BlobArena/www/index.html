@@ -1,0 +1,766 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SMQ Blob Arena</title>
+  <script src="/rtl/smq.js"></script>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #101417;
+      --panel: rgba(20, 26, 31, 0.86);
+      --line: rgba(255, 255, 255, 0.14);
+      --text: #edf3f5;
+      --muted: #9fb1b7;
+      --accent: #6ee7b7;
+      --warn: #f59e0b;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    canvas {
+      display: block;
+      width: 100vw;
+      height: 100vh;
+      background: #12191c;
+    }
+
+    .hud {
+      position: fixed;
+      inset: 14px 14px auto 14px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 10px;
+      pointer-events: none;
+      align-items: start;
+    }
+
+    .panel {
+      min-width: 0;
+      width: fit-content;
+      max-width: min(520px, calc(100vw - 28px));
+      padding: 10px 12px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.22);
+      backdrop-filter: blur(10px);
+    }
+
+    .stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    .stats strong {
+      font-size: 16px;
+    }
+
+    .status {
+      justify-self: end;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .status .dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      margin-right: 6px;
+      border-radius: 50%;
+      background: var(--warn);
+    }
+
+    .status.connected .dot {
+      background: var(--accent);
+    }
+
+    .overlay {
+      position: fixed;
+      inset: 0;
+      display: none;
+      place-items: center;
+      pointer-events: none;
+      background: rgba(8, 12, 14, 0.28);
+    }
+
+    .overlay.visible {
+      display: grid;
+    }
+
+    .message {
+      width: min(380px, calc(100vw - 32px));
+      padding: 18px;
+      text-align: center;
+      background: rgba(18, 24, 28, 0.92);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.36);
+    }
+
+    .message h1 {
+      margin: 0 0 8px;
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: 0;
+    }
+
+    .message p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .name-form {
+      position: fixed;
+      left: 14px;
+      bottom: 14px;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      padding: 10px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      backdrop-filter: blur(10px);
+    }
+
+    .name-form input {
+      width: min(220px, calc(100vw - 112px));
+      height: 34px;
+      padding: 0 10px;
+      color: var(--text);
+      background: #172126;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      outline: none;
+      font: inherit;
+    }
+
+    .name-form input:focus {
+      border-color: var(--accent);
+    }
+
+    .name-form button {
+      height: 34px;
+      padding: 0 12px;
+      color: #07110d;
+      background: var(--accent);
+      border: 0;
+      border-radius: 6px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    @media (max-width: 640px) {
+      .hud {
+        grid-template-columns: 1fr;
+      }
+
+      .status {
+        justify-self: start;
+      }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="game"></canvas>
+
+  <div class="hud">
+    <div class="panel stats">
+      <span><strong id="score">0</strong> score</span>
+      <span><strong id="size">18</strong> size</span>
+      <span><strong id="players">1</strong> players</span>
+    </div>
+    <div id="status" class="panel status"><span class="dot"></span><span id="statusText">Connecting</span></div>
+  </div>
+
+  <form id="nameForm" class="name-form" autocomplete="off">
+    <input id="nameInput" maxlength="18" aria-label="Player name">
+    <button type="submit">Set</button>
+  </form>
+
+  <div id="overlay" class="overlay">
+    <div class="message">
+      <h1 id="overlayTitle">Respawning</h1>
+      <p id="overlayText">Finding a clear spot in the arena.</p>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      "use strict";
+
+      var STATE_TOPIC = "/game/state";
+      var EATEN_SUBTOPIC = "eaten";
+      var ARENA = { width: 1800, height: 1200 };
+      var BASE_RADIUS = 18;
+      var MAX_RADIUS = 76;
+      var MOVE_SPEED = 330;
+      var STATE_INTERVAL = 80;
+      var STALE_AFTER = 2200;
+      var EAT_COOLDOWN = 1200;
+      var RESPAWN_MS = 1400;
+      var GRID_SIZE = 48;
+      var FOOD_COUNT = 85;
+      var FOOD_RADIUS = 5;
+      var FOOD_GROWTH = 18;
+
+      var canvas = document.getElementById("game");
+      var ctx = canvas.getContext("2d");
+      var scoreEl = document.getElementById("score");
+      var sizeEl = document.getElementById("size");
+      var playersEl = document.getElementById("players");
+      var statusEl = document.getElementById("status");
+      var statusText = document.getElementById("statusText");
+      var overlay = document.getElementById("overlay");
+      var overlayTitle = document.getElementById("overlayTitle");
+      var overlayText = document.getElementById("overlayText");
+      var nameForm = document.getElementById("nameForm");
+      var nameInput = document.getElementById("nameInput");
+
+      var dpr = 1;
+      var view = { width: 0, height: 0 };
+      var mouse = { x: 0, y: 0, active: false };
+      var keys = Object.create(null);
+      var peers = Object.create(null);
+      var observed = Object.create(null);
+      var lastEatSent = Object.create(null);
+      var food = [];
+      var connected = false;
+      var smq = null;
+      var lastFrame = performance.now();
+      var lastStateSent = 0;
+      var sequence = 0;
+
+      var palette = ["#6ee7b7", "#38bdf8", "#f472b6", "#facc15", "#fb7185", "#a3e635", "#c084fc", "#f97316"];
+      var local = {
+        x: 0,
+        y: 0,
+        radius: BASE_RADIUS,
+        color: palette[Math.floor(Math.random() * palette.length)],
+        score: 0,
+        name: localStorage.getItem("smqBlobName") || "Player " + Math.floor(100 + Math.random() * 900),
+        respawningUntil: 0
+      };
+
+      nameInput.value = local.name;
+      randomSpawn();
+      createFood();
+      resize();
+
+      window.addEventListener("resize", resize);
+      window.addEventListener("keydown", function (event) {
+        keys[event.key.toLowerCase()] = true;
+      });
+      window.addEventListener("keyup", function (event) {
+        keys[event.key.toLowerCase()] = false;
+      });
+      canvas.addEventListener("pointerdown", function (event) {
+        mouse.active = true;
+        setMouseTarget(event);
+      });
+      canvas.addEventListener("pointermove", setMouseTarget);
+      canvas.addEventListener("pointerleave", function () {
+        mouse.active = false;
+      });
+      nameForm.addEventListener("submit", function (event) {
+        event.preventDefault();
+        var value = nameInput.value.trim().slice(0, 18);
+        local.name = value || local.name;
+        nameInput.value = local.name;
+        localStorage.setItem("smqBlobName", local.name);
+        publishState(true);
+      });
+
+      connect();
+      requestAnimationFrame(frame);
+
+      function connect() {
+        if (!window.SMQ) {
+          setStatus(false, "Missing /rtl/smq.js");
+          return;
+        }
+
+        smq = SMQ.Client(SMQ.wsURL("/smq.lsp"));
+
+        smq.onconnect = function () {
+          connected = true;
+          setStatus(true, "Connected");
+          subscribe();
+          publishState(true);
+        };
+
+        smq.onreconnect = function () {
+          connected = true;
+          observed = Object.create(null);
+          setStatus(true, "Reconnected");
+          subscribe();
+          publishState(true);
+        };
+
+        smq.onclose = function (message, canreconnect) {
+          connected = false;
+          setStatus(false, message || "Disconnected");
+          return canreconnect ? 1000 : null;
+        };
+
+        smq.onmsg = function (data, ptid) {
+          console.warn("Unhandled SMQ message", ptid, data);
+        };
+      }
+
+      function subscribe() {
+        smq.subscribe(STATE_TOPIC, {
+          datatype: "json",
+          onmsg: onStateMessage
+        });
+
+        smq.subscribe("self", EATEN_SUBTOPIC, {
+          datatype: "json",
+          onmsg: onEatenMessage
+        });
+      }
+
+      function onStateMessage(message, ptid) {
+        if (!ptid || ptid === smq.gettid()) {
+          return;
+        }
+
+        var peer = peers[ptid];
+        if (!peer) {
+          peer = peers[ptid] = {
+            id: ptid,
+            x: validNumber(message.x, ARENA.width / 2),
+            y: validNumber(message.y, ARENA.height / 2),
+            tx: validNumber(message.x, ARENA.width / 2),
+            ty: validNumber(message.y, ARENA.height / 2),
+            radius: BASE_RADIUS,
+            targetRadius: BASE_RADIUS,
+            color: "#94a3b8",
+            score: 0,
+            name: "Player",
+            lastSeen: performance.now()
+          };
+        }
+
+        peer.tx = clamp(validNumber(message.x, peer.tx), 0, ARENA.width);
+        peer.ty = clamp(validNumber(message.y, peer.ty), 0, ARENA.height);
+        peer.targetRadius = clamp(validNumber(message.radius, BASE_RADIUS), 8, MAX_RADIUS);
+        peer.color = typeof message.color === "string" ? message.color : peer.color;
+        peer.score = Math.max(0, validNumber(message.score, 0));
+        peer.name = typeof message.name === "string" ? message.name.slice(0, 18) : peer.name;
+        peer.lastSeen = performance.now();
+
+        observePeer(ptid);
+      }
+
+      function onEatenMessage(message, ptid) {
+        var eater = message && (message.byName || message.by || ptid);
+        resetPlayer();
+        overlayTitle.textContent = "You were eaten";
+        overlayText.textContent = eater ? "Consumed by " + eater + ". Respawning now." : "Respawning now.";
+        overlay.classList.add("visible");
+        window.setTimeout(function () {
+          if (performance.now() >= local.respawningUntil) {
+            overlay.classList.remove("visible");
+          }
+        }, RESPAWN_MS);
+      }
+
+      function observePeer(ptid) {
+        if (observed[ptid]) {
+          return;
+        }
+        observed[ptid] = true;
+        smq.observe(ptid, function (subscribers, topic) {
+          if (subscribers === 0) {
+            delete peers[topic];
+            delete observed[topic];
+            delete lastEatSent[topic];
+          }
+        });
+      }
+
+      function frame(now) {
+        var dt = Math.min(0.033, (now - lastFrame) / 1000 || 0.016);
+        lastFrame = now;
+
+        update(dt, now);
+        draw(now);
+        requestAnimationFrame(frame);
+      }
+
+      function update(dt, now) {
+        updateLocal(dt, now);
+        checkFood();
+        updatePeers(dt, now);
+        checkEating(now);
+
+        if (connected && now - lastStateSent >= STATE_INTERVAL) {
+          publishState(false);
+        }
+
+        scoreEl.textContent = String(Math.round(local.score));
+        sizeEl.textContent = String(Math.round(local.radius));
+        playersEl.textContent = String(Object.keys(peers).length + 1);
+      }
+
+      function updateLocal(dt, now) {
+        if (now < local.respawningUntil) {
+          return;
+        }
+
+        var vx = 0;
+        var vy = 0;
+        if (keys.arrowleft || keys.a) vx -= 1;
+        if (keys.arrowright || keys.d) vx += 1;
+        if (keys.arrowup || keys.w) vy -= 1;
+        if (keys.arrowdown || keys.s) vy += 1;
+
+        if (vx || vy) {
+          var len = Math.hypot(vx, vy) || 1;
+          local.x += (vx / len) * MOVE_SPEED * dt;
+          local.y += (vy / len) * MOVE_SPEED * dt;
+          mouse.active = false;
+        } else if (mouse.active) {
+          var target = screenToWorld(mouse.x, mouse.y);
+          var dx = target.x - local.x;
+          var dy = target.y - local.y;
+          var dist = Math.hypot(dx, dy);
+          if (dist > 3) {
+            var speed = Math.min(MOVE_SPEED, dist / Math.max(dt, 0.001));
+            local.x += (dx / dist) * speed * dt;
+            local.y += (dy / dist) * speed * dt;
+          }
+        }
+
+        local.x = clamp(local.x, local.radius, ARENA.width - local.radius);
+        local.y = clamp(local.y, local.radius, ARENA.height - local.radius);
+      }
+
+      function updatePeers(dt, now) {
+        Object.keys(peers).forEach(function (id) {
+          var peer = peers[id];
+          if (now - peer.lastSeen > STALE_AFTER) {
+            delete peers[id];
+            delete observed[id];
+            delete lastEatSent[id];
+            return;
+          }
+
+          var ease = 1 - Math.pow(0.001, dt);
+          peer.x += (peer.tx - peer.x) * ease;
+          peer.y += (peer.ty - peer.y) * ease;
+          peer.radius += (peer.targetRadius - peer.radius) * ease;
+        });
+      }
+
+      function checkEating(now) {
+        if (!connected || now < local.respawningUntil) {
+          return;
+        }
+
+        Object.keys(peers).forEach(function (id) {
+          var peer = peers[id];
+          if (!canEat(peer)) {
+            return;
+          }
+
+          var dist = Math.hypot(local.x - peer.x, local.y - peer.y);
+          if (dist > local.radius + peer.radius) {
+            return;
+          }
+
+          if (lastEatSent[id] && now - lastEatSent[id] < EAT_COOLDOWN) {
+            return;
+          }
+
+          lastEatSent[id] = now;
+          local.score += Math.max(1, Math.round(peer.radius));
+          local.radius = Math.min(MAX_RADIUS, Math.sqrt(local.radius * local.radius + peer.radius * peer.radius * 0.35));
+          smq.pubjson({
+            type: "eaten",
+            by: smq.gettid(),
+            byName: local.name,
+            at: Date.now()
+          }, Number(id), EATEN_SUBTOPIC);
+          publishState(true);
+        });
+      }
+
+      function checkFood() {
+        for (var i = food.length - 1; i >= 0; i -= 1) {
+          var pellet = food[i];
+          var dist = Math.hypot(local.x - pellet.x, local.y - pellet.y);
+          if (dist <= local.radius + pellet.r) {
+            food.splice(i, 1);
+            local.score += 1;
+            local.radius = Math.min(MAX_RADIUS, Math.sqrt(local.radius * local.radius + FOOD_GROWTH));
+            food.push(makeFood());
+            publishState(true);
+          }
+        }
+      }
+
+      function publishState(force) {
+        if (!connected || !smq) {
+          return;
+        }
+        var now = performance.now();
+        if (!force && now - lastStateSent < STATE_INTERVAL) {
+          return;
+        }
+        lastStateSent = now;
+        smq.pubjson({
+          x: Math.round(local.x * 10) / 10,
+          y: Math.round(local.y * 10) / 10,
+          radius: Math.round(local.radius * 10) / 10,
+          color: local.color,
+          score: Math.round(local.score),
+          name: local.name,
+          timestamp: Date.now(),
+          seq: ++sequence,
+          respawning: now < local.respawningUntil
+        }, STATE_TOPIC);
+      }
+
+      function resetPlayer() {
+        local.radius = BASE_RADIUS;
+        local.score = 0;
+        local.respawningUntil = performance.now() + RESPAWN_MS;
+        randomSpawn();
+        publishState(true);
+      }
+
+      function randomSpawn() {
+        local.x = ARENA.width * 0.25 + Math.random() * ARENA.width * 0.5;
+        local.y = ARENA.height * 0.25 + Math.random() * ARENA.height * 0.5;
+      }
+
+      function createFood() {
+        food = [];
+        for (var i = 0; i < FOOD_COUNT; i += 1) {
+          food.push(makeFood());
+        }
+      }
+
+      function makeFood() {
+        return {
+          x: 24 + Math.random() * (ARENA.width - 48),
+          y: 24 + Math.random() * (ARENA.height - 48),
+          r: FOOD_RADIUS + Math.random() * 2,
+          color: palette[Math.floor(Math.random() * palette.length)]
+        };
+      }
+
+      function draw(now) {
+        ctx.clearRect(0, 0, view.width, view.height);
+
+        var cam = camera();
+        drawArena(cam);
+        drawFood(cam);
+
+        Object.keys(peers).forEach(function (id) {
+          drawBlob(peers[id], cam, false);
+        });
+
+        drawBlob(local, cam, true, now);
+        drawMinimap();
+      }
+
+      function drawArena(cam) {
+        ctx.save();
+        ctx.translate(-cam.x, -cam.y);
+
+        ctx.fillStyle = "#12191c";
+        ctx.fillRect(cam.x, cam.y, view.width, view.height);
+
+        ctx.strokeStyle = "rgba(255,255,255,0.07)";
+        ctx.lineWidth = 1;
+        var grid = GRID_SIZE;
+        var startX = Math.floor(cam.x / grid) * grid;
+        var endX = cam.x + view.width + grid;
+        var startY = Math.floor(cam.y / grid) * grid;
+        var endY = cam.y + view.height + grid;
+
+        for (var x = startX; x <= endX; x += grid) {
+          ctx.beginPath();
+          ctx.moveTo(x, cam.y);
+          ctx.lineTo(x, cam.y + view.height);
+          ctx.stroke();
+        }
+
+        for (var y = startY; y <= endY; y += grid) {
+          ctx.beginPath();
+          ctx.moveTo(cam.x, y);
+          ctx.lineTo(cam.x + view.width, y);
+          ctx.stroke();
+        }
+
+        ctx.strokeStyle = "rgba(255,255,255,0.28)";
+        ctx.lineWidth = 4;
+        ctx.strokeRect(0, 0, ARENA.width, ARENA.height);
+        ctx.restore();
+      }
+
+      function drawFood(cam) {
+        ctx.save();
+        ctx.translate(-cam.x, -cam.y);
+        food.forEach(function (pellet) {
+          ctx.fillStyle = pellet.color;
+          ctx.beginPath();
+          ctx.arc(pellet.x, pellet.y, pellet.r, 0, Math.PI * 2);
+          ctx.fill();
+        });
+        ctx.restore();
+      }
+
+      function drawBlob(blob, cam, isLocal, now) {
+        var alpha = 1;
+        if (isLocal && now < local.respawningUntil) {
+          alpha = 0.35 + Math.sin(now / 90) * 0.16;
+        }
+
+        var x = blob.x - cam.x;
+        var y = blob.y - cam.y;
+
+        ctx.save();
+        ctx.globalAlpha = alpha;
+        ctx.shadowColor = blob.color;
+        ctx.shadowBlur = isLocal ? 18 : 10;
+        ctx.fillStyle = blob.color;
+        ctx.beginPath();
+        ctx.arc(x, y, blob.radius, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.shadowBlur = 0;
+        ctx.lineWidth = isLocal ? 3 : 2;
+        ctx.strokeStyle = isLocal ? "rgba(255,255,255,0.85)" : "rgba(255,255,255,0.45)";
+        ctx.stroke();
+
+        if (!isLocal && canEat(blob)) {
+          ctx.strokeStyle = "rgba(110, 231, 183, 0.85)";
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.arc(x, y, blob.radius + 5, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+
+        ctx.fillStyle = "#f8fafc";
+        ctx.font = "700 13px Arial, Helvetica, sans-serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(blob.name || "Player", x, y);
+        ctx.restore();
+      }
+
+      function drawMinimap() {
+        var w = 150;
+        var h = 100;
+        var pad = 14;
+        var x = view.width - w - pad;
+        var y = view.height - h - pad;
+
+        ctx.save();
+        ctx.fillStyle = "rgba(20, 26, 31, 0.86)";
+        ctx.strokeStyle = "rgba(255,255,255,0.16)";
+        ctx.lineWidth = 1;
+        roundRect(x, y, w, h, 8);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = local.color;
+        ctx.beginPath();
+        ctx.arc(x + local.x / ARENA.width * w, y + local.y / ARENA.height * h, 4, 0, Math.PI * 2);
+        ctx.fill();
+
+        Object.keys(peers).forEach(function (id) {
+          var peer = peers[id];
+          ctx.fillStyle = canEat(peer) ? "#6ee7b7" : "#f59e0b";
+          ctx.beginPath();
+          ctx.arc(x + peer.x / ARENA.width * w, y + peer.y / ARENA.height * h, 3.5, 0, Math.PI * 2);
+          ctx.fill();
+        });
+
+        ctx.restore();
+      }
+
+      function roundRect(x, y, w, h, r) {
+        ctx.beginPath();
+        ctx.moveTo(x + r, y);
+        ctx.lineTo(x + w - r, y);
+        ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+        ctx.lineTo(x + w, y + h - r);
+        ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+        ctx.lineTo(x + r, y + h);
+        ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+        ctx.lineTo(x, y + r);
+        ctx.quadraticCurveTo(x, y, x + r, y);
+      }
+
+      function canEat(peer) {
+        return local.radius >= peer.radius + 4;
+      }
+
+      function camera() {
+        return {
+          x: clamp(local.x - view.width / 2, 0, Math.max(0, ARENA.width - view.width)),
+          y: clamp(local.y - view.height / 2, 0, Math.max(0, ARENA.height - view.height))
+        };
+      }
+
+      function screenToWorld(x, y) {
+        var cam = camera();
+        return { x: x + cam.x, y: y + cam.y };
+      }
+
+      function setMouseTarget(event) {
+        var rect = canvas.getBoundingClientRect();
+        mouse.x = event.clientX - rect.left;
+        mouse.y = event.clientY - rect.top;
+      }
+
+      function resize() {
+        dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+        view.width = window.innerWidth;
+        view.height = window.innerHeight;
+        canvas.width = Math.floor(view.width * dpr);
+        canvas.height = Math.floor(view.height * dpr);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+
+      function setStatus(isConnected, text) {
+        statusEl.classList.toggle("connected", isConnected);
+        statusText.textContent = text;
+      }
+
+      function validNumber(value, fallback) {
+        return typeof value === "number" && isFinite(value) ? value : fallback;
+      }
+
+      function clamp(value, min, max) {
+        return Math.max(min, Math.min(max, value));
+      }
+    }());
+  </script>
+</body>
+</html>

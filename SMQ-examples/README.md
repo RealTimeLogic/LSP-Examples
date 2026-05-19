@@ -16,6 +16,7 @@ This README is an index for the SMQ examples collected in this repository.
 - [Using Vue.js](https://github.com/RealTimeLogic/SMQ-LED-Vue.js) - Additional external example.
 - [Using Java](https://github.com/RealTimeLogic/JavaSMQ) - Additional external example.
 - [Using C Code](https://github.com/RealTimeLogic/SMQ) - Additional external example.
+- [Blob Arena Multiplayer Game](BlobArena/README.md) - SMQ Blob Arena is a small vibe coded multiplayer browser game
 
 ## How to run
 

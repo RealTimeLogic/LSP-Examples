@@ -1,0 +1,26 @@
+local hub = require"smq.hub"
+
+app.smq = hub
+app.broker = hub.create({
+   onconnect=function(tid, info, peer)
+      trace("SMQ client connected", tid, peer and peer.uid or "")
+   end,
+   onclose=function(tid, sock, peer, err)
+      trace("SMQ client closed", tid, err or "")
+   end,
+   log=function(sock, msg)
+      trace("SMQ", msg)
+   end
+})
+
+-- Called by smq.lsp. The broker morphs the current HTTP(S) request into
+-- a persistent SMQ connection and owns the socket after this call returns.
+function app.dispatch(cmd)
+   app.broker:connect(cmd.request or cmd)
+end
+
+function onunload()
+   if app.broker then
+      app.broker:shutdown("application reload")
+   end
+end
