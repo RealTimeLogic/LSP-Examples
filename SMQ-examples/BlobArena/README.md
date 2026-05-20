@@ -18,6 +18,13 @@ mako -l::www
 
 Once the server is running, open your browser and navigate to the local Mako Server instance.
 
+### Running the game on Xedge, such as [Xedge32](https://realtimelogic.com/downloads/bas/ESP32/).
+- Zip everything in the www directory, including the Xedge .config script; make sure to exclude the www directory name in the ZIP file.
+- Open the Xedge IDE, click the menu in the top right corner, and click App Upload
+- Drag and drop the ZIP file onto the App Uploader
+- Click Save without selecting unpacking
+- Navigate to the root URL (http://ip-address/) to play the game
+
 ## AI Prompt
 
 The following file contains the prompt used to generate the game:
