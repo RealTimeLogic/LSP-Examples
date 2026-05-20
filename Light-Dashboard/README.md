@@ -192,8 +192,9 @@ Default security headers, including the Content Security Policy, are defined in 
 This project is intentionally AI-friendly. It has been tested with Codex, but the same workflow can be used with other tools as long as you keep the variant boundaries clear:
 
 - say which variant you want changed
-- target `custom/` first for new work
-- port the same change to `www/` and `htmx/` only if you need parity
+- target the variant `custom/` first for new work
+
+This example comes with its [own AGENTS.md file](AGENTS.md). If you are new to AGENTS.md and using AI agents, see the instructions for the [Blob Arena Game -> Using an AI Agent](../SMQ-examples/BlobArena/README.md#using-an-ai-agent).
 
 ### Example AI prompts
 
