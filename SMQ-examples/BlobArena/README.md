@@ -8,7 +8,7 @@ The introductory article describing the game architecture and design is availabl
 
 - https://makoserver.net/articles/Blob-Arena-Multiplayer-Game
 
-## Running the Game
+## Running the Game using Mako Server and Xedge
 
 Start the game from the `SMQ-examples/BlobArena` directory:
 
@@ -52,3 +52,6 @@ The AI agent should also be able to run the Mako Server and verify that the game
 4. Copy and paste the prompt into the AI agent.
 5. Let the AI agent generate, run, and test the game locally.
 
+## The AGENTS Markdown File
+
+For more information on AGENTS.md, see the official page: [https://agents.md/](https://agents.md/).

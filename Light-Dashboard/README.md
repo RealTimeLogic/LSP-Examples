@@ -170,7 +170,7 @@ To modify a page, update the fragment and adjust the matching menu entry if the 
 
 ## Notes / Troubleshooting
 
-- For AI-assisted updates, see [AGENTS.md](AGENTS.md) and target `custom/` first unless you specifically want parity across all three variants.
+- For AI-assisted updates, see [AGENTS.md](AGENTS.md) and target `custom/` first unless you specifically want parity across all three variants ([details below](#ai-assisted-changes)).
 - If you add new external scripts or styles, update the Content Security Policy in the relevant `cms.lua`.
 - Keep page fragments wrapped in `.header` and `.content` for consistent styling across variants.
 

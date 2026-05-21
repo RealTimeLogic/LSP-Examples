@@ -17,6 +17,7 @@ The Barracuda App Server running on the ESP32 is packaged as the ready-to-use [X
 - `servo.lsp` - Introductory servo-control example.
 - `uiservo.lsp` - Real-time web UI for servo control.
 - `bme280.xlua` - BME280 temperature, humidity, and pressure example.
+- `bme280.lsp` - Vibe coded web interface. See the [tutorial](https://realtimelogic.com/articles/Vibe-Coding-Embedded-Web-Interfaces) for details.
 - `simulator/` - Supporting simulator assets for selected examples.
 
 ## How to run
