@@ -1,0 +1,1462 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Blob Arena | Multiplayer SMQ Game</title>
+  <meta name="description" content="A premium 2D minimalist multiplayer .io game powered by Mako Server and SMQ WebSockets.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="/rtl/smq.js"></script>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #070a0d;
+      --panel: rgba(15, 22, 28, 0.75);
+      --border: rgba(255, 255, 255, 0.08);
+      --border-focus: rgba(110, 231, 183, 0.4);
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+      --accent: #6ee7b7;
+      --accent-gradient: linear-gradient(135deg, #6ee7b7 0%, #3b82f6 100%);
+      --danger: #ef4444;
+      --danger-gradient: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%);
+      --warn: #f59e0b;
+      --shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+    }
+
+    * {
+      box-sizing: border-box;
+      user-select: none;
+      -webkit-user-drag: none;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    canvas {
+      display: block;
+      width: 100vw;
+      height: 100vh;
+      background: #090d10;
+      cursor: crosshair;
+    }
+
+    .glass {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-radius: 12px;
+      box-shadow: var(--shadow), inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Start Screen / Lobby */
+    .lobby-overlay {
+      position: fixed;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      background: rgba(5, 8, 11, 0.5);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      z-index: 100;
+      transition: opacity 0.5s ease;
+    }
+
+    .lobby-card {
+      width: min(440px, calc(100vw - 32px));
+      padding: 32px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .logo-container h1 {
+      margin: 0;
+      font-family: 'Outfit', sans-serif;
+      font-size: 38px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      background: var(--accent-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 2px 10px rgba(110, 231, 183, 0.2));
+    }
+
+    .logo-container p {
+      margin: 4px 0 0 0;
+      font-size: 13px;
+      color: var(--muted);
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      text-align: left;
+    }
+
+    .form-group label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    .input-wrapper {
+      position: relative;
+    }
+
+    .input-wrapper input {
+      width: 100%;
+      height: 48px;
+      padding: 0 16px;
+      background: rgba(9, 13, 17, 0.6);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 15px;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    .input-wrapper input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 4px rgba(110, 231, 183, 0.15);
+      background: rgba(9, 13, 17, 0.8);
+    }
+
+    /* Color Picker */
+    .color-picker {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+    }
+
+    .color-dot {
+      aspect-ratio: 1;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 3px solid transparent;
+      transition: all 0.2s ease;
+      position: relative;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .color-dot:hover {
+      transform: scale(1.15);
+    }
+
+    .color-dot.selected {
+      border-color: var(--text);
+      transform: scale(1.1);
+      box-shadow: 0 0 12px var(--dot-color);
+    }
+
+    .color-dot.custom-picker {
+      background: linear-gradient(135deg, #ff0000 0%, #00ff00 50%, #0000ff 100%);
+      overflow: hidden;
+    }
+
+    .color-dot.custom-picker input[type="color"] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+      width: 100%;
+      height: 100%;
+    }
+
+    .btn-join {
+      height: 50px;
+      background: var(--accent-gradient);
+      border: none;
+      border-radius: 8px;
+      color: #070a0d;
+      font-family: 'Outfit', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 4px 20px rgba(110, 231, 183, 0.25);
+    }
+
+    .btn-join:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 24px rgba(110, 231, 183, 0.35);
+      filter: brightness(1.05);
+    }
+
+    .btn-join:active:not(:disabled) {
+      transform: translateY(0);
+    }
+
+    .btn-join:disabled {
+      background: var(--border);
+      color: var(--muted);
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .lobby-info {
+      font-size: 12px;
+      color: var(--muted);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .lobby-info span {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    /* Controls Instruction */
+    .controls-guide {
+      margin-top: 8px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      text-align: left;
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .control-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .control-icon {
+      padding: 4px 6px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-family: monospace;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    /* HUD overlay components */
+    .hud {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 10;
+      display: grid;
+      grid-template-columns: 240px 1fr 240px;
+      grid-template-rows: auto 1fr;
+      padding: 16px;
+      gap: 16px;
+    }
+
+    .hud-panel {
+      pointer-events: auto;
+      padding: 14px 18px;
+    }
+
+    /* Left Stats Panel */
+    .hud-left {
+      grid-column: 1;
+      grid-row: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      align-self: start;
+    }
+
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .stat-row strong {
+      font-family: 'Outfit', sans-serif;
+      font-size: 16px;
+      color: var(--text);
+    }
+
+    /* Server Status Top-Center */
+    .hud-center {
+      grid-column: 2;
+      grid-row: 1;
+      justify-self: center;
+      align-self: start;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 8px 14px;
+      border-radius: 30px;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--danger);
+      box-shadow: 0 0 8px var(--danger);
+    }
+
+    .hud-center.connected .status-dot {
+      background: var(--accent);
+      box-shadow: 0 0 8px var(--accent);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% { opacity: 0.6; }
+      50% { opacity: 1; }
+      100% { opacity: 0.6; }
+    }
+
+    /* Right Leaderboard Panel */
+    .hud-right {
+      grid-column: 3;
+      grid-row: 1 / span 2;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      align-self: start;
+      max-height: 400px;
+    }
+
+    .hud-right h3 {
+      margin: 0 0 4px 0;
+      font-family: 'Outfit', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      color: var(--text);
+      text-transform: uppercase;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 8px;
+    }
+
+    .leaderboard-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      overflow-y: auto;
+    }
+
+    .leaderboard-item {
+      display: grid;
+      grid-template-columns: auto 12px 1fr auto;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      padding: 6px 8px;
+      border-radius: 6px;
+      transition: background 0.2s ease;
+    }
+
+    .leaderboard-item.local-player {
+      background: rgba(110, 231, 183, 0.1);
+      border: 1px dashed rgba(110, 231, 183, 0.3);
+      font-weight: 600;
+    }
+
+    .leaderboard-item .rank {
+      font-family: 'Outfit', sans-serif;
+      font-size: 12px;
+      color: var(--muted);
+      width: 14px;
+      text-align: right;
+    }
+
+    .leaderboard-item.rank-1 .rank { color: #ffd700; font-weight: 700; }
+    .leaderboard-item.rank-2 .rank { color: #c0c0c0; font-weight: 700; }
+    .leaderboard-item.rank-3 .rank { color: #cd7f32; font-weight: 700; }
+
+    .leaderboard-item .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+
+    .leaderboard-item .name {
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .leaderboard-item .score {
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      color: var(--text);
+    }
+
+    /* Eaten / Respawn Overlay */
+    .eaten-overlay {
+      position: fixed;
+      inset: 0;
+      display: none;
+      place-items: center;
+      background: rgba(11, 7, 7, 0.7);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      z-index: 90;
+    }
+
+    .eaten-overlay.visible {
+      display: grid;
+    }
+
+    .eaten-card {
+      width: min(380px, calc(100vw - 32px));
+      padding: 32px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      border-color: rgba(239, 68, 68, 0.2);
+    }
+
+    .eaten-card h1 {
+      margin: 0;
+      font-family: 'Outfit', sans-serif;
+      font-size: 30px;
+      font-weight: 800;
+      background: var(--danger-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 2px 10px rgba(239, 68, 68, 0.2));
+    }
+
+    .eaten-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .countdown-bar {
+      width: 100%;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 2px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+
+    .countdown-fill {
+      width: 100%;
+      height: 100%;
+      background: var(--danger);
+      transition: width 1.5s linear;
+    }
+
+    /* Mobile Adaptations */
+    @media (max-width: 768px) {
+      .hud {
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: auto auto 1fr;
+        padding: 10px;
+        gap: 10px;
+      }
+
+      .hud-left {
+        grid-column: 1;
+        grid-row: 1;
+        width: 100%;
+      }
+
+      .hud-right {
+        grid-column: 2;
+        grid-row: 1;
+        width: 100%;
+        max-height: 140px;
+      }
+
+      .hud-center {
+        grid-column: 1 / span 2;
+        grid-row: 2;
+        justify-self: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="game"></canvas>
+
+  <!-- Lobby Screen Overlay -->
+  <div id="lobbyOverlay" class="lobby-overlay">
+    <div class="lobby-card glass">
+      <div class="logo-container">
+        <h1>BLOB ARENA</h1>
+        <p>Simple Message Queue Multiplayer Experiment</p>
+      </div>
+
+      <form id="lobbyForm" class="form-group" autocomplete="off">
+        <label for="nicknameInput">Your Codename</label>
+        <div class="input-wrapper">
+          <input id="nicknameInput" type="text" maxlength="18" placeholder="Enter Nickname..." required>
+        </div>
+
+        <label style="margin-top: 10px;">Choose Your Vibe</label>
+        <div class="color-picker" id="colorPickerGrid">
+          <!-- Populated dynamically via JS -->
+        </div>
+
+        <button type="submit" id="btnJoin" class="btn-join" disabled>Connecting...</button>
+      </form>
+
+      <div class="lobby-info">
+        <span id="lobbyStatus"><span class="status-dot"></span>Connecting to SMQ server...</span>
+      </div>
+
+      <div class="controls-guide">
+        <div class="control-item">
+          <span class="control-icon">WASD</span>
+          <span>Or Keyboard Arrows</span>
+        </div>
+        <div class="control-item">
+          <span class="control-icon">Mouse</span>
+          <span>Aim and follow cursor</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Realtime HUD overlays -->
+  <div class="hud" id="hudOverlay" style="display: none;">
+    <!-- Left panel (Stats) -->
+    <div class="hud-panel glass hud-left">
+      <div class="stat-row">
+        <span>Score:</span>
+        <strong id="hudScore">0</strong>
+      </div>
+      <div class="stat-row">
+        <span>Size:</span>
+        <strong id="hudSize">18</strong>
+      </div>
+      <div class="stat-row">
+        <span>Players:</span>
+        <strong id="hudPlayers">1</strong>
+      </div>
+    </div>
+
+    <!-- Center indicator (Network status) -->
+    <div id="hudStatus" class="hud-center glass">
+      <span class="status-dot"></span>
+      <span id="hudStatusText">Syncing</span>
+    </div>
+
+    <!-- Right panel (Leaderboard) -->
+    <div class="hud-panel glass hud-right">
+      <h3>Leaderboard</h3>
+      <div id="leaderboardList" class="leaderboard-list">
+        <!-- Rendered in real-time -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Eaten Screen Overlay -->
+  <div id="eatenOverlay" class="eaten-overlay">
+    <div class="eaten-card glass">
+      <h1>CONSUMED</h1>
+      <p id="eatenMessage">You were absorbed by an opponent.</p>
+      <div class="countdown-bar">
+        <div id="countdownFill" class="countdown-fill"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      "use strict";
+
+      var STATE_TOPIC = "/game/state";
+      var EATEN_SUBTOPIC = "eaten";
+      var ARENA = { width: 1800, height: 1200 };
+      var BASE_RADIUS = 18;
+      var MAX_RADIUS = 85;
+      var MOVE_SPEED = 350;
+      var STATE_INTERVAL = 80;
+      var STALE_AFTER = 2500;
+      var EAT_COOLDOWN = 1200;
+      var RESPAWN_MS = 1500;
+      var GRID_SIZE = 48;
+      var FOOD_COUNT = 120;
+      var FOOD_RADIUS = 4.5;
+      var FOOD_GROWTH = 14;
+
+      var canvas = document.getElementById("game");
+      var ctx = canvas.getContext("2d");
+      
+      // HUD elements
+      var hudOverlay = document.getElementById("hudOverlay");
+      var hudScore = document.getElementById("hudScore");
+      var hudSize = document.getElementById("hudSize");
+      var hudPlayers = document.getElementById("hudPlayers");
+      var hudStatus = document.getElementById("hudStatus");
+      var hudStatusText = document.getElementById("hudStatusText");
+      var leaderboardList = document.getElementById("leaderboardList");
+
+      // Lobby elements
+      var lobbyOverlay = document.getElementById("lobbyOverlay");
+      var lobbyForm = document.getElementById("lobbyForm");
+      var nicknameInput = document.getElementById("nicknameInput");
+      var colorPickerGrid = document.getElementById("colorPickerGrid");
+      var btnJoin = document.getElementById("btnJoin");
+      var lobbyStatus = document.getElementById("lobbyStatus");
+
+      // Eaten overlay elements
+      var eatenOverlay = document.getElementById("eatenOverlay");
+      var eatenMessage = document.getElementById("eatenMessage");
+      var countdownFill = document.getElementById("countdownFill");
+
+      var dpr = 1;
+      var view = { width: 0, height: 0 };
+      var mouse = { x: 0, y: 0, active: false };
+      var keys = Object.create(null);
+      
+      var peers = Object.create(null);
+      var observed = Object.create(null);
+      var lastEatSent = Object.create(null);
+      var food = [];
+      var connected = false;
+      var smq = null;
+      var lastFrame = performance.now();
+      var lastStateSent = 0;
+      var sequence = 0;
+      
+      var isPlaying = false;
+
+      // Color Palette
+      var palette = [
+        "#10b981", // Emerald
+        "#06b6d4", // Cyan
+        "#3b82f6", // Blue
+        "#6366f1", // Indigo
+        "#8b5cf6", // Purple
+        "#ec4899", // Pink
+        "#f43f5e", // Rose
+        "#f97316", // Orange
+        "#eab308"  // Yellow
+      ];
+
+      var selectedColor = localStorage.getItem("smqBlobColor") || palette[Math.floor(Math.random() * (palette.length - 1))];
+      var local = {
+        x: 0,
+        y: 0,
+        radius: BASE_RADIUS,
+        color: selectedColor,
+        score: 0,
+        name: localStorage.getItem("smqBlobName") || "",
+        respawningUntil: 0
+      };
+
+      // Set initial values in Lobby Form
+      if (local.name) {
+        nicknameInput.value = local.name;
+      } else {
+        // Preset random nickname placeholder style
+        nicknameInput.value = "Blob" + Math.floor(100 + Math.random() * 900);
+      }
+
+      // Initialize color picker grid
+      function buildColorPicker() {
+        colorPickerGrid.innerHTML = "";
+        
+        palette.forEach(function (color) {
+          var dot = document.createElement("div");
+          dot.className = "color-dot";
+          dot.style.backgroundColor = color;
+          dot.style.setProperty("--dot-color", color);
+          if (color === selectedColor) {
+            dot.classList.add("selected");
+          }
+          dot.addEventListener("click", function () {
+            document.querySelectorAll(".color-dot").forEach(function (d) { d.classList.remove("selected"); });
+            dot.classList.add("selected");
+            selectedColor = color;
+            local.color = color;
+          });
+          colorPickerGrid.appendChild(dot);
+        });
+
+        // Add a custom HTML color picker
+        var customDot = document.createElement("div");
+        customDot.className = "color-dot custom-picker";
+        
+        var customInput = document.createElement("input");
+        customInput.type = "color";
+        customInput.value = selectedColor.indexOf("#") === 0 && selectedColor.length === 7 ? selectedColor : "#10b981";
+        
+        customDot.appendChild(customInput);
+        
+        if (palette.indexOf(selectedColor) === -1) {
+          customDot.classList.add("selected");
+          customDot.style.boxShadow = "0 0 12px " + selectedColor;
+        }
+
+        customInput.addEventListener("input", function (e) {
+          document.querySelectorAll(".color-dot").forEach(function (d) { d.classList.remove("selected"); });
+          customDot.classList.add("selected");
+          selectedColor = e.target.value;
+          customDot.style.boxShadow = "0 0 12px " + selectedColor;
+          local.color = selectedColor;
+        });
+
+        colorPickerGrid.appendChild(customDot);
+      }
+
+      buildColorPicker();
+      randomSpawn();
+      createFood();
+      resize();
+
+      // Listeners
+      window.addEventListener("resize", resize);
+      window.addEventListener("keydown", function (event) {
+        keys[event.key.toLowerCase()] = true;
+      });
+      window.addEventListener("keyup", function (event) {
+        keys[event.key.toLowerCase()] = false;
+      });
+      canvas.addEventListener("pointerdown", function (event) {
+        if (!isPlaying) return;
+        mouse.active = true;
+        setMouseTarget(event);
+      });
+      canvas.addEventListener("pointermove", function (event) {
+        if (!isPlaying) return;
+        setMouseTarget(event);
+      });
+      canvas.addEventListener("pointerleave", function () {
+        mouse.active = false;
+      });
+
+      // Submit Lobby Form
+      lobbyForm.addEventListener("submit", function (event) {
+        event.preventDefault();
+        var value = nicknameInput.value.trim().slice(0, 18);
+        local.name = value || "Unnamed Blob";
+        local.color = selectedColor;
+
+        // Persist local selection
+        localStorage.setItem("smqBlobName", local.name);
+        localStorage.setItem("smqBlobColor", local.color);
+
+        // Transition out lobby
+        lobbyOverlay.style.opacity = 0;
+        setTimeout(function () {
+          lobbyOverlay.style.display = "none";
+          hudOverlay.style.display = "grid";
+          isPlaying = true;
+          publishState(true);
+        }, 500);
+      });
+
+      // Connect automatically to server on page load
+      connect();
+      requestAnimationFrame(frame);
+
+      function connect() {
+        if (!window.SMQ) {
+          setLobbyStatus(false, "Error: Missing smq.js library");
+          setHUDStatus(false, "No Library");
+          return;
+        }
+
+        smq = SMQ.Client(SMQ.wsURL("/smq.lsp"), { cleanstart: true });
+
+        smq.onconnect = function () {
+          connected = true;
+          setLobbyStatus(true, "Connected! Ready to enter.");
+          setHUDStatus(true, "Connected");
+          subscribe();
+          if (isPlaying) {
+            publishState(true);
+          }
+        };
+
+        smq.onreconnect = function () {
+          connected = true;
+          observed = Object.create(null);
+          setLobbyStatus(true, "Reconnected to SMQ server.");
+          setHUDStatus(true, "Reconnected");
+          subscribe();
+          if (isPlaying) {
+            publishState(true);
+          }
+        };
+
+        smq.onclose = function (message, canreconnect) {
+          connected = false;
+          isPlaying = false;
+          setLobbyStatus(false, "Disconnected: " + (message || "Socket Closed"));
+          setHUDStatus(false, "Offline");
+          
+          // Re-reveal lobby overlay with disconnected state
+          lobbyOverlay.style.display = "grid";
+          setTimeout(function() { lobbyOverlay.style.opacity = 1; }, 50);
+          hudOverlay.style.display = "none";
+
+          return canreconnect ? 1000 : null;
+        };
+
+        smq.onmsg = function (data, ptid) {
+          console.warn("Unrouted SMQ message:", ptid, data);
+        };
+      }
+
+      function subscribe() {
+        smq.subscribe(STATE_TOPIC, {
+          datatype: "json",
+          onmsg: onStateMessage
+        });
+
+        smq.subscribe("self", EATEN_SUBTOPIC, {
+          datatype: "json",
+          onmsg: onEatenMessage
+        });
+      }
+
+      function onStateMessage(message, ptid) {
+        if (!ptid || ptid === smq.gettid()) {
+          return;
+        }
+
+        var peer = peers[ptid];
+        if (!peer) {
+          peer = peers[ptid] = {
+            id: ptid,
+            x: validNumber(message.x, ARENA.width / 2),
+            y: validNumber(message.y, ARENA.height / 2),
+            tx: validNumber(message.x, ARENA.width / 2),
+            ty: validNumber(message.y, ARENA.height / 2),
+            radius: BASE_RADIUS,
+            targetRadius: BASE_RADIUS,
+            color: "#94a3b8",
+            score: 0,
+            name: "Opponent",
+            respawning: false,
+            lastSeen: performance.now()
+          };
+        }
+
+        peer.tx = clamp(validNumber(message.x, peer.tx), 0, ARENA.width);
+        peer.ty = clamp(validNumber(message.y, peer.ty), 0, ARENA.height);
+        peer.targetRadius = clamp(validNumber(message.radius, BASE_RADIUS), 8, MAX_RADIUS);
+        peer.color = typeof message.color === "string" ? message.color : peer.color;
+        peer.score = Math.max(0, validNumber(message.score, 0));
+        peer.name = typeof message.name === "string" ? message.name.slice(0, 18) : peer.name;
+        peer.respawning = !!message.respawning;
+        peer.lastSeen = performance.now();
+
+        observePeer(ptid);
+      }
+
+      function onEatenMessage(message, ptid) {
+        var eater = message && (message.byName || message.by || ptid);
+        resetPlayer();
+        
+        eatenMessage.textContent = eater ? "You were swallowed whole by " + eater + "!" : "You were absorbed!";
+        eatenOverlay.classList.add("visible");
+        
+        // Animated progress fill countdown
+        countdownFill.style.width = "100%";
+        countdownFill.style.transition = "none";
+        
+        setTimeout(function () {
+          countdownFill.style.width = "0%";
+          countdownFill.style.transition = "width " + RESPAWN_MS + "ms linear";
+        }, 10);
+
+        window.setTimeout(function () {
+          eatenOverlay.classList.remove("visible");
+        }, RESPAWN_MS);
+      }
+
+      function observePeer(ptid) {
+        if (observed[ptid]) {
+          return;
+        }
+        observed[ptid] = true;
+        smq.observe(ptid, function (subscribers, topic) {
+          if (subscribers === 0) {
+            delete peers[topic];
+            delete observed[topic];
+            delete lastEatSent[topic];
+          }
+        });
+      }
+
+      function frame(now) {
+        var dt = Math.min(0.033, (now - lastFrame) / 1000 || 0.016);
+        lastFrame = now;
+
+        update(dt, now);
+        draw(now);
+        requestAnimationFrame(frame);
+      }
+
+      function update(dt, now) {
+        updateLocal(dt, now);
+        checkFood();
+        updatePeers(dt, now);
+        checkEating(now);
+
+        if (connected && isPlaying && now - lastStateSent >= STATE_INTERVAL) {
+          publishState(false);
+        }
+
+        // Update HUD
+        if (isPlaying) {
+          hudScore.textContent = String(Math.round(local.score));
+          hudSize.textContent = String(Math.round(local.radius));
+          hudPlayers.textContent = String(Object.keys(peers).length + 1);
+          updateLeaderboard();
+        }
+      }
+
+      function updateLocal(dt, now) {
+        if (!isPlaying || now < local.respawningUntil) {
+          return;
+        }
+
+        // Dynamic speed based on size (larger blobs move slightly slower)
+        var speedModifier = Math.max(0.45, 1 - (local.radius - BASE_RADIUS) / 140);
+        var currentSpeed = MOVE_SPEED * speedModifier;
+
+        var vx = 0;
+        var vy = 0;
+        if (keys.arrowleft || keys.a) vx -= 1;
+        if (keys.arrowright || keys.d) vx += 1;
+        if (keys.arrowup || keys.w) vy -= 1;
+        if (keys.arrowdown || keys.s) vy += 1;
+
+        if (vx || vy) {
+          var len = Math.hypot(vx, vy) || 1;
+          local.x += (vx / len) * currentSpeed * dt;
+          local.y += (vy / len) * currentSpeed * dt;
+          mouse.active = false;
+        } else if (mouse.active) {
+          var target = screenToWorld(mouse.x, mouse.y);
+          var dx = target.x - local.x;
+          var dy = target.y - local.y;
+          var dist = Math.hypot(dx, dy);
+          if (dist > 3) {
+            // Smooth speed scaling when mouse is very close to local blob center
+            var easeSpeed = Math.min(currentSpeed, dist * 5);
+            local.x += (dx / dist) * easeSpeed * dt;
+            local.y += (dy / dist) * easeSpeed * dt;
+          }
+        }
+
+        local.x = clamp(local.x, local.radius, ARENA.width - local.radius);
+        local.y = clamp(local.y, local.radius, ARENA.height - local.radius);
+      }
+
+      function updatePeers(dt, now) {
+        Object.keys(peers).forEach(function (id) {
+          var peer = peers[id];
+          if (now - peer.lastSeen > STALE_AFTER) {
+            delete peers[id];
+            delete observed[id];
+            delete lastEatSent[id];
+            return;
+          }
+
+          var ease = 1 - Math.pow(0.0001, dt); // Interpolation smoothing
+          peer.x += (peer.tx - peer.x) * ease;
+          peer.y += (peer.ty - peer.y) * ease;
+          peer.radius += (peer.targetRadius - peer.radius) * ease;
+        });
+      }
+
+      function checkEating(now) {
+        if (!isPlaying || !connected || now < local.respawningUntil) {
+          return;
+        }
+
+        Object.keys(peers).forEach(function (id) {
+          var peer = peers[id];
+          if (peer.respawning || !canEat(peer)) {
+            return;
+          }
+
+          var dist = Math.hypot(local.x - peer.x, local.y - peer.y);
+          // Standard overlap criteria (e.g. center of target inside your perimeter)
+          if (dist > local.radius) {
+            return;
+          }
+
+          if (lastEatSent[id] && now - lastEatSent[id] < EAT_COOLDOWN) {
+            return;
+          }
+
+          lastEatSent[id] = now;
+          
+          // Absorb score and size
+          local.score += Math.max(5, Math.round(peer.radius / 2));
+          local.radius = Math.min(MAX_RADIUS, Math.sqrt(local.radius * local.radius + peer.radius * peer.radius * 0.4));
+          
+          smq.pubjson({
+            type: "eaten",
+            by: smq.gettid(),
+            byName: local.name,
+            at: Date.now()
+          }, Number(id), EATEN_SUBTOPIC);
+          
+          publishState(true);
+        });
+      }
+
+      function checkFood() {
+        if (!isPlaying || performance.now() < local.respawningUntil) {
+          return;
+        }
+
+        for (var i = food.length - 1; i >= 0; i -= 1) {
+          var pellet = food[i];
+          var dist = Math.hypot(local.x - pellet.x, local.y - pellet.y);
+          if (dist <= local.radius) {
+            food.splice(i, 1);
+            local.score += 1;
+            local.radius = Math.min(MAX_RADIUS, Math.sqrt(local.radius * local.radius + FOOD_GROWTH));
+            food.push(makeFood());
+            publishState(true);
+          }
+        }
+      }
+
+      function publishState(force) {
+        if (!connected || !smq || !isPlaying) {
+          return;
+        }
+        var now = performance.now();
+        if (!force && now - lastStateSent < STATE_INTERVAL) {
+          return;
+        }
+        lastStateSent = now;
+        smq.pubjson({
+          x: Math.round(local.x * 10) / 10,
+          y: Math.round(local.y * 10) / 10,
+          radius: Math.round(local.radius * 10) / 10,
+          color: local.color,
+          score: Math.round(local.score),
+          name: local.name,
+          timestamp: Date.now(),
+          seq: ++sequence,
+          respawning: now < local.respawningUntil
+        }, STATE_TOPIC);
+      }
+
+      function resetPlayer() {
+        local.radius = BASE_RADIUS;
+        local.score = 0;
+        local.respawningUntil = performance.now() + RESPAWN_MS;
+        randomSpawn();
+        publishState(true);
+      }
+
+      function randomSpawn() {
+        local.x = ARENA.width * 0.2 + Math.random() * ARENA.width * 0.6;
+        local.y = ARENA.height * 0.2 + Math.random() * ARENA.height * 0.6;
+      }
+
+      function createFood() {
+        food = [];
+        for (var i = 0; i < FOOD_COUNT; i += 1) {
+          food.push(makeFood());
+        }
+      }
+
+      function makeFood() {
+        return {
+          x: 24 + Math.random() * (ARENA.width - 48),
+          y: 24 + Math.random() * (ARENA.height - 48),
+          r: FOOD_RADIUS + Math.random() * 1.5,
+          color: palette[Math.floor(Math.random() * palette.length)]
+        };
+      }
+
+      function draw(now) {
+        ctx.clearRect(0, 0, view.width, view.height);
+
+        var cam = camera(now);
+        drawArena(cam);
+        drawFood(cam);
+
+        // Render opposing blobs
+        Object.keys(peers).forEach(function (id) {
+          var peer = peers[id];
+          if (!peer.respawning) {
+            drawBlob(peer, cam, false, now);
+          }
+        });
+
+        // Render local player blob
+        if (isPlaying) {
+          drawBlob(local, cam, true, now);
+        }
+
+        // Overlay aiming reticle if mouse is active
+        if (isPlaying && mouse.active && now > local.respawningUntil) {
+          drawAimReticle(cam);
+        }
+
+        if (isPlaying) {
+          drawMinimap();
+        }
+      }
+
+      function drawArena(cam) {
+        ctx.save();
+        ctx.translate(-cam.x, -cam.y);
+
+        ctx.fillStyle = "#090d10";
+        ctx.fillRect(cam.x, cam.y, view.width, view.height);
+
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.04)";
+        ctx.lineWidth = 1;
+        var grid = GRID_SIZE;
+        var startX = Math.floor(cam.x / grid) * grid;
+        var endX = cam.x + view.width + grid;
+        var startY = Math.floor(cam.y / grid) * grid;
+        var endY = cam.y + view.height + grid;
+
+        for (var x = startX; x <= endX; x += grid) {
+          ctx.beginPath();
+          ctx.moveTo(x, cam.y);
+          ctx.lineTo(x, cam.y + view.height);
+          ctx.stroke();
+        }
+
+        for (var y = startY; y <= endY; y += grid) {
+          ctx.beginPath();
+          ctx.moveTo(cam.x, y);
+          ctx.lineTo(cam.x + view.width, y);
+          ctx.stroke();
+        }
+
+        // Bounding Border with a neon linear gradient vibe
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.2)";
+        ctx.lineWidth = 4;
+        ctx.shadowBlur = 10;
+        ctx.shadowColor = "rgba(255, 255, 255, 0.15)";
+        ctx.strokeRect(0, 0, ARENA.width, ARENA.height);
+        
+        ctx.restore();
+      }
+
+      function drawFood(cam) {
+        ctx.save();
+        ctx.translate(-cam.x, -cam.y);
+        food.forEach(function (pellet) {
+          // Inner core
+          ctx.fillStyle = pellet.color;
+          ctx.globalAlpha = 0.22;
+          ctx.beginPath();
+          ctx.arc(pellet.x, pellet.y, pellet.r + 3, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.globalAlpha = 1.0;
+          ctx.beginPath();
+          ctx.arc(pellet.x, pellet.y, pellet.r, 0, Math.PI * 2);
+          ctx.fill();
+        });
+        ctx.restore();
+      }
+
+      function drawBlob(blob, cam, isLocal, now) {
+        var alpha = 1.0;
+        if (isLocal && now < local.respawningUntil) {
+          // Flashing effect during spawn invulnerability
+          alpha = 0.35 + Math.sin(now / 85) * 0.18;
+        }
+
+        var x = blob.x - cam.x;
+        var y = blob.y - cam.y;
+
+        ctx.save();
+        ctx.globalAlpha = alpha;
+        
+        // Outer glowing shadow
+        ctx.shadowColor = blob.color;
+        ctx.shadowBlur = isLocal ? 16 : 8;
+        
+        // Radial gradient blob skin
+        var grad = ctx.createRadialGradient(x - blob.radius*0.2, y - blob.radius*0.2, blob.radius * 0.1, x, y, blob.radius);
+        grad.addColorStop(0, lightenDarkenColor(blob.color, 40));
+        grad.addColorStop(0.6, blob.color);
+        grad.addColorStop(1, lightenDarkenColor(blob.color, -30));
+        
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.arc(x, y, blob.radius, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.shadowBlur = 0;
+        ctx.lineWidth = isLocal ? 3.5 : 2;
+        ctx.strokeStyle = isLocal ? "#ffffff" : "rgba(255, 255, 255, 0.4)";
+        ctx.stroke();
+
+        // Ring indicators for Edible state
+        if (!isLocal && canEat(blob) && !blob.respawning) {
+          // Pulse edible green outer ring
+          var ringPulse = 5 + Math.sin(now / 150) * 2;
+          ctx.strokeStyle = "#34d399";
+          ctx.lineWidth = 2.5;
+          ctx.beginPath();
+          ctx.arc(x, y, blob.radius + ringPulse, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+
+        // Draw Player name label
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "bold 13px 'Plus Jakarta Sans', Arial, sans-serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.shadowColor = "rgba(0, 0, 0, 0.6)";
+        ctx.shadowBlur = 4;
+        ctx.fillText(blob.name || "Player", x, y);
+        ctx.restore();
+      }
+
+      function drawAimReticle(cam) {
+        var screenTargetX = mouse.x;
+        var screenTargetY = mouse.y;
+        
+        ctx.save();
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.25)";
+        ctx.lineWidth = 1.5;
+        ctx.setLineDash([4, 4]);
+        
+        // Draw dotted pointer line
+        var localScreenX = local.x - cam.x;
+        var localScreenY = local.y - cam.y;
+        
+        ctx.beginPath();
+        ctx.moveTo(localScreenX, localScreenY);
+        ctx.lineTo(screenTargetX, screenTargetY);
+        ctx.stroke();
+        
+        // Aiming ring
+        ctx.strokeStyle = local.color;
+        ctx.setLineDash([]);
+        ctx.beginPath();
+        ctx.arc(screenTargetX, screenTargetY, 8, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      function drawMinimap() {
+        var w = 150;
+        var h = 100;
+        var pad = 16;
+        var x = view.width - w - pad;
+        var y = view.height - h - pad;
+
+        ctx.save();
+        // Glassmorphic background matching main theme
+        ctx.fillStyle = "rgba(15, 22, 28, 0.8)";
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.08)";
+        ctx.lineWidth = 1;
+        
+        roundRect(x, y, w, h, 8);
+        ctx.fill();
+        ctx.stroke();
+
+        // Local player marker
+        ctx.fillStyle = local.color;
+        ctx.shadowColor = local.color;
+        ctx.shadowBlur = 4;
+        ctx.beginPath();
+        ctx.arc(x + local.x / ARENA.width * w, y + local.y / ARENA.height * h, 4.5, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Peers markers
+        ctx.shadowBlur = 0;
+        Object.keys(peers).forEach(function (id) {
+          var peer = peers[id];
+          if (peer.respawning) return;
+          
+          ctx.fillStyle = canEat(peer) ? "#34d399" : "#f97316";
+          ctx.beginPath();
+          ctx.arc(x + peer.x / ARENA.width * w, y + peer.y / ARENA.height * h, 3.5, 0, Math.PI * 2);
+          ctx.fill();
+        });
+
+        ctx.restore();
+      }
+
+      function roundRect(x, y, w, h, r) {
+        ctx.beginPath();
+        ctx.moveTo(x + r, y);
+        ctx.lineTo(x + w - r, y);
+        ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+        ctx.lineTo(x + w, y + h - r);
+        ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+        ctx.lineTo(x + r, y + h);
+        ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+        ctx.lineTo(x, y + r);
+        ctx.quadraticCurveTo(x, y, x + r, y);
+      }
+
+      function canEat(peer) {
+        // Enforce you must be at least 10% larger than the peer
+        return local.radius > peer.radius * 1.1;
+      }
+
+      function camera(now) {
+        if (!isPlaying) {
+          // Gentle screen cinematic float while idle in lobby
+          var t = now * 0.0002;
+          var cx = ARENA.width / 2 + Math.sin(t) * 160;
+          var cy = ARENA.height / 2 + Math.cos(t) * 120;
+          return {
+            x: clamp(cx - view.width / 2, 0, Math.max(0, ARENA.width - view.width)),
+            y: clamp(cy - view.height / 2, 0, Math.max(0, ARENA.height - view.height))
+          };
+        }
+        return {
+          x: clamp(local.x - view.width / 2, 0, Math.max(0, ARENA.width - view.width)),
+          y: clamp(local.y - view.height / 2, 0, Math.max(0, ARENA.height - view.height))
+        };
+      }
+
+      function screenToWorld(x, y) {
+        var cam = camera(performance.now());
+        return { x: x + cam.x, y: y + cam.y };
+      }
+
+      function setMouseTarget(event) {
+        var rect = canvas.getBoundingClientRect();
+        mouse.x = event.clientX - rect.left;
+        mouse.y = event.clientY - rect.top;
+      }
+
+      function resize() {
+        dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+        view.width = window.innerWidth;
+        view.height = window.innerHeight;
+        canvas.width = Math.floor(view.width * dpr);
+        canvas.height = Math.floor(view.height * dpr);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+
+      function setLobbyStatus(isOk, text) {
+        if (isOk) {
+          lobbyStatus.innerHTML = '<span class="status-dot" style="background:#6ee7b7;box-shadow:0 0 8px #6ee7b7"></span>' + text;
+          btnJoin.disabled = false;
+          btnJoin.textContent = "ENTER THE ARENA";
+        } else {
+          lobbyStatus.innerHTML = '<span class="status-dot" style="background:#ef4444;box-shadow:0 0 8px #ef4444"></span>' + text;
+          btnJoin.disabled = true;
+          btnJoin.textContent = "WAITING ON CONNECTION";
+        }
+      }
+
+      function setHUDStatus(isOk, text) {
+        hudStatus.classList.toggle("connected", isOk);
+        hudStatusText.textContent = text;
+      }
+
+      function updateLeaderboard() {
+        var list = [];
+        // Add self
+        list.push({
+          name: local.name,
+          score: Math.round(local.score),
+          color: local.color,
+          isLocal: true
+        });
+
+        // Add active peers
+        Object.keys(peers).forEach(function (id) {
+          var peer = peers[id];
+          if (peer.respawning) return;
+          list.push({
+            name: peer.name || "Opponent",
+            score: Math.round(peer.score),
+            color: peer.color,
+            isLocal: false
+          });
+        });
+
+        // Sort score desc
+        list.sort(function (a, b) {
+          return b.score - a.score;
+        });
+
+        var html = "";
+        list.slice(0, 10).forEach(function (p, i) {
+          var localClass = p.isLocal ? "local-player" : "";
+          var rClass = "rank-" + (i + 1);
+          html += '<div class="leaderboard-item ' + localClass + ' ' + rClass + '">' +
+                    '<span class="rank">' + (i + 1) + '</span>' +
+                    '<span class="dot" style="background:' + p.color + '"></span>' +
+                    '<span class="name">' + escapeHTML(p.name) + '</span>' +
+                    '<span class="score">' + p.score + '</span>' +
+                  '</div>';
+        });
+
+        leaderboardList.innerHTML = html;
+      }
+
+      function escapeHTML(str) {
+        if (!str) return "";
+        return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+      }
+
+      function validNumber(value, fallback) {
+        return typeof value === "number" && isFinite(value) ? value : fallback;
+      }
+
+      function clamp(value, min, max) {
+        return Math.max(min, Math.min(max, value));
+      }
+
+      // Utility to lighten/darken hex colors for radial shading
+      function lightenDarkenColor(col, amt) {
+        var usePound = false;
+        if (col[0] == "#") {
+          col = col.slice(1);
+          usePound = true;
+        }
+        var num = parseInt(col, 16);
+        var r = (num >> 16) + amt;
+        if (r > 255) r = 255;
+        else if (r < 0) r = 0;
+        var b = ((num >> 8) & 0x00FF) + amt;
+        if (b > 255) b = 255;
+        else if (b < 0) b = 0;
+        var g = (num & 0x0000FF) + amt;
+        if (g > 255) g = 255;
+        else if (g < 0) g = 0;
+        return (usePound ? "#" : "") + (g | (b << 8) | (r << 16)).toString(16).padStart(6, "0");
+      }
+    }());
+  </script>
+</body>
+</html>
