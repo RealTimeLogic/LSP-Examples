@@ -1,0 +1,47 @@
+
+mako.createloader(io)
+
+local shark
+if mako then
+   tracep(false,0,"Broker: Loading default Mako Certificate")
+   -- Create a SharkSSL certificate by using the certificate stored in
+   -- the internal ZIP file.
+   local iovm = ba.openio("vm")
+   local certf=".certificate/MakoServer.%s"
+   local cert,err=ba.create.sharkcert(
+                                      iovm, string.format(certf,"pem"),
+                                      string.format(certf,"key"), "sharkssl")
+   if not cert then error"Certificate not found" end
+
+   -- Create a SharkSSL server object by using the above certificate
+   shark=ba.create.sharkssl(nil,{server=true})
+   shark:addcert(cert)
+end
+ 
+local op={
+   -- allowWildcards=false,
+   shark=shark,
+   plain=true,
+   auth=function(client,username,password)
+      if username == nil and password == nil then return true end
+      return username == "mqttuser" and password == "mqttpass"
+   end,
+   onpublish=function(client,topic,payload,retain)
+      if topic:sub(1,8) == "blocked/" then return false end
+   end,
+   onerror=function(client,etype,status)
+      trace("onerror",etype,status,client and client.clientId or "")
+   end
+}
+
+
+local mqttBroker,err=require("mqttbroker").create(op)
+if not mqttBroker then error("cannot create MQTT broker",err) end
+
+tracep(false,0,"Broker: Running")
+
+function onunload()
+   if mqttBroker then
+      mqttBroker:shutdown()
+   end
+end
