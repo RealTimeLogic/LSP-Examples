@@ -1,0 +1,2163 @@
+{
+  "version": 1,
+  "repository": {
+    "owner": "RealTimeLogic",
+    "name": "LSP-Examples",
+    "branch": "master"
+  },
+  "purpose": "AI-friendly index for selecting and copying BAS/Mako/Xedge examples.",
+  "examples": [
+    {
+      "examplePath": "AJAX",
+      "title": "AJAX",
+      "summary": "Minimal LSP AJAX example where browser keypresses are posted to Lua and returned as JSON.",
+      "tags": [
+        "ajax",
+        "browser-ui",
+        "client-server",
+        "json",
+        "small"
+      ],
+      "goodFor": [
+        "simple client/server request-response",
+        "small browser UI examples",
+        "submitting browser events or settings to Lua/LSP"
+      ],
+      "notFor": [
+        "authentication",
+        "large dashboards",
+        "real-time pub/sub"
+      ],
+      "runtime": {
+        "mako": "compatible",
+        "xedge": "compatible",
+        "notes": []
+      },
+      "appRoots": [
+        {
+          "appRootPath": "AJAX/www",
+          "label": "AJAX demo",
+          "run": "mako -l::www",
+          "summary": "Runnable Mako app root for the AJAX request-response example.",
+          "importantFiles": [
+            "AJAX/www/index.lsp"
+          ],
+          "omitFromCompactContext": []
+        }
+      ],
+      "readme": "AJAX/README.md",
+      "rawReadmeUrl": "https://raw.githubusercontent.com/RealTimeLogic/LSP-Examples/refs/heads/master/AJAX/README.md"
+    },
+    {
+      "examplePath": "AJAX-Over-WebSockets",
+      "title": "REST / AJAX / RPC Over WebSockets",
+      "summary": "Browser-to-Lua request/response calls over a persistent WebSocket transport.",
+      "tags": [
+        "ajax",
+        "browser-ui",
+        "client-server",
+        "json",
+        "rest",
+        "websocket"
+      ],
+      "goodFor": [
+        "browser RPC over WebSockets",
+        "low-latency browser/server calls",
+        "modern Promise based browser examples"
+      ],
+      "notFor": [
+        "authentication",
+        "file upload workflows",
+        "SMQ pub/sub"
+      ],
+      "runtime": {
+        "mako": "compatible",
+        "xedge": "compatible",
+        "notes": []
+      },
+      "appRoots": [
+        {
+          "appRootPath": "AJAX-Over-WebSockets/www",
+          "label": "AJAX over WebSockets",
+          "run": "mako -l::www",
+          "summary": "WebSocket service and browser clients for asynchronous RPC-style calls.",
+          "importantFiles": [
+            "AJAX-Over-WebSockets/www/.preload",
+            "AJAX-Over-WebSockets/www/index.html",
+            "AJAX-Over-WebSockets/www/promise.html",
+            "AJAX-Over-WebSockets/www/service.lsp"
+          ],
+          "omitFromCompactContext": []
+        }
+      ],
+      "readme": "AJAX-Over-WebSockets/README.md",
+      "rawReadmeUrl": "https://raw.githubusercontent.com/RealTimeLogic/LSP-Examples/refs/heads/master/AJAX-Over-WebSockets/README.md"
+    },
+    {
+      "examplePath": "authentication",
+      "title": "Lua Authentication Examples",
+      "summary": "Three BAS authentication patterns for protecting an app root, a subdirectory, or individual pages.",
+      "tags": [
+        "authentication",
+        "browser-ui",
+        "security"
+      ],
+      "goodFor": [
+        "basic BAS authentication examples",
+        "protecting entire applications",
+        "protecting subdirectories or individual pages"
+      ],
+      "notFor": [
+        "production password storage design",
+        "single sign-on",
+        "WebAuthn"
+      ],
+      "runtime": {
+        "mako": "compatible",
+        "xedge": "compatible",
+        "notes": [
+          "Digest/basic credentials may be cached by browsers while testing."
+        ]
+      },
+      "appRoots": [
+        {
+          "appRootPath": "authentication/root",
+          "label": "Root-protected auth",
+          "run": "mako -l::root",
+          "summary": "Authenticator applied to the full application root.",
+          "importantFiles": [
+            "authentication/root/.preload",
+            "authentication/root/index.lsp"
+          ],
+          "omitFromCompactContext": [
+            "authentication/root/public/style.css"
+          ]
+        },
+        {
+          "appRootPath": "authentication/semiautomatic",
+          "label": "Semiautomatic page auth",
+          "run": "mako -l::semiautomatic",
+          "summary": "Pages that call authentication manually through shared page logic.",
+          "importantFiles": [
+            "authentication/semiautomatic/.preload",
+            "authentication/semiautomatic/index.lsp",
+            "authentication/semiautomatic/page1.lsp",
+            "authentication/semiautomatic/page2.lsp",
+            "authentication/semiautomatic/page3.lsp"
+          ],
+          "omitFromCompactContext": [
+            "authentication/semiautomatic/style.css"
+          ]
+        },
+        {
+          "appRootPath": "authentication/subdir",
+          "label": "Subdirectory auth",
+          "run": "mako -l::subdir",
+          "summary": "Authenticator applied to only the protected subdirectory branch.",
+          "importantFiles": [
+            "authentication/subdir/.preload",
+            "authentication/subdir/index.lsp",
+            "authentication/subdir/my-protected/index.lsp"
+          ],
+          "omitFromCompactContext": [
+            "authentication/subdir/style.css"
+          ]
+        }
+      ],
+      "readme": "authentication/README.md",
+      "rawReadmeUrl": "https://raw.githubusercontent.com/RealTimeLogic/LSP-Examples/refs/heads/master/authentication/README.md"
+    },
+    {
+      "examplePath": "AWS-MQTT",
+      "title": "AWS IoT Core MQTT",
+      "summary": "MQTT client example for connecting to AWS IoT Core with ALPN and mutual TLS.",
+      "tags": [
+        "iot",
+        "mqtt",
+        "security",
+        "xedge32"
+      ],
+      "goodFor": [
+        "AWS IoT Core MQTT connection examples",
+        "mutual TLS MQTT setup",
+        "publishing JSON data to cloud topics"
+      ],
+      "notFor": [
+        "browser UI examples",
+        "local MQTT broker implementation",
+        "offline-only examples"
+      ],
+      "runtime": {
+        "mako": "compatible",
+        "xedge": "compatible",
+        "notes": [
+          "Requires AWS endpoint, CA certificate, device certificate, and private key before it will connect."
+        ]
+      },
+      "appRoots": [
+        {
+          "appRootPath": "AWS-MQTT/www",
+          "label": "AWS MQTT client",
+          "run": "mako -l::www",
+          "summary": "Startup-only MQTT client application for AWS IoT Core.",
+          "importantFiles": [
+            "AWS-MQTT/www/.preload"
+          ],
+          "omitFromCompactContext": []
+        }
+      ],
+      "readme": "AWS-MQTT/README.md",
+      "rawReadmeUrl": "https://raw.githubusercontent.com/RealTimeLogic/LSP-Examples/refs/heads/master/AWS-MQTT/README.md"
+    },
+    {
+      "examplePath": "CGI",
+      "title": "CGI Plugin and Examples",
+      "summary": "Lua CGI compatibility layer using forkpty to run external CGI scripts.",
+      "tags": [
+        "cgi",
+        "http-api",
+        "lua",
+        "mako"
+      ],
+      "goodFor": [
+        "CGI compatibility experiments",
+        "external process integration",
+        "porting CGI scripts to BAS"
+      ],
+      "notFor": [
+        "embedded RTOS deployments",
+        "small browser UI examples",
+        "Windows-only targets"
+      ],
+      "runtime": {
+        "mako": "partial",
+        "xedge": "partial",
+        "notes": [
+          "Depends on the forkpty plugin and is intended for Linux, macOS, and QNX."
+        ]
+      },
+      "appRoots": [
+        {
+          "appRootPath": "CGI/www",
+          "label": "CGI bridge",
+          "run": "mako -l::www",
+          "summary": "App root that mounts a CGI directory into the BAS virtual file system.",
+          "importantFiles": [
+            "CGI/www/.lua/cgi.lua",
+            "CGI/www/.preload",
+            "CGI/www/index.lsp"
+          ],
+          "omitFromCompactContext": []
+        }
+      ],
+      "readme": "CGI/README.md",
+      "rawReadmeUrl": "https://raw.githubusercontent.com/RealTimeLogic/LSP-Examples/refs/heads/master/CGI/README.md"
+    },
+    {
+      "examplePath": "command-env",
+      "title": "Command Environment",
+      "summary": "Examples showing request/response environment behavior with includes and forwards.",
+      "tags": [
+        "lua",
+        "small"
+      ],
+      "goodFor": [
+        "LSP include examples",
+        "LSP request forwarding examples",
+        "understanding ephemeral request/response environment"
+      ],
+      "notFor": [
+        "browser UI applications",
+        "device-control UI",
+        "security examples"
+      ],
+      "runtime": {
+        "mako": "compatible",
+        "xedge": "compatible",
+        "notes": []
+      },
+      "appRoots": [
+        {
+          "appRootPath": "command-env/forward",
+          "label": "Forward command environment",
+          "run": "mako -l::forward",
+          "summary": "LSP forward-chain example.",
+          "importantFiles": [
+            "command-env/forward/.second.lsp",
+            "command-env/forward/.third.lsp",
+            "command-env/forward/first.lsp",
+            "command-env/forward/index.lsp"
+          ],
+          "omitFromCompactContext": []
+        },
+        {
+          "appRootPath": "command-env/include",
+          "label": "Include command environment",
+          "run": "mako -l::include",
+          "summary": "LSP include example with shared header and footer pages.",
+          "importantFiles": [
+            "command-env/include/.footer.lsp",
+            "command-env/include/.header.lsp",
+            "command-env/include/index.lsp",
+            "command-env/include/page1.lsp",
+            "command-env/include/page2.lsp"
+          ],
+          "omitFromCompactContext": []
+        }
+      ],
+      "readme": "command-env/README.md",
+      "rawReadmeUrl": "https://raw.githubusercontent.com/RealTimeLogic/LSP-Examples/refs/heads/master/command-env/README.md"
+    },
+    {
+      "examplePath": "CryptoIO",
+      "title": "CryptoIO",
+      "summary": "AES-GCM encrypted IO wrapper with an encrypted WebDAV/file-server example.",
+      "tags": [
+        "file-server",
+        "lua",
+        "security"
+      ],
+      "goodFor": [
+        "encrypted file storage examples",
+        "reusable Lua IO wrapper code",
+        "WebDAV file server with encrypted backing storage"
+      ],
+      "notFor": [
+        "browser dashboard UI",
+        "database examples",
+        "real-time messaging"
+      ],
+      "runtime": {
+        "mako": "compatible",
+        "xedge": "compatible",
+        "notes": []
+      },
+      "appRoots": [
+        {
+          "appRootPath": "CryptoIO/www",
+          "label": "Encrypted file service",
+          "run": "mako -l::www",
+          "summary": "App root containing the CryptoIO module and encrypted file server setup.",
+          "importantFiles": [
+            "CryptoIO/www/.lua/CryptoIO.lua",
+            "CryptoIO/www/.preload"
+          ],
+          "omitFromCompactContext": []
+        }
+      ],
+      "readme": "CryptoIO/README.md",
+      "rawReadmeUrl": "https://raw.githubusercontent.com/RealTimeLogic/LSP-Examples/refs/heads/master/CryptoIO/README.md"
+    },
+    {
+      "examplePath": "CSRF-Prevention",
+      "title": "CSRF Prevention",
+      "summary": "Small LSP form example that checks trusted host/referrer state before accepting a request.",
+      "tags": [
+        "browser-ui",
+        "forms",
+        "security",
+        "small"
+      ],
+      "goodFor": [
+        "CSRF mitigation examples",
+        "form submission security",
+        "trusted browser/server handshake examples"
+      ],
+      "notFor": [
+        "authentication systems",
+        "file upload workflows",
+        "real-time pub/sub"
+      ],
+      "runtime": {
+        "mako": "compatible",
+        "xedge": "compatible",
+        "notes": []
+      },
+      "appRoots": [
+        {
+          "appRootPath": "CSRF-Prevention",
+          "label": "CSRF form demo",
+          "run": "mako -l::CSRF-Prevention",
+          "summary": "Self-contained app root with preload handshake and protected form page.",
+          "importantFiles": [
+            "CSRF-Prevention/.preload",
+            "CSRF-Prevention/index.lsp",
+            "CSRF-Prevention/myapp/index.lsp"
+          ],
+          "omitFromCompactContext": []
+        }
+      ],
+      "readme": "CSRF-Prevention/README.md",
+      "rawReadmeUrl": "https://raw.githubusercontent.com/RealTimeLogic/LSP-Examples/refs/heads/master/CSRF-Prevention/README.md"
+    },
+    {
+      "examplePath": "docex/cart",
+      "title": "Docex Shopping Cart",
+      "summary": "Small shopping-cart example using LSP pages and a startup preload script.",
+      "tags": [
+        "browser-ui",
+        "client-server",
+        "small"
+      ],
+      "goodFor": [
+        "compact LSP application examples",
+        "shopping-cart request handling",
+        "stateful browser/server examples"
+      ],
+      "notFor": [
+        "authentication",
+        "database-backed cart design",
+        "real-time messaging"
+      ],
+      "runtime": {
+        "mako": "compatible",
+        "xedge": "compatible",
+        "notes": []
+      },
+      "appRoots": [
+        {
+          "appRootPath": "docex/cart/www",
+          "label": "Shopping cart",
+          "run": "mako -l::www",
+          "summary": "Runnable cart app root.",
+          "importantFiles": [
+            "docex/cart/www/.cart.lsp",
+            "docex/cart/www/.preload",
+            "docex/cart/www/index.lsp"
+          ],
+          "omitFromCompactContext": []
+        }
+      ],
+      "readme": "docex/cart/README.md",
+      "rawReadmeUrl": "https://raw.githubusercontent.com/RealTimeLogic/LSP-Examples/refs/heads/master/docex/cart/README.md"
+    },
+    {
+      "examplePath": "Dynamic-Nav-Menu",
+      "title": "Dynamic Navigation Menu",
+      "summary": "Authenticated multi-page dashboard shell with JSON-backed users and dynamic navigation.",
+      "tags": [
+        "authentication",
+        "browser-ui",
+        "dashboard",
+        "json",
+        "security"
+      ],
+      "goodFor": [
+        "dashboard UI with authentication",
+        "dynamic menu examples",
+        "form login with hashed JSON user data"
+      ],
+      "notFor": [
+        "file upload workflows",
+        "minimal beginner examples",
+        "SMQ messaging"
+      ],
+      "runtime": {
+        "mako": "compatible",
+        "xedge": "compatible",
+        "notes": []
+      },
+      "appRoots": [
+        {
+          "appRootPath": "Dynamic-Nav-Menu/www",
+          "label": "Authenticated navigation dashboard",
+          "run": "mako -l::www",
+          "summary": "Dashboard-style app root with login handling, menu pages, and source viewer.",
+          "importantFiles": [
+            "Dynamic-Nav-Menu/www/.login-form.lsp",
+            "Dynamic-Nav-Menu/www/.preload",
+            "Dynamic-Nav-Menu/www/admin.lsp",
+            "Dynamic-Nav-Menu/www/index.lsp",
+            "Dynamic-Nav-Menu/www/network.lsp",
+            "Dynamic-Nav-Menu/www/security.lsp",
+            "Dynamic-Nav-Menu/www/users.lsp"
+          ],
+          "omitFromCompactContext": [
+            "Dynamic-Nav-Menu/www/public/login-style.css",
+            "Dynamic-Nav-Menu/www/public/style.css"
+          ]
+        }
+      ],
+      "readme": "Dynamic-Nav-Menu/README.md",
+      "rawReadmeUrl": "https://raw.githubusercontent.com/RealTimeLogic/LSP-Examples/refs/heads/master/Dynamic-Nav-Menu/README.md"
+    },
+    {
+      "examplePath": "Email-and-Logging",
+      "title": "Email and Logging",
+      "summary": "Examples for sending email, parsing EML, and mailing logged server errors.",
+      "tags": [
+        "lua",
+        "mako"
+      ],
+      "goodFor": [
+        "EML parser examples",
+        "Mako emailed error log examples",
+        "SMTP email examples"
+      ],
+      "notFor": [
+        "browser UI workflows",
+        "device-control UI",
+        "real-time messaging"
+      ],
+      "runtime": {
+        "mako": "compatible",
+        "xedge": "partial",
+        "notes": [
+          "Several variants use Mako log SMTP settings from mako.conf."
+        ]
+      },
+      "appRoots": [
+        {
+          "appRootPath": "Email-and-Logging/eml",
+          "label": "EML parser",
+          "run": "mako -l::eml",
+          "summary": "EML parser example and supporting Lua modules.",
+          "importantFiles": [
+            "Email-and-Logging/eml/.lua/eml/Decoder.lua",
+            "Email-and-Logging/eml/.lua/eml/EmailMessage.lua",
+            "Email-and-Logging/eml/.lua/eml/Header.lua",
+            "Email-and-Logging/eml/.lua/eml/Headers.lua",
+            "Email-and-Logging/eml/.lua/eml/Multipart.lua",
+            "Email-and-Logging/eml/.preload"
+          ],
+          "omitFromCompactContext": []
+        },
+        {
+          "appRootPath": "Email-and-Logging/html",
+          "label": "HTML email",
+          "run": "mako -l::html",
+          "summary": "Startup script that sends an HTML email using configured SMTP settings.",
+          "importantFiles": [
+            "Email-and-Logging/html/.preload"
+          ],
+          "omitFromCompactContext": []
+        },
+        {
+          "appRootPath": "Email-and-Logging/log",
+          "label": "Emailed log errors",
+          "run": "mako -l::log",
+          "summary": "Logging example with an LSP page that can trigger emailed error reporting.",
+          "importantFiles": [
+            "Email-and-Logging/log/.preload",
+            "Email-and-Logging/log/index.lsp"
+          ],
+          "omitFromCompactContext": []
+        },
+        {
+          "appRootPath": "Email-and-Logging/text",
+          "label": "Plain text email",
+          "run": "mako -l::text",
+          "summary": "Startup script that sends a plain text email using configured SMTP settings.",
+          "importantFiles": [
+            "Email-and-Logging/text/.preload"
+          ],
+          "omitFromCompactContext": []
+        }
+      ],
+      "readme": "Email-and-Logging/README.md",
+      "rawReadmeUrl": "https://raw.githubusercontent.com/RealTimeLogic/LSP-Examples/refs/heads/master/Email-and-Logging/README.md"
+    },
+    {
+      "examplePath": "ESP32",
+      "title": "ESP32 Xedge32 Examples",
+      "summary": "Collection of Xedge32 examples for GPIO, sensors, servo control, cameras, MQTT, and audio.",
+      "tags": [
+        "device-control",
+        "iot",
+        "mqtt",
+        "xedge",
+        "xedge32"
+      ],
+      "goodFor": [
+        "camera, sensor, LED, and servo examples",
+        "ESP32 device-control examples",
+        "Xedge32 XLua startup scripts"
+      ],
+      "notFor": [
+        "desktop Mako-only examples",
+        "production authentication design",
+        "server-class database examples"
+      ],
+      "runtime": {
+        "mako": "partial",
+        "xedge": "compatible",
+        "notes": [
+          ".xlua files are important for Xedge32 startup behavior; Mako can store them but does not auto-execute them.",
+          "Copying the whole directory can start multiple XLua apps on Xedge32, so select files deliberately."
+        ]
+      },
+      "appRoots": [
+        {
+          "appRootPath": "ESP32",
+          "label": "ESP32 examples bundle",
+          "run": "Upload selected files to Xedge32",
+          "summary": "Bundle of Xedge32-oriented LSP and XLua examples.",
+          "importantFiles": [
+            "ESP32/blinkled.xlua",
+            "ESP32/bme280.lsp",
+            "ESP32/bme280.xlua",
+            "ESP32/camtest.lsp",
+            "ESP32/CheckWiFi.lsp",
+            "ESP32/mqttcam.html",
+            "ESP32/mqttcam.xlua",
+            "ESP32/servo.lsp",
+            "ESP32/uiservo.lsp",
+            "ESP32/wscam.lsp"
+          ],
+          "omitFromCompactContext": []
+        },
+        {
+          "appRootPath": "ESP32/simulator",
+          "label": "ESP32 sensor simulator",
+          "run": "mako -l::simulator",
+          "summary": "Simulator support for ESP32 examples.",
+          "importantFiles": [
+            "ESP32/simulator/.lua/bme280.lua",
+            "ESP32/simulator/.preload"
+          ],
+          "omitFromCompactContext": []
+        }
+      ],
+      "readme": "ESP32/README.md",
+      "rawReadmeUrl": "https://raw.githubusercontent.com/RealTimeLogic/LSP-Examples/refs/heads/master/ESP32/README.md"
+    },
+    {
+      "examplePath": "File-Server",
+      "title": "WebDAV and Web File Server",
+      "summary": "Ready-to-run WebDAV/Web File Manager example with basic authentication.",
+      "tags": [
+        "authentication",
+        "file-server",
+        "security"
+      ],
+      "goodFor": [
+        "file serving examples",
+        "Web File Manager setup",
+        "WebDAV examples with authentication"
+      ],
+      "notFor": [
+        "device-control UI",
+        "small form examples",
+        "upload internals"
+      ],
+      "runtime": {
+        "mako": "compatible",
+        "xedge": "compatible",
+        "notes": []
+      },
+      "appRoots": [
+        {
+          "appRootPath": "File-Server/www",
+          "label": "Web file server",
+          "run": "mako -l::www",
+          "summary": "App root that mounts WebDAV/Web File Manager at /fs/.",
+          "importantFiles": [
+            "File-Server/www/.preload"
+          ],
+          "omitFromCompactContext": []
+        }
+      ],
+      "readme": "File-Server/README.md",
+      "rawReadmeUrl": "https://raw.githubusercontent.com/RealTimeLogic/LSP-Examples/refs/heads/master/File-Server/README.md"
+    },
+    {
+      "examplePath": "fs-sso",
+      "title": "File Server Single Sign-On",
+      "summary": "OpenID Connect single sign-on flow for a Web File Server style app.",
+      "tags": [
+        "authentication",
+        "file-server",
+        "oauth",
+        "security"
+      ],
+      "goodFor": [
+        "OpenID Connect SSO examples",
+        "single sign-on protected file server",
+        "token-based login flow examples"
+      ],
+      "notFor": [
+        "basic authentication examples",
+        "offline-only examples",
+        "small beginner examples"
+      ],
+      "runtime": {
+        "mako": "compatible",
+        "xedge": "partial",
+        "notes": [
+          "Requires external identity-provider configuration and valid client credentials."
+        ]
+      },
+      "appRoots": [
+        {
+          "appRootPath": "fs-sso/www",
+          "label": "SSO file server",
+          "run": "mako -l::www",
+          "summary": "SSO app root with Microsoft Entra style login flow and file-server access.",
+          "importantFiles": [
+            "fs-sso/www/.lua/ms-sso.lua",
+            "fs-sso/www/.preload",
+            "fs-sso/www/help.lsp",
+            "fs-sso/www/index.lsp",
+            "fs-sso/www/logout.lsp"
+          ],
+          "omitFromCompactContext": []
+        }
+      ],
+      "readme": "fs-sso/README.md",
+      "rawReadmeUrl": "https://raw.githubusercontent.com/RealTimeLogic/LSP-Examples/refs/heads/master/fs-sso/README.md"
+    },
+    {
+      "examplePath": "GitHubIo",
+      "title": "GitHub IO",
+      "summary": "GitHub repository mounted as a BAS file system through a Lua IO implementation.",
+      "tags": [
+        "file-server",
+        "http-api",
+        "lua"
+      ],
+      "goodFor": [
+        "custom Lua IO examples",
+        "GitHub-backed file system experiments",
+        "repository content browsing through BAS"
+      ],
+      "notFor": [
+        "offline examples",
+        "small browser UI examples",
+        "unauthenticated production file serving"
+      ],
+      "runtime": {
+        "mako": "compatible",
+        "xedge": "partial",
+        "notes": [
+          "The shipped preload intentionally errors until credentials and repository settings are configured."
+        ]
+      },
+      "appRoots": [
+        {
+          "appRootPath": "GitHubIo/www",
+          "label": "GitHub IO file system",
+          "run": "mako -l::www",
+          "summary": "App root containing the GitHub IO module and example mount.",
+          "importantFiles": [
+            "GitHubIo/www/.lua/GitHubIo.lua",
+            "GitHubIo/www/.preload"
+          ],
+          "omitFromCompactContext": []
+        }
+      ],
+      "readme": "GitHubIo/README.md",
+      "rawReadmeUrl": "https://raw.githubusercontent.com/RealTimeLogic/LSP-Examples/refs/heads/master/GitHubIo/README.md"
+    },
+    {
+      "examplePath": "html-form",
+      "title": "Basic HTML Form",
+      "summary": "Beginner LSP form example where one page renders and processes submitted fields.",
+      "tags": [
+        "browser-ui",
+        "forms",
+        "small"
+      ],
+      "goodFor": [
+        "beginner LSP examples",
+        "form submission from browser to server",
+        "small request/response examples"
+      ],
+      "notFor": [
+        "AJAX examples",
+        "authentication",
+        "file upload workflows"
+      ],
+      "runtime": {
+        "mako": "compatible",
+        "xedge": "compatible",
+        "notes": []
+      },
+      "appRoots": [
+        {
+          "appRootPath": "html-form/www",
+          "label": "HTML form",
+          "run": "mako -l::www",
+          "summary": "Single LSP page for rendering and processing a basic HTML form.",
+          "importantFiles": [
+            "html-form/www/index.lsp"
+          ],
+          "omitFromCompactContext": []
+        }
+      ],
+      "readme": "html-form/README.md",
+      "rawReadmeUrl": "https://raw.githubusercontent.com/RealTimeLogic/LSP-Examples/refs/heads/master/html-form/README.md"
+    },
+    {
+      "examplePath": "htmx",
+      "title": "htmx Introduction",
+      "summary": "Server-rendered htmx example where LSP returns HTML fragments for browser updates.",
+      "tags": [
+        "browser-ui",
+        "client-server",
+        "htmx"
+      ],
+      "goodFor": [
+        "htmx and LSP examples",
+        "server-rendered browser interactivity",
+        "updating page fragments without custom JavaScript"
+      ],
+      "notFor": [
+        "authentication",
+        "large dashboard templates",
+        "real-time pub/sub"
+      ],
+      "runtime": {
+        "mako": "compatible",
+        "xedge": "compatible",
+        "notes": []
+      },
+      "appRoots": [
+        {
+          "appRootPath": "htmx/introduction",
+          "label": "htmx introduction",
+          "run": "mako -l::introduction",
+          "summary": "Browser page and LSP fragment endpoint for the htmx introduction.",
+          "importantFiles": [
+            "htmx/introduction/index.html",
+            "htmx/introduction/users.lsp"
+          ],
+          "omitFromCompactContext": []
+        }
+      ],
+      "readme": "htmx/README.md",
+      "rawReadmeUrl": "https://raw.githubusercontent.com/RealTimeLogic/LSP-Examples/refs/heads/master/htmx/README.md"
+    },
+    {
+      "examplePath": "JSON-File-Server",
+      "title": "JSON File Server Authentication",
+      "summary": "Web file server using JSON-backed users, digest authentication, request login, and ACL examples.",
+      "tags": [
+        "authentication",
+        "file-server",
+        "json",
+        "security"
+      ],
+      "goodFor": [
+        "authorization rule examples",
+        "JSON authenticator examples",
+        "Web File Manager with user roles"
+      ],
+      "notFor": [
+        "device-control UI",
+        "minimal beginner authentication",
+        "real-time messaging"
+      ],
+      "runtime": {
+        "mako": "compatible",
+        "xedge": "compatible",
+        "notes": []
+      },
+      "appRoots": [
+        {
+          "appRootPath": "JSON-File-Server/www",
+          "label": "JSON-authenticated file server",
+          "run": "mako -l::www",
+          "summary": "App root with JSON user database setup and Web File Manager mount.",
+          "importantFiles": [
+            "JSON-File-Server/www/.preload",
+            "JSON-File-Server/www/index.lsp",
+            "JSON-File-Server/www/logout.lsp"
+          ],
+          "omitFromCompactContext": []
+        }
+      ],
+      "readme": "JSON-File-Server/README.md",
+      "rawReadmeUrl": "https://raw.githubusercontent.com/RealTimeLogic/LSP-Examples/refs/heads/master/JSON-File-Server/README.md"
+    },
+    {
+      "examplePath": "Light-Dashboard",
+      "title": "Light Dashboard",
+      "summary": "Embedded dashboard template variants with SMQ-based light control and optional authentication.",
+      "tags": [
+        "authentication",
+        "browser-ui",
+        "dashboard",
+        "device-control",
+        "iot",
+        "smq"
+      ],
+      "goodFor": [
+        "dashboard UI with authentication",
+        "embedded device-control UI",
+        "SMQ light-control examples"
+      ],
+      "notFor": [
+        "database-only examples",
+        "file upload workflows",
+        "minimal single-page examples"
+      ],
+      "runtime": {
+        "mako": "compatible",
+        "xedge": "compatible",
+        "notes": [
+          "Custom variant is the best starting point for adapting the dashboard template."
+        ]
+      },
+      "appRoots": [
+        {
+          "appRootPath": "Light-Dashboard/custom",
+          "label": "Custom dashboard",
+          "run": "mako -l::custom",
+          "summary": "Customizable dashboard variant with SMQ slider and CMS-like Lua templates.",
+          "importantFiles": [
+            "Light-Dashboard/custom/.config",
+            "Light-Dashboard/custom/.lua/cms.lua",
+            "Light-Dashboard/custom/.lua/www/index.html",
+            "Light-Dashboard/custom/.lua/www/template.lsp",
+            "Light-Dashboard/custom/.preload",
+            "Light-Dashboard/custom/SMQ/index.lsp",
+            "Light-Dashboard/custom/static/RoundSlider.js",
+            "Light-Dashboard/custom/static/ui.js"
+          ],
+          "omitFromCompactContext": [
+            "Light-Dashboard/custom/static/RoundSlider.css",
+            "Light-Dashboard/custom/static/RoundSlider.js",
+            "Light-Dashboard/custom/static/styles.css"
+          ]
+        },
+        {
+          "appRootPath": "Light-Dashboard/htmx",
+          "label": "HTMX dashboard",
+          "run": "mako -l::htmx",
+          "summary": "HTMX-styled dashboard variant with SMQ light-control endpoint.",
+          "importantFiles": [
+            "Light-Dashboard/htmx/.config",
+            "Light-Dashboard/htmx/.lua/cms.lua",
+            "Light-Dashboard/htmx/.lua/www/index.html",
+            "Light-Dashboard/htmx/.lua/www/template.lsp",
+            "Light-Dashboard/htmx/.preload",
+            "Light-Dashboard/htmx/SMQ/index.lsp",
+            "Light-Dashboard/htmx/static/ui.js"
+          ],
+          "omitFromCompactContext": [
+            "Light-Dashboard/htmx/static/pure-min.css",
+            "Light-Dashboard/htmx/static/RoundSlider.css",
+            "Light-Dashboard/htmx/static/RoundSlider.js",
+            "Light-Dashboard/htmx/static/styles.css"
+          ]
+        },
+        {
+          "appRootPath": "Light-Dashboard/www",
+          "label": "Pure CSS dashboard",
+          "run": "mako -l::www",
+          "summary": "Original dashboard variant with static assets and SMQ light-control endpoint.",
+          "importantFiles": [
+            "Light-Dashboard/www/.config",
+            "Light-Dashboard/www/.lua/cms.lua",
+            "Light-Dashboard/www/.lua/www/index.html",
+            "Light-Dashboard/www/.lua/www/template.lsp",
+            "Light-Dashboard/www/.preload",
+            "Light-Dashboard/www/SMQ/index.lsp",
+            "Light-Dashboard/www/static/ui.js"
+          ],
+          "omitFromCompactContext": [
+            "Light-Dashboard/www/static/pure-min.css",
+            "Light-Dashboard/www/static/RoundSlider.css",
+            "Light-Dashboard/www/static/RoundSlider.js",
+            "Light-Dashboard/www/static/styles.css"
+          ]
+        }
+      ],
+      "readme": "Light-Dashboard/README.md",
+      "rawReadmeUrl": "https://raw.githubusercontent.com/RealTimeLogic/LSP-Examples/refs/heads/master/Light-Dashboard/README.md"
+    },
+    {
+      "examplePath": "Lua-Debug",
+      "title": "Lua Debug",
+      "summary": "VS Code debugging workflow for Lua, LSP, preload scripts, and Mako-loaded apps.",
+      "tags": [
+        "debugging",
+        "lua",
+        "mako"
+      ],
+      "goodFor": [
+        "debugging LSP pages",
+        "debugging Lua modules",
+        "VS Code debug setup for Mako"
+      ],
+      "notFor": [
+        "device-control UI",
+        "production file server design",
+        "real-time messaging"
+      ],
+      "runtime": {
+        "mako": "compatible",
+        "xedge": "partial",
+        "notes": [
+          "Debug workflow is centered on local Mako Server and VS Code."
+        ]
+      },
+      "appRoots": [
+        {
+          "appRootPath": "Lua-Debug/FileServer",
+          "label": "Debug file server",
+          "run": "mako -l::FileServer",
+          "summary": "File-server app used by the debugging walkthrough.",
+          "importantFiles": [
+            "Lua-Debug/FileServer/.lua/StartBrowser.lua",
+            "Lua-Debug/FileServer/.preload",
+            "Lua-Debug/FileServer/index.lsp"
+          ],
+          "omitFromCompactContext": []
+        },
+        {
+          "appRootPath": "Lua-Debug/www",
+          "label": "Lua debug app",
+          "run": "mako -l::www",
+          "summary": "Debuggable LSP app with preload script and Lua module.",
+          "importantFiles": [
+            "Lua-Debug/www/.lua/Markow-Chain.lua",
+            "Lua-Debug/www/.preload",
+            "Lua-Debug/www/index.lsp"
+          ],
+          "omitFromCompactContext": []
+        }
+      ],
+      "readme": "Lua-Debug/README.md",
+      "rawReadmeUrl": "https://raw.githubusercontent.com/RealTimeLogic/LSP-Examples/refs/heads/master/Lua-Debug/README.md"
+    },
+    {
+      "examplePath": "MinnowSim",
+      "title": "MinnowSim",
+      "summary": "Embedded single-page application simulator with LSP entry point and preload logic.",
+      "tags": [
+        "browser-ui",
+        "device-control",
+        "iot",
+        "small"
+      ],
+      "goodFor": [
+        "embedded single page application examples",
+        "simple simulated device UI",
+        "small BAS app roots without a www wrapper"
+      ],
+      "notFor": [
+        "authentication",
+        "database examples",
+        "file upload workflows"
+      ],
+      "runtime": {
+        "mako": "compatible",
+        "xedge": "compatible",
+        "notes": [
+          "No local MinnowSim README was present; metadata is inferred from the root README and app markers."
+        ]
+      },
+      "appRoots": [
+        {
+          "appRootPath": "MinnowSim",
+          "label": "MinnowSim app",
+          "run": "mako -l::MinnowSim",
+          "summary": "Self-contained app root with index.lsp and preload script.",
+          "importantFiles": [
+            "MinnowSim/.preload",
+            "MinnowSim/index.lsp"
+          ],
+          "omitFromCompactContext": []
+        }
+      ],
+      "readme": "README.md",
+      "rawReadmeUrl": "https://raw.githubusercontent.com/RealTimeLogic/LSP-Examples/refs/heads/master/README.md"
+    },
+    {
+      "examplePath": "MQTT-Broker",
+      "title": "MQTT Broker",
+      "summary": "Lua MQTT broker example with TLS/plain listeners and broker callback hooks.",
+      "tags": [
+        "iot",
+        "mqtt",
+        "security"
+      ],
+      "goodFor": [
+        "local MQTT broker examples",
+        "MQTT callback policy experiments",
+        "TLS MQTT listener setup"
+      ],
+      "notFor": [
+        "AWS IoT client setup",
+        "browser UI examples",
+        "SMQ examples"
+      ],
+      "runtime": {
+        "mako": "compatible",
+        "xedge": "compatible",
+        "notes": [
+          "Default listeners may conflict with existing services on ports 1883, 1884, or 8883."
+        ]
+      },
+      "appRoots": [
+        {
+          "appRootPath": "MQTT-Broker/www",
+          "label": "MQTT broker app",
+          "run": "mako -l::www",
+          "summary": "App root containing broker module and startup configuration.",
+          "importantFiles": [
+            "MQTT-Broker/www/.lua/mqttbroker.lua",
+            "MQTT-Broker/www/.preload"
+          ],
+          "omitFromCompactContext": []
+        }
+      ],
+      "readme": "MQTT-Broker/README.md",
+      "rawReadmeUrl": "https://raw.githubusercontent.com/RealTimeLogic/LSP-Examples/refs/heads/master/MQTT-Broker/README.md"
+    },
+    {
+      "examplePath": "MysqlAndRedis",
+      "title": "MySQL and Redis Drivers",
+      "summary": "BAS-compatible MySQL and Redis drivers adapted from OpenResty with test LSP pages.",
+      "tags": [
+        "database",
+        "lua",
+        "mako"
+      ],
+      "goodFor": [
+        "MySQL driver examples",
+        "OpenResty cosocket compatibility references",
+        "Redis driver examples"
+      ],
+      "notFor": [
+        "browser dashboard UI",
+        "embedded RTOS targets without database services",
+        "small beginner examples"
+      ],
+      "runtime": {
+        "mako": "compatible",
+        "xedge": "partial",
+        "notes": [
+          "The reusable driver bundle is packaged from MysqlAndRedis/MySQL and loaded alongside MysqlAndRedis/www."
+        ]
+      },
+      "appRoots": [
+        {
+          "appRootPath": "MysqlAndRedis",
+          "label": "MySQL and Redis example package",
+          "run": "cd MySQL && zip -D -q -u -r -9 ../MySQL.zip .; mako -l::MySQL.zip -l::www",
+          "summary": "Package root containing both the driver bundle and the LSP test pages.",
+          "importantFiles": [
+            "MysqlAndRedis/MySQL/.config",
+            "MysqlAndRedis/MySQL/.lua/resty/mysql.lua",
+            "MysqlAndRedis/MySQL/.lua/resty/redis.lua",
+            "MysqlAndRedis/MySQL/.preload",
+            "MysqlAndRedis/www/.preload",
+            "MysqlAndRedis/www/MySQL.lsp",
+            "MysqlAndRedis/www/Redis.lsp"
+          ],
+          "omitFromCompactContext": [
+            "MysqlAndRedis/MySQL/.lua/resty/rsa.lua",
+            "MysqlAndRedis/MySQL/.lua/resty/sha256.lua"
+          ]
+        }
+      ],
+      "readme": "MysqlAndRedis/README.md",
+      "rawReadmeUrl": "https://raw.githubusercontent.com/RealTimeLogic/LSP-Examples/refs/heads/master/MysqlAndRedis/README.md"
+    },
+    {
+      "examplePath": "oauth",
+      "title": "OAuth 2.0 Example",
+      "summary": "GitHub OAuth 2.0 client flow converted from PHP to LSP.",
+      "tags": [
+        "authentication",
+        "oauth",
+        "security"
+      ],
+      "goodFor": [
+        "GitHub OAuth callback examples",
+        "OAuth 2.0 client flow in LSP",
+        "redirect-based authentication examples"
+      ],
+      "notFor": [
+        "local username/password authentication",
+        "offline-only examples",
+        "WebAuthn"
+      ],
+      "runtime": {
+        "mako": "compatible",
+        "xedge": "partial",
+        "notes": [
+          "Requires OAuth application configuration, callback URL, and credentials."
+        ]
+      },
+      "appRoots": [
+        {
+          "appRootPath": "oauth/sample-oauth2-client",
+          "label": "GitHub OAuth client",
+          "run": "mako -l::sample-oauth2-client",
+          "summary": "Single LSP GitHub OAuth client example.",
+          "importantFiles": [
+            "oauth/sample-oauth2-client/github.lsp"
+          ],
+          "omitFromCompactContext": []
+        }
+      ],
+      "readme": "oauth/README.md",
+      "rawReadmeUrl": "https://raw.githubusercontent.com/RealTimeLogic/LSP-Examples/refs/heads/master/oauth/README.md"
+    },
+    {
+      "examplePath": "PostgreSQL",
+      "title": "PostgreSQL",
+      "summary": "Form-driven PostgreSQL example using a shared helper object and deferred response flow.",
+      "tags": [
+        "browser-ui",
+        "database",
+        "forms"
+      ],
+      "goodFor": [
+        "background SQL work from LSP pages",
+        "form-driven database inserts",
+        "PostgreSQL LSP examples"
+      ],
+      "notFor": [
+        "authentication",
+        "real-time messaging",
+        "SQLite examples"
+      ],
+      "runtime": {
+        "mako": "compatible",
+        "xedge": "partial",
+        "notes": [
+          "Requires PostgreSQL service and pgsql.so availability."
+        ]
+      },
+      "appRoots": [
+        {
+          "appRootPath": "PostgreSQL/www",
+          "label": "PostgreSQL form app",
+          "run": "mako -l::www",
+          "summary": "App root containing PostgreSQL startup helper and form page.",
+          "importantFiles": [
+            "PostgreSQL/www/.lua/pg.lua",
+            "PostgreSQL/www/.preload",
+            "PostgreSQL/www/index.lsp"
+          ],
+          "omitFromCompactContext": []
+        }
+      ],
+      "readme": "PostgreSQL/README.md",
+      "rawReadmeUrl": "https://raw.githubusercontent.com/RealTimeLogic/LSP-Examples/refs/heads/master/PostgreSQL/README.md"
+    },
+    {
+      "examplePath": "QNX/PPS",
+      "title": "QNX PPS SMQ Bridge",
+      "summary": "Reusable Lua module that bridges QNX Persistent Publish Subscribe topics to SMQ.",
+      "tags": [
+        "iot",
+        "lua",
+        "messaging",
+        "smq"
+      ],
+      "goodFor": [
+        "browser access to QNX publish/subscribe data",
+        "QNX PPS integration",
+        "SMQ bridge module examples"
+      ],
+      "notFor": [
+        "non-QNX deployments",
+        "small browser UI examples",
+        "standalone Mako app roots"
+      ],
+      "runtime": {
+        "mako": "not-applicable",
+        "xedge": "not-applicable",
+        "notes": [
+          "This directory provides a reusable QNX module rather than a standalone runnable app."
+        ]
+      },
+      "appRoots": [],
+      "readme": "QNX/PPS/README.md",
+      "rawReadmeUrl": "https://raw.githubusercontent.com/RealTimeLogic/LSP-Examples/refs/heads/master/QNX/PPS/README.md"
+    },
+    {
+      "examplePath": "RADIUS",
+      "title": "RADIUS Authentication",
+      "summary": "BAS authenticator example backed by a RADIUS client.",
+      "tags": [
+        "authentication",
+        "security"
+      ],
+      "goodFor": [
+        "BAS authentication integration",
+        "protecting LSP pages with external authentication",
+        "RADIUS client examples"
+      ],
+      "notFor": [
+        "browser UI design",
+        "local JSON user database examples",
+        "small no-dependency examples"
+      ],
+      "runtime": {
+        "mako": "compatible",
+        "xedge": "partial",
+        "notes": [
+          "Requires access to a RADIUS server and matching shared secret."
+        ]
+      },
+      "appRoots": [
+        {
+          "appRootPath": "RADIUS/www",
+          "label": "RADIUS-protected app",
+          "run": "mako -l::www",
+          "summary": "Protected landing page and RADIUS-backed authenticator setup.",
+          "importantFiles": [
+            "RADIUS/www/.lua/radius.lua",
+            "RADIUS/www/.preload",
+            "RADIUS/www/index.lsp"
+          ],
+          "omitFromCompactContext": [
+            "RADIUS/www/public/style.css"
+          ]
+        }
+      ],
+      "readme": "RADIUS/README.md",
+      "rawReadmeUrl": "https://raw.githubusercontent.com/RealTimeLogic/LSP-Examples/refs/heads/master/RADIUS/README.md"
+    },
+    {
+      "examplePath": "require-test",
+      "title": "Require Search Path Test",
+      "summary": "Small example showing how a BAS app can add module search paths and require Lua modules.",
+      "tags": [
+        "lua",
+        "small"
+      ],
+      "goodFor": [
+        "Lua module loading examples",
+        "mako.createloader setup",
+        "require path troubleshooting"
+      ],
+      "notFor": [
+        "browser UI workflows",
+        "device-control UI",
+        "security examples"
+      ],
+      "runtime": {
+        "mako": "compatible",
+        "xedge": "compatible",
+        "notes": []
+      },
+      "appRoots": [
+        {
+          "appRootPath": "require-test/www",
+          "label": "Require test",
+          "run": "mako -l::www",
+          "summary": "App root demonstrating Lua module loading from app directories.",
+          "importantFiles": [
+            "require-test/www/.lua/helloworld2.lua",
+            "require-test/www/.lua/subdir/helloworld3.lua",
+            "require-test/www/.preload",
+            "require-test/www/helloworld1.lua",
+            "require-test/www/index.lsp"
+          ],
+          "omitFromCompactContext": []
+        }
+      ],
+      "readme": "require-test/README.md",
+      "rawReadmeUrl": "https://raw.githubusercontent.com/RealTimeLogic/LSP-Examples/refs/heads/master/require-test/README.md"
+    },
+    {
+      "examplePath": "REST",
+      "title": "RESTful Services",
+      "summary": "Lua REST router example mounted under /api with JSON-style user endpoints.",
+      "tags": [
+        "http-api",
+        "json",
+        "rest"
+      ],
+      "goodFor": [
+        "REST JSON endpoints",
+        "routing HTTP APIs in Lua",
+        "server-side API examples without a large UI"
+      ],
+      "notFor": [
+        "dashboard UI",
+        "file upload workflows",
+        "real-time pub/sub"
+      ],
+      "runtime": {
+        "mako": "compatible",
+        "xedge": "compatible",
+        "notes": []
+      },
+      "appRoots": [
+        {
+          "appRootPath": "REST/www",
+          "label": "REST API app",
+          "run": "mako -l::www",
+          "summary": "App root with REST router module and API startup script.",
+          "importantFiles": [
+            "REST/www/.lua/rest.lua",
+            "REST/www/.preload"
+          ],
+          "omitFromCompactContext": []
+        }
+      ],
+      "readme": "REST/README.md",
+      "rawReadmeUrl": "https://raw.githubusercontent.com/RealTimeLogic/LSP-Examples/refs/heads/master/REST/README.md"
+    },
+    {
+      "examplePath": "SMQ-examples/BlobArena",
+      "title": "SMQ Blob Arena",
+      "summary": "Small AI-generated multiplayer browser game variants using SMQ for realtime state.",
+      "tags": [
+        "browser-ui",
+        "messaging",
+        "realtime",
+        "smq"
+      ],
+      "goodFor": [
+        "browser multiplayer SMQ examples",
+        "realtime browser state synchronization",
+        "SMQ game experiments"
+      ],
+      "notFor": [
+        "device-control UI",
+        "production game architecture",
+        "small beginner SMQ examples"
+      ],
+      "runtime": {
+        "mako": "compatible",
+        "xedge": "compatible",
+        "notes": []
+      },
+      "appRoots": [
+        {
+          "appRootPath": "SMQ-examples/BlobArena/codex",
+          "label": "Codex Blob Arena",
+          "run": "mako -l::codex",
+          "summary": "Codex-generated Blob Arena SMQ game variant.",
+          "importantFiles": [
+            "SMQ-examples/BlobArena/codex/.config",
+            "SMQ-examples/BlobArena/codex/.preload",
+            "SMQ-examples/BlobArena/codex/index.html",
+            "SMQ-examples/BlobArena/codex/smq.lsp"
+          ],
+          "omitFromCompactContext": []
+        },
+        {
+          "appRootPath": "SMQ-examples/BlobArena/gemini",
+          "label": "Gemini Blob Arena",
+          "run": "mako -l::gemini",
+          "summary": "Gemini-generated Blob Arena SMQ game variant.",
+          "importantFiles": [
+            "SMQ-examples/BlobArena/gemini/.config",
+            "SMQ-examples/BlobArena/gemini/.preload",
+            "SMQ-examples/BlobArena/gemini/index.html",
+            "SMQ-examples/BlobArena/gemini/smq.lsp"
+          ],
+          "omitFromCompactContext": []
+        }
+      ],
+      "readme": "SMQ-examples/BlobArena/README.md",
+      "rawReadmeUrl": "https://raw.githubusercontent.com/RealTimeLogic/LSP-Examples/refs/heads/master/SMQ-examples/BlobArena/README.md"
+    },
+    {
+      "examplePath": "SMQ-examples/cluster",
+      "title": "SMQ Cluster",
+      "summary": "Local SMQ clustering and redundancy experiment with chat and autoconfiguration endpoints.",
+      "tags": [
+        "messaging",
+        "realtime",
+        "smq"
+      ],
+      "goodFor": [
+        "local redundancy examples",
+        "realtime chat with clustered SMQ",
+        "SMQ broker clustering experiments"
+      ],
+      "notFor": [
+        "beginner SMQ examples",
+        "device-control UI",
+        "production cluster design"
+      ],
+      "runtime": {
+        "mako": "compatible",
+        "xedge": "partial",
+        "notes": [
+          "Cluster behavior is intended as an experiment and may require multiple local instances."
+        ]
+      },
+      "appRoots": [
+        {
+          "appRootPath": "SMQ-examples/cluster/www",
+          "label": "SMQ cluster",
+          "run": "mako -l::www",
+          "summary": "SMQ cluster app root with chat and autoconfiguration pages.",
+          "importantFiles": [
+            "SMQ-examples/cluster/www/.preload",
+            "SMQ-examples/cluster/www/autoconf.lsp",
+            "SMQ-examples/cluster/www/chat/index.html",
+            "SMQ-examples/cluster/www/index.lsp",
+            "SMQ-examples/cluster/www/smq.lsp"
+          ],
+          "omitFromCompactContext": [
+            "SMQ-examples/cluster/www/chat/style.css"
+          ]
+        }
+      ],
+      "readme": "SMQ-examples/cluster/README.md",
+      "rawReadmeUrl": "https://raw.githubusercontent.com/RealTimeLogic/LSP-Examples/refs/heads/master/SMQ-examples/cluster/README.md"
+    },
+    {
+      "examplePath": "SMQ-examples/IoT",
+      "title": "SMQ IoT Examples",
+      "summary": "SMQ bundle containing chat and browser-based LED-control examples.",
+      "tags": [
+        "browser-ui",
+        "device-control",
+        "iot",
+        "messaging",
+        "realtime",
+        "smq"
+      ],
+      "goodFor": [
+        "browser chat over SMQ",
+        "device LED control examples",
+        "SMQ pub/sub tutorials"
+      ],
+      "notFor": [
+        "authentication",
+        "database examples",
+        "file serving"
+      ],
+      "runtime": {
+        "mako": "compatible",
+        "xedge": "compatible",
+        "notes": []
+      },
+      "appRoots": [
+        {
+          "appRootPath": "SMQ-examples/IoT",
+          "label": "SMQ IoT bundle",
+          "run": "mako -l::IoT",
+          "summary": "SMQ app root with chat, basic chat, and LED-control pages.",
+          "importantFiles": [
+            "SMQ-examples/IoT/.lua/markdown.lua",
+            "SMQ-examples/IoT/.preload",
+            "SMQ-examples/IoT/chat/BasicChat.html",
+            "SMQ-examples/IoT/chat/index.html",
+            "SMQ-examples/IoT/index.lsp",
+            "SMQ-examples/IoT/led-control/index.html",
+            "SMQ-examples/IoT/smq.lsp"
+          ],
+          "omitFromCompactContext": [
+            "SMQ-examples/IoT/chat/*.wav",
+            "SMQ-examples/IoT/chat/style.css",
+            "SMQ-examples/IoT/led-control/style.css",
+            "SMQ-examples/IoT/style.css"
+          ]
+        }
+      ],
+      "readme": "SMQ-examples/IoT/README.md",
+      "rawReadmeUrl": "https://raw.githubusercontent.com/RealTimeLogic/LSP-Examples/refs/heads/master/SMQ-examples/IoT/README.md"
+    },
+    {
+      "examplePath": "SMQ-examples/LightSwitch-And-LightBulb-App",
+      "title": "SMQ Light Switch and Light Bulb",
+      "summary": "Companion browser apps showing SMQ light switch and light bulb messaging.",
+      "tags": [
+        "browser-ui",
+        "device-control",
+        "iot",
+        "messaging",
+        "realtime",
+        "smq"
+      ],
+      "goodFor": [
+        "device setting control with a browser UI",
+        "light switch and light bulb messaging",
+        "small SMQ pub/sub examples"
+      ],
+      "notFor": [
+        "authentication",
+        "database examples",
+        "large dashboards"
+      ],
+      "runtime": {
+        "mako": "compatible",
+        "xedge": "compatible",
+        "notes": []
+      },
+      "appRoots": [
+        {
+          "appRootPath": "SMQ-examples/LightSwitch-And-LightBulb-App/www",
+          "label": "SMQ light switch and bulb",
+          "run": "mako -l::www",
+          "summary": "Browser switch and bulb pages connected through an SMQ endpoint.",
+          "importantFiles": [
+            "SMQ-examples/LightSwitch-And-LightBulb-App/www/bulb.html",
+            "SMQ-examples/LightSwitch-And-LightBulb-App/www/smq.lsp",
+            "SMQ-examples/LightSwitch-And-LightBulb-App/www/switch.html"
+          ],
+          "omitFromCompactContext": [
+            "SMQ-examples/LightSwitch-And-LightBulb-App/www/bulb.css",
+            "SMQ-examples/LightSwitch-And-LightBulb-App/www/switch.css"
+          ]
+        }
+      ],
+      "readme": "SMQ-examples/LightSwitch-And-LightBulb-App/README.md",
+      "rawReadmeUrl": "https://raw.githubusercontent.com/RealTimeLogic/LSP-Examples/refs/heads/master/SMQ-examples/LightSwitch-And-LightBulb-App/README.md"
+    },
+    {
+      "examplePath": "SMQ-examples/one2one",
+      "title": "SMQ One-to-One",
+      "summary": "Direct browser-to-server and client-specific SMQ messaging example.",
+      "tags": [
+        "browser-ui",
+        "messaging",
+        "realtime",
+        "small",
+        "smq"
+      ],
+      "goodFor": [
+        "direct SMQ publish examples",
+        "small SMQ starting point",
+        "understanding SMQ one-to-one messages"
+      ],
+      "notFor": [
+        "authentication",
+        "large dashboards",
+        "plain HTTP REST APIs"
+      ],
+      "runtime": {
+        "mako": "compatible",
+        "xedge": "compatible",
+        "notes": []
+      },
+      "appRoots": [
+        {
+          "appRootPath": "SMQ-examples/one2one",
+          "label": "SMQ one-to-one",
+          "run": "mako -l::one2one",
+          "summary": "Small SMQ app with preload broker support and one browser page.",
+          "importantFiles": [
+            "SMQ-examples/one2one/.preload",
+            "SMQ-examples/one2one/index.html"
+          ],
+          "omitFromCompactContext": []
+        }
+      ],
+      "readme": "SMQ-examples/one2one/README.md",
+      "rawReadmeUrl": "https://raw.githubusercontent.com/RealTimeLogic/LSP-Examples/refs/heads/master/SMQ-examples/one2one/README.md"
+    },
+    {
+      "examplePath": "SMQ-examples/RPC",
+      "title": "REST / AJAX / RPC Over SMQ",
+      "summary": "Browser-to-server RPC over SMQ with a small JavaScript RPC client and Lua server module.",
+      "tags": [
+        "ajax",
+        "browser-ui",
+        "client-server",
+        "messaging",
+        "realtime",
+        "smq"
+      ],
+      "goodFor": [
+        "browser RPC over SMQ",
+        "request-response on top of pub/sub",
+        "SMQ JavaScript client examples"
+      ],
+      "notFor": [
+        "device-control UI",
+        "plain HTTP REST endpoints",
+        "WebSocket transport examples"
+      ],
+      "runtime": {
+        "mako": "compatible",
+        "xedge": "compatible",
+        "notes": []
+      },
+      "appRoots": [
+        {
+          "appRootPath": "SMQ-examples/RPC",
+          "label": "SMQ RPC",
+          "run": "mako -l::RPC",
+          "summary": "SMQ broker, Lua RPC module, and browser RPC client.",
+          "importantFiles": [
+            "SMQ-examples/RPC/.lua/smqrpc.lua",
+            "SMQ-examples/RPC/.preload",
+            "SMQ-examples/RPC/index.html",
+            "SMQ-examples/RPC/smqrpc.js"
+          ],
+          "omitFromCompactContext": []
+        }
+      ],
+      "readme": "SMQ-examples/RPC/README.md",
+      "rawReadmeUrl": "https://raw.githubusercontent.com/RealTimeLogic/LSP-Examples/refs/heads/master/SMQ-examples/RPC/README.md"
+    },
+    {
+      "examplePath": "socket-examples",
+      "title": "Sockets and WebSockets",
+      "summary": "Bundle of TCP, UDP, NTP, WebSocket, proxy, and Eliza socket examples.",
+      "tags": [
+        "browser-ui",
+        "client-server",
+        "lua",
+        "websocket"
+      ],
+      "goodFor": [
+        "BAS socket API examples",
+        "UDP and NTP examples",
+        "WebSocket server examples"
+      ],
+      "notFor": [
+        "authentication",
+        "file serving",
+        "SMQ messaging"
+      ],
+      "runtime": {
+        "mako": "compatible",
+        "xedge": "partial",
+        "notes": [
+          "Some examples are socket- or platform-dependent."
+        ]
+      },
+      "appRoots": [
+        {
+          "appRootPath": "socket-examples/www",
+          "label": "Socket examples bundle",
+          "run": "mako -l::www",
+          "summary": "App root containing the socket examples landing page and endpoint pages.",
+          "importantFiles": [
+            "socket-examples/www/.lua/eliza.lua",
+            "socket-examples/www/.lua/WebProxy.lua",
+            "socket-examples/www/.lua/WebServer.lua",
+            "socket-examples/www/.preload",
+            "socket-examples/www/asyncntp.lsp",
+            "socket-examples/www/Blocking-WS-Server/ws.lsp",
+            "socket-examples/www/Cosocket-WS-Server/ws.lsp",
+            "socket-examples/www/eliza/server.lsp",
+            "socket-examples/www/index.lsp",
+            "socket-examples/www/ntp.lsp",
+            "socket-examples/www/udp.lsp",
+            "socket-examples/www/wsecho.lsp"
+          ],
+          "omitFromCompactContext": [
+            "socket-examples/www/eliza/console.js"
+          ]
+        }
+      ],
+      "readme": "socket-examples/README.md",
+      "rawReadmeUrl": "https://raw.githubusercontent.com/RealTimeLogic/LSP-Examples/refs/heads/master/socket-examples/README.md"
+    },
+    {
+      "examplePath": "Sparkplug",
+      "title": "Sparkplug Client",
+      "summary": "Sparkplug 3.0 MQTT client documentation with Edge of Network and explorer startup scripts.",
+      "tags": [
+        "iot",
+        "messaging",
+        "mqtt",
+        "sparkplug"
+      ],
+      "goodFor": [
+        "Industrial MQTT Sparkplug examples",
+        "Sparkplug Edge of Network node examples",
+        "Sparkplug traffic explorer examples"
+      ],
+      "notFor": [
+        "browser UI examples",
+        "generic MQTT broker implementation",
+        "small beginner examples"
+      ],
+      "runtime": {
+        "mako": "compatible",
+        "xedge": "compatible",
+        "notes": [
+          "EoN run command is inferred from the app marker; README explicitly documents SparkplugExplorer."
+        ]
+      },
+      "appRoots": [
+        {
+          "appRootPath": "Sparkplug/EoN",
+          "label": "Sparkplug EoN node",
+          "run": "mako -l::EoN",
+          "summary": "Edge of Network node startup script using the Sparkplug client library.",
+          "importantFiles": [
+            "Sparkplug/EoN/.preload"
+          ],
+          "omitFromCompactContext": []
+        },
+        {
+          "appRootPath": "Sparkplug/SparkplugExplorer",
+          "label": "Sparkplug Explorer",
+          "run": "mako -l::SparkplugExplorer",
+          "summary": "Console-oriented Sparkplug traffic explorer startup script.",
+          "importantFiles": [
+            "Sparkplug/SparkplugExplorer/.preload"
+          ],
+          "omitFromCompactContext": []
+        }
+      ],
+      "readme": "Sparkplug/README.md",
+      "rawReadmeUrl": "https://raw.githubusercontent.com/RealTimeLogic/LSP-Examples/refs/heads/master/Sparkplug/README.md"
+    },
+    {
+      "examplePath": "SQLite/Shared-Connection",
+      "title": "SQLite Shared Connection",
+      "summary": "SQLite example focused on shared access paths, repeated writes, and locking behavior.",
+      "tags": [
+        "browser-ui",
+        "database",
+        "forms",
+        "sqlite"
+      ],
+      "goodFor": [
+        "repeated form-driven inserts",
+        "SQLite connection management examples",
+        "SQLite locking behavior experiments"
+      ],
+      "notFor": [
+        "authentication",
+        "simple first SQLite examples",
+        "URL-to-database wiki mapping"
+      ],
+      "runtime": {
+        "mako": "compatible",
+        "xedge": "compatible",
+        "notes": []
+      },
+      "appRoots": [
+        {
+          "appRootPath": "SQLite/Shared-Connection/www",
+          "label": "SQLite shared connection",
+          "run": "mako -l::www",
+          "summary": "App root demonstrating shared SQLite access from LSP.",
+          "importantFiles": [
+            "SQLite/Shared-Connection/www/.preload",
+            "SQLite/Shared-Connection/www/index.lsp"
+          ],
+          "omitFromCompactContext": []
+        }
+      ],
+      "readme": "SQLite/Shared-Connection/README.md",
+      "rawReadmeUrl": "https://raw.githubusercontent.com/RealTimeLogic/LSP-Examples/refs/heads/master/SQLite/Shared-Connection/README.md"
+    },
+    {
+      "examplePath": "SQLite/Tutorial",
+      "title": "Lua SQLite Database Tutorial",
+      "summary": "Beginner form-driven SQLite workflow using one LSP page and a preload initializer.",
+      "tags": [
+        "browser-ui",
+        "database",
+        "forms",
+        "sqlite"
+      ],
+      "goodFor": [
+        "beginner SQLite examples",
+        "form-driven database inserts",
+        "simple LSP database workflows"
+      ],
+      "notFor": [
+        "authentication",
+        "concurrent SQLite locking experiments",
+        "URL-to-database wiki mapping"
+      ],
+      "runtime": {
+        "mako": "compatible",
+        "xedge": "compatible",
+        "notes": []
+      },
+      "appRoots": [
+        {
+          "appRootPath": "SQLite/Tutorial/www",
+          "label": "SQLite tutorial",
+          "run": "mako -l::www",
+          "summary": "Small SQLite form app for inserts and rendering results.",
+          "importantFiles": [
+            "SQLite/Tutorial/www/.preload",
+            "SQLite/Tutorial/www/index.lsp"
+          ],
+          "omitFromCompactContext": [
+            "SQLite/Tutorial/www/style.css"
+          ]
+        }
+      ],
+      "readme": "SQLite/Tutorial/README.md",
+      "rawReadmeUrl": "https://raw.githubusercontent.com/RealTimeLogic/LSP-Examples/refs/heads/master/SQLite/Tutorial/README.md"
+    },
+    {
+      "examplePath": "SQLite/Wiki",
+      "title": "Basic Wiki Engine",
+      "summary": "Small wiki that maps URLs to SQLite-backed content through a BAS directory function.",
+      "tags": [
+        "browser-ui",
+        "database",
+        "sqlite"
+      ],
+      "goodFor": [
+        "database-backed dynamic content",
+        "URL-to-database mapping examples",
+        "wiki-style LSP examples"
+      ],
+      "notFor": [
+        "authentication",
+        "production wiki features",
+        "simple form-only SQLite examples"
+      ],
+      "runtime": {
+        "mako": "compatible",
+        "xedge": "compatible",
+        "notes": []
+      },
+      "appRoots": [
+        {
+          "appRootPath": "SQLite/Wiki/www",
+          "label": "SQLite wiki",
+          "run": "mako -l::www",
+          "summary": "Wiki app root with SQLite initialization and LSP edit flows.",
+          "importantFiles": [
+            "SQLite/Wiki/www/.preload",
+            "SQLite/Wiki/www/index.lsp"
+          ],
+          "omitFromCompactContext": []
+        }
+      ],
+      "readme": "SQLite/Wiki/README.md",
+      "rawReadmeUrl": "https://raw.githubusercontent.com/RealTimeLogic/LSP-Examples/refs/heads/master/SQLite/Wiki/README.md"
+    },
+    {
+      "examplePath": "TraceLogger",
+      "title": "TraceLogger Client",
+      "summary": "Local client that connects to and forwards trace output from another BAS-enabled device.",
+      "tags": [
+        "debugging",
+        "iot",
+        "mako"
+      ],
+      "goodFor": [
+        "remote trace monitoring",
+        "TraceLogger client setup",
+        "watching BAS device logs from Mako"
+      ],
+      "notFor": [
+        "browser UI examples",
+        "Lua source debugging",
+        "real-time pub/sub examples"
+      ],
+      "runtime": {
+        "mako": "compatible",
+        "xedge": "partial",
+        "notes": [
+          "Requires editing TraceLogger/mako.conf to point at the peer device."
+        ]
+      },
+      "appRoots": [
+        {
+          "appRootPath": "TraceLogger/www",
+          "label": "TraceLogger client",
+          "run": "mako -l::www",
+          "summary": "App root that starts the TraceLogger client connection.",
+          "importantFiles": [
+            "TraceLogger/www/.preload",
+            "TraceLogger/www/index.lsp"
+          ],
+          "omitFromCompactContext": []
+        }
+      ],
+      "readme": "TraceLogger/README.md",
+      "rawReadmeUrl": "https://raw.githubusercontent.com/RealTimeLogic/LSP-Examples/refs/heads/master/TraceLogger/README.md"
+    },
+    {
+      "examplePath": "upload/asynchronous",
+      "title": "Asynchronous Upload",
+      "summary": "Concurrent upload example using ba.create.upload() with drag-and-drop and form upload UI.",
+      "tags": [
+        "browser-ui",
+        "file-server",
+        "forms",
+        "upload"
+      ],
+      "goodFor": [
+        "asynchronous upload workflows",
+        "drag-and-drop file upload",
+        "high-concurrency upload examples"
+      ],
+      "notFor": [
+        "beginner upload examples",
+        "database examples",
+        "real-time messaging"
+      ],
+      "runtime": {
+        "mako": "compatible",
+        "xedge": "compatible",
+        "notes": [
+          "More complex than the blocking upload variant and intended for concurrent upload handling."
+        ]
+      },
+      "appRoots": [
+        {
+          "appRootPath": "upload/asynchronous/www",
+          "label": "Asynchronous upload",
+          "run": "mako -l::www",
+          "summary": "App root with upload directory object and browser upload UI.",
+          "importantFiles": [
+            "upload/asynchronous/www/.managezip.lsp",
+            "upload/asynchronous/www/.preload",
+            "upload/asynchronous/www/index.lsp",
+            "upload/asynchronous/www/upload.js"
+          ],
+          "omitFromCompactContext": [
+            "upload/asynchronous/www/doc/*",
+            "upload/asynchronous/www/style.css"
+          ]
+        }
+      ],
+      "readme": "upload/asynchronous/README.md",
+      "rawReadmeUrl": "https://raw.githubusercontent.com/RealTimeLogic/LSP-Examples/refs/heads/master/upload/asynchronous/README.md"
+    },
+    {
+      "examplePath": "upload/blocking",
+      "title": "Blocking Upload",
+      "summary": "Simpler upload example using blocking request APIs for multipart and raw drag-and-drop uploads.",
+      "tags": [
+        "browser-ui",
+        "file-server",
+        "forms",
+        "upload"
+      ],
+      "goodFor": [
+        "beginner upload examples",
+        "drag-and-drop file upload",
+        "multipart form upload workflows"
+      ],
+      "notFor": [
+        "high-concurrency upload handling",
+        "real-time messaging",
+        "single-threaded server targets"
+      ],
+      "runtime": {
+        "mako": "compatible",
+        "xedge": "partial",
+        "notes": [
+          "Uses blocking request APIs and should run on a server with threaded request handling."
+        ]
+      },
+      "appRoots": [
+        {
+          "appRootPath": "upload/blocking/www",
+          "label": "Blocking upload",
+          "run": "mako -l::www",
+          "summary": "App root with blocking upload handlers and browser upload UI.",
+          "importantFiles": [
+            "upload/blocking/www/.managezip.lsp",
+            "upload/blocking/www/.preload",
+            "upload/blocking/www/index.lsp",
+            "upload/blocking/www/upload.js"
+          ],
+          "omitFromCompactContext": [
+            "upload/blocking/www/doc/*",
+            "upload/blocking/www/style.css"
+          ]
+        }
+      ],
+      "readme": "upload/blocking/README.md",
+      "rawReadmeUrl": "https://raw.githubusercontent.com/RealTimeLogic/LSP-Examples/refs/heads/master/upload/blocking/README.md"
+    },
+    {
+      "examplePath": "Web-Shell",
+      "title": "Linux Web Shell",
+      "summary": "Browser terminal over SMQ backed by a server-side pseudo-terminal process.",
+      "tags": [
+        "browser-ui",
+        "messaging",
+        "realtime",
+        "smq"
+      ],
+      "goodFor": [
+        "browser terminal examples",
+        "forkpty process integration",
+        "SMQ bidirectional terminal transport"
+      ],
+      "notFor": [
+        "embedded RTOS deployments",
+        "production shell exposure",
+        "Windows-only targets"
+      ],
+      "runtime": {
+        "mako": "partial",
+        "xedge": "partial",
+        "notes": [
+          "Linux-oriented because it depends on ba.forkpty()."
+        ]
+      },
+      "appRoots": [
+        {
+          "appRootPath": "Web-Shell/www",
+          "label": "Web shell",
+          "run": "mako -l::www",
+          "summary": "App root with xterm.js UI and SMQ-connected shell process.",
+          "importantFiles": [
+            "Web-Shell/www/.preload",
+            "Web-Shell/www/index.lsp",
+            "Web-Shell/www/xterm.js"
+          ],
+          "omitFromCompactContext": [
+            "Web-Shell/www/xterm.css",
+            "Web-Shell/www/xterm.js"
+          ]
+        }
+      ],
+      "readme": "Web-Shell/README.md",
+      "rawReadmeUrl": "https://raw.githubusercontent.com/RealTimeLogic/LSP-Examples/refs/heads/master/Web-Shell/README.md"
+    },
+    {
+      "examplePath": "WebAuthn",
+      "title": "BAS WebAuthn",
+      "summary": "Passwordless WebAuthn module and two Mako examples for registration and login.",
+      "tags": [
+        "authentication",
+        "browser-ui",
+        "iot",
+        "security",
+        "webauthn"
+      ],
+      "goodFor": [
+        "embedded WebAuthn authentication",
+        "passwordless login examples",
+        "WebAuthn registration and login flows"
+      ],
+      "notFor": [
+        "basic username/password examples",
+        "small beginner examples",
+        "unauthenticated dashboards"
+      ],
+      "runtime": {
+        "mako": "compatible",
+        "xedge": "compatible",
+        "notes": [
+          "Run from the WebAuthn directory with mako so mako.conf loads WebAuthnModule plus the selected active example.",
+          "Example 2 requires email or manual registration-link handling."
+        ]
+      },
+      "appRoots": [
+        {
+          "appRootPath": "WebAuthn",
+          "label": "WebAuthn configured package",
+          "run": "mako",
+          "summary": "Package root containing mako.conf, the reusable module app, and both WebAuthn examples.",
+          "importantFiles": [
+            "WebAuthn/example1/.config",
+            "WebAuthn/example1/.preload",
+            "WebAuthn/example1/index.html",
+            "WebAuthn/example2/.config",
+            "WebAuthn/example2/.login.lsp",
+            "WebAuthn/example2/.preload",
+            "WebAuthn/example2/.RegEmail",
+            "WebAuthn/example2/index.html",
+            "WebAuthn/WebAuthnModule/.config",
+            "WebAuthn/WebAuthnModule/.lua/webauthn.lua",
+            "WebAuthn/WebAuthnModule/.preload"
+          ],
+          "omitFromCompactContext": [
+            "WebAuthn/images/*"
+          ]
+        }
+      ],
+      "readme": "WebAuthn/README.md",
+      "rawReadmeUrl": "https://raw.githubusercontent.com/RealTimeLogic/LSP-Examples/refs/heads/master/WebAuthn/README.md"
+    }
+  ]
+}
