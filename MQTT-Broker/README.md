@@ -4,9 +4,9 @@
 
 This example includes **LMQTT Broker**, a compact MQTT 3.1.1 and MQTT 5.0 broker written in Lua for the [Barracuda App Server](https://realtimelogic.com/products/barracuda-application-server/) runtime. It can run with the [Mako Server](https://makoserver.net/), [Xedge](https://realtimelogic.com/products/xedge/), and other BAS derivatives.
 
-## API
+## The Lua Broker API
 
-See [LMQTT-Broker.md](LMQTT-Broker.md) for the module API, options, callbacks, TLS setup, and feature scope.
+See the document **[LMQTT-Broker.md](LMQTT-Broker.md)** for the broker API, options, callbacks, TLS setup, and feature scope.
 
 ## Files (broker module and example files)
 

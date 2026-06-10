@@ -34,7 +34,6 @@ This workspace contains a compact Lua MQTT broker for Barracuda App Server runti
 - Shared subscriptions.
 - Topic aliases.
 - MQTT 5 flow control.
-- Broker-side application publish API.
 - Per-client outbound queues.
 
 ## Validation
