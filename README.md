@@ -16,8 +16,10 @@ If you are new to Lua, start with the [online Lua tutorial](https://tutorial.rea
 - [Authentication: WebAuthn](WebAuthn) - Passwordless, FIDO2-compliant authentication examples.
 - [Authentication: Single Sign On](fs-sso) - Single Sign-On example designed to avoid pre-installed password vulnerabilities.
 - [Authentication: RADIUS](RADIUS) - RADIUS integration for BAS authentication.
-- [AJAX / REST: For Beginners](AJAX)
-- [AJAX / REST / RPC Over WebSockets](AJAX-Over-WebSockets)
+- REST / AJAX / RPC - different names, same idea
+  - [AJAX / REST: For Beginners](AJAX)
+  - [AJAX / REST / RPC Over WebSockets](AJAX-Over-WebSockets)
+  - [RESTful](REST) - Designing RESTful services in Lua.
 - [htmx Examples](htmx) - htmx + LSP examples for server-rendered interactive pages.
 - [Website Template Engine for Embedded](Light-Dashboard) - Embedded dashboard templates with optional TPM-backed user database support.
 - [Dynamic Navigation Menu](Dynamic-Nav-Menu)
@@ -28,7 +30,6 @@ If you are new to Lua, start with the [online Lua tutorial](https://tutorial.rea
 - [IoT: MQTT and AWS](AWS-MQTT) - AWS IoT Core connection example.
 - [IoT: MQTT Sparkplug](Sparkplug) - Sparkplug library notes and example applications.
 - [IoT: MQTT Broker](MQTT-Broker) - A ready-to-use **MQTT broker** and example code.
-- [RESTful](REST) - Designing RESTful services in Lua.
 - [ESP32 Microcontroller Examples](ESP32) - Examples designed for [Xedge32](https://realtimelogic.com/downloads/bas/ESP32/).
 - [MinnowSim](MinnowSim) - Source code for the tutorial [Your First Embedded Single Page Application](https://realtimelogic.com/articles/Your-First-Embedded-Single-Page-Application).
 - [MyApp.zip](MyApp.zip) - Ready-to-run example for [Mastering Xedge Application Deployment: From Installation to Creation](https://realtimelogic.com/articles/Mastering-Xedge-Application-Deployment-From-Installation-to-Creation).
