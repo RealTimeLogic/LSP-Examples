@@ -1,4 +1,8 @@
 $(function() {
+  if (window.roundSliderCleanup) {
+    window.roundSliderCleanup();
+  }
+
   //SMQ Doc: https://realtimelogic.com/ba/doc/en/JavaScript/SMQ.html 
   var smq = SMQ.Client("/SMQ/"); // Connect to /SMQ/index.lsp
   let running=true;
@@ -46,12 +50,24 @@ $(function() {
   });
   active=false;
 
-  $('body').on('htmx:beforeSwap', function (event) {
+  function cleanup() {
+    if (!running) return;
     running=false;
+    $('body').off('htmx:beforeSwap.roundSlider', beforeSwap);
+    smq.disconnect();
+    if (window.roundSliderCleanup === cleanup) {
+      window.roundSliderCleanup = null;
+    }
+  }
+
+  function beforeSwap(event) {
     const target = event.originalEvent.detail.target; // Access native event detail via jQuery
     if (target && target.id === 'main') {
       console.log('WebSocket fragment is about to be unloaded, stopping SMQ');
-      smq.disconnect();
+      cleanup();
     }
-  });
+  }
+
+  window.roundSliderCleanup = cleanup;
+  $('body').off('htmx:beforeSwap.roundSlider').on('htmx:beforeSwap.roundSlider', beforeSwap);
 });

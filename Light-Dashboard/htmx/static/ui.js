@@ -51,16 +51,54 @@
     
     document.addEventListener('click', handleEvent);
 
+    function routePath(path) {
+        if (path === '/') {
+          return '/index.html';
+        }
+        return path.match(/\/$/) ? path + 'index.html' : path;
+    }
+
+    function samePath(link) {
+        var linkUrl = new URL(link.getAttribute('href'), window.location.href);
+        return routePath(linkUrl.pathname) === routePath(window.location.pathname);
+    }
+
+    function setActiveLink(link) {
+        document.querySelectorAll('.pure-menu-item .pure-menu-link').forEach(link => {
+          link.classList.remove('pure-menu-selected');
+        });
+        if (link) {
+          link.classList.add('pure-menu-selected');
+          document.title = link.textContent.trim();
+        }
+    }
+
+    function syncNavigationFromUrl() {
+        var links = document.querySelectorAll('.pure-menu-item .pure-menu-link');
+        var activeLink = null;
+
+        links.forEach(link => {
+          if (!activeLink && samePath(link)) {
+            activeLink = link;
+          }
+        });
+
+        if (activeLink) {
+          setActiveLink(activeLink);
+        }
+    }
+
     document.body.addEventListener('htmx:afterRequest', function (event) {
       // Add the class to the clicked link
       const targetLink = event.target.closest('.pure-menu-link');
       if (targetLink) {
-        // Remove the 'pure-menu-selected' class from all menu links
-        document.querySelectorAll('.pure-menu-item .pure-menu-link').forEach(link => {
-          link.classList.remove('pure-menu-selected');
-        });
-        targetLink.classList.add('pure-menu-selected');
+        setActiveLink(targetLink);
       }
+    });
+
+    document.body.addEventListener('htmx:historyRestore', syncNavigationFromUrl);
+    window.addEventListener('popstate', function () {
+      window.setTimeout(syncNavigationFromUrl, 0);
     });
 
 }(this, this.document));

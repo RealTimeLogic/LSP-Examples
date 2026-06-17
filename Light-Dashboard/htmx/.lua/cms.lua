@@ -75,7 +75,9 @@ local pagesT={}
 -- See the following for details on the request/response environment:
 -- https://realtimelogic.com/ba/doc/en/lua/lua.html#CMDE
 local function cmsfunc(_ENV, relpath, notInMenuOK)
-   trace("hx-request:",request:header"hx-request" and "yes" or "no")
+   local hxRequest=request:header"hx-request"
+   local hxHistoryRestore=request:header"hx-history-restore-request"
+   trace("hx-request:",hxRequest and "yes" or "no")
    local response=response -- e.g. = _ENV.response. Now faster.
 
    -- Translate to (path/)index.html if only directory name is provided.
@@ -107,7 +109,7 @@ local function cmsfunc(_ENV, relpath, notInMenuOK)
    response:setdefaultheaders()
 
    local lspPage=parseLspPage(".lua/www/"..relpath)
-   if request:header"hx-request" then
+   if hxRequest and not hxHistoryRestore then
       lspPage(_ENV,relpath,io,pageT,app)
    else
       for k,v in pairs(securityPolicies) do response:setheader(k,v) end

@@ -47,7 +47,7 @@ end
             </ul>
         </div>
     </div>
-    <div id="main">
+    <div id="main" hx-history-elt>
         <?lsp
              -- Call _ENV.lspPage (set by directory callback in cms.lua) and
              -- inject page content.
