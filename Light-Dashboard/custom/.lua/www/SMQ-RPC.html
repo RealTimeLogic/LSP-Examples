@@ -1,0 +1,74 @@
+<link href="/static/SMQ-RPC.css" rel="stylesheet" />
+
+<div class="header">
+  <h1>SMQ RPC</h1>
+  <h2>Page-scoped request/response over the shared SMQ connection</h2>
+</div>
+
+<div class="content rpc-demo" id="SmqRpcDemo">
+  <section class="panel rpc-intro">
+    <p>
+      This page demonstrates the custom CMS page-scoped SMQ RPC helper (REST / AJAX / RPC Over SMQ). The page
+      uses the shared shell-level SMQ connection, calls broker-side Lua methods
+      with <code>scope.rpc.methodName(...)</code>, and verifies that success,
+      failure, and concurrent calls all resolve through correlated
+      <code>$RpcReq</code> / <code>$RpcResp</code> messages.
+    </p>
+    <p>
+      The standalone SMQ RPC example is documented in
+      <a href="https://github.com/RealTimeLogic/LSP-Examples/blob/master/SMQ-examples/RPC/README.md" target="_blank" rel="noopener">SMQ-examples/RPC README.md</a>.
+    </p>
+  </section>
+
+  <section class="panel rpc-actions" aria-labelledby="RpcActionsTitle">
+    <div class="panel-header">
+      <h3 id="RpcActionsTitle" class="panel-title">Manual Calls</h3>
+    </div>
+    <div class="rpc-input-grid">
+      <label class="form-field" for="RpcFactorA">
+        <span>Multiply value A</span>
+        <input id="RpcFactorA" type="number" value="6" step="1" />
+      </label>
+      <label class="form-field" for="RpcFactorB">
+        <span>Multiply value B</span>
+        <input id="RpcFactorB" type="number" value="7" step="1" />
+      </label>
+    </div>
+    <div class="rpc-button-row">
+      <button class="btn btn-primary" type="button" data-rpc-action="echo">Echo</button>
+      <button class="btn btn-primary" type="button" data-rpc-action="multiply">Multiply</button>
+      <button class="btn btn-primary" type="button" data-rpc-action="serverInfo">Server Info</button>
+      <button class="btn" type="button" data-rpc-action="failure">Test Error Handling</button>
+      <button class="btn" type="button" data-rpc-action="runTests">Run Tests</button>
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="RpcStatusTitle">
+    <div class="panel-header">
+      <h3 id="RpcStatusTitle" class="panel-title">Test Status</h3>
+    </div>
+    <div class="rpc-status-grid">
+      <div>
+        <span class="rpc-label">Connection</span>
+        <strong id="RpcConnection">waiting</strong>
+      </div>
+      <div>
+        <span class="rpc-label">Passed</span>
+        <strong id="RpcPassed">0</strong>
+      </div>
+      <div>
+        <span class="rpc-label">Failed</span>
+        <strong id="RpcFailed">0</strong>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="RpcLogTitle">
+    <div class="panel-header">
+      <h3 id="RpcLogTitle" class="panel-title">RPC Test Log</h3>
+    </div>
+    <ol id="RpcLog" class="rpc-log" aria-live="polite"></ol>
+  </section>
+</div>
+
+<script src="/static/SMQ-RPC.js"></script>

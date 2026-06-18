@@ -1,12 +1,4 @@
-<!--
-Slider documentation: https://roundsliderui.com/
--->
-<link href="https://cdn.jsdelivr.net/npm/round-slider@1.6.1/dist/roundslider.min.css" rel="stylesheet" />
 <link href="/static/RoundSlider.css" rel="stylesheet" />
-<script src="/rtl/jquery.js"></script>
-<script src="/rtl/smq.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/round-slider@1.6.1/dist/roundslider.min.js"></script>
-<script src="/static/RoundSlider.js"></script>
 
 <div class="header">
   <h1>WebSockets</h1>
@@ -14,14 +6,22 @@ Slider documentation: https://roundsliderui.com/
 </div>
 
 <div class="content">
-  <div id="SliderContainer">
-    <div id="Slider">Whoops, your browser has no access to the Internet!</div>
+  <div id="SliderContainer" class="slider-panel">
+    <div class="slider-gauge" style="--slider-percent: 0">
+      <div class="slider-arc" aria-hidden="true"></div>
+      <div class="slider-needle" aria-hidden="true"></div>
+      <output id="SliderValue" for="Slider">0&deg;</output>
+    </div>
+    <label class="slider-label" for="Slider">Slider angle</label>
+    <input id="Slider" class="slider-range" type="range" min="0" max="100" value="0" />
   </div>
   <p>The slider example shows how to send real time data via WebSockets. You should see the slider angle being printed in real time in the console when you move the slider using the mouse.</p>
 
   <p>Instead of using raw WebSockets, the data is sent via the pub/sub protocol <a target="_blank" href="https://realtimelogic.com/ba/doc/?url=SMQ.html">SMQ</a>, which runs on top of WebSockets. SMQ simplifies communicating with multiple clients. Open this page in a <a target="_blank" href="RoundSlider.html">separate browser window</a> and move the slider. You should see the slider in the other browser window being updated too.</p>
 
-   <p>The slider position is stored persistently on the server side and refreshing this page restores the slider angle position in the browser. The server side immediately publishes the angle position to any new client (browser) that connects to the server. Right click on this page, click Inspect, and click the Network tab to get an understanding of the browser's load sequence. You should see the persistent WebSocket connection on the Network tab after clicking the refresh button.</p>
+   <p>The slider position is stored persistently on the server side and refreshing this page restores the slider angle position in the browser. The shared CMS shell owns the SMQ connection, and this fragment subscribes to the slider topics only while it is loaded. Right click on this page, click Inspect, and click the Network tab to get an understanding of the browser's load sequence. You should see the persistent WebSocket connection on the Network tab after clicking the refresh button.</p>
 
   <p>See our <a target="_blank" href="https://tutorial.realtimelogic.com/WebSockets.lsp">online tutorial : WebSockets</a> for a WebSockets introduction.</p>
 </div>
+
+<script src="/static/RoundSlider.js"></script>

@@ -1,81 +1,110 @@
 (function (window, document) {
+  "use strict";
 
-    // we fetch the elements each time because docusaurus removes the previous
-    // element references on page navigation
-    function getElements() {
-        return {
-            layout: document.getElementById('layout'),
-            menu: document.getElementById('menu'),
-            menuLink: document.getElementById('menuLink')
-        };
+  function getElements() {
+    return {
+      layout: document.getElementById("layout"),
+      menu: document.getElementById("menu"),
+      menuLink: document.getElementById("menuLink")
+    };
+  }
+
+  function toggleClass(element, className) {
+    if (element) {
+      element.classList.toggle(className);
     }
+  }
 
-    function toggleClass(element, className) {
-        var classes = element.className.split(/\s+/);
-        var length = classes.length;
-        var i = 0;
+  function toggleAll() {
+    const elements = getElements();
 
-        for (; i < length; i++) {
-            if (classes[i] === className) {
-                classes.splice(i, 1);
-                break;
-            }
-        }
-        // The className is not found
-        if (length === classes.length) {
-            classes.push(className);
-        }
+    toggleClass(elements.layout, "active");
+    toggleClass(elements.menu, "active");
+    toggleClass(elements.menuLink, "active");
+  }
 
-        element.className = classes.join(' ');
+  function routePath(path) {
+    if (path === "/") {
+      return "/index.html";
     }
+    return path.endsWith("/") ? `${path}index.html` : path;
+  }
 
-    function toggleAll() {
-        var active = 'active';
-        var elements = getElements();
+  function linkMatchesLocation(link) {
+    const linkUrl = new URL(link.getAttribute("href"), window.location.href);
+    return routePath(linkUrl.pathname) === routePath(window.location.pathname);
+  }
 
-        toggleClass(elements.layout, active);
-        toggleClass(elements.menu, active);
-        toggleClass(elements.menuLink, active);
-    }
-    
-    function handleEvent(e) {
-        var elements = getElements();
-        var menu = elements.menu;
-        var menuLink = elements.menuLink;
-        var target = e.target;
+  function setActiveLink(activeLink) {
+    document
+      .querySelectorAll(".nav-link.is-active, .nav-sublink.is-active, .nav-group-title.is-active")
+      .forEach((link) => {
+        link.classList.remove("is-active");
+        link.removeAttribute("aria-current");
+      });
 
-        if (menuLink && menuLink.contains(target)) {
-            toggleAll();
-            e.preventDefault();
-            return;
-        }
-
-        var groupTitle = target.closest && target.closest('.nav-group-title');
-        if (groupTitle && groupTitle.tagName === 'SPAN') {
-            var group = groupTitle.closest('.nav-group');
-            if (group) {
-                toggleClass(group, 'is-open');
-            }
-            e.preventDefault();
-            return;
-        }
-
-        if (menu && menu.className.indexOf('active') !== -1 && !menu.contains(target)) {
-            toggleAll();
-        }
-    }
-    
-    document.addEventListener('click', handleEvent);
-
-    document.body.addEventListener('htmx:afterRequest', function (event) {
-
-      // Add the class to the clicked link
-      const targetLink = event.target.closest('a');
-      if (targetLink) {
-document.querySelectorAll('.nav-link.is-active, .nav-sublink.is-active')
-  .forEach(link => link.classList.remove('is-active'));
-        targetLink.classList.add('is-active');
-      }
+    document.querySelectorAll(".nav-group.is-active").forEach((group) => {
+      group.classList.remove("is-active");
     });
 
+    if (!activeLink) {
+      return;
+    }
+
+    activeLink.classList.add("is-active");
+    activeLink.setAttribute("aria-current", "page");
+    document.title = activeLink.textContent.trim();
+
+    const group = activeLink.closest(".nav-group");
+    if (group) {
+      group.classList.add("is-active");
+    }
+  }
+
+  function syncNavigationFromUrl() {
+    const activeLink = Array.from(document.querySelectorAll(".nav-link, .nav-sublink, .nav-group-title[href]"))
+      .find(linkMatchesLocation);
+
+    setActiveLink(activeLink);
+  }
+
+  function handleEvent(event) {
+    const elements = getElements();
+    const { menu, menuLink } = elements;
+    const target = event.target;
+
+    if (menuLink && menuLink.contains(target)) {
+      toggleAll();
+      event.preventDefault();
+      return;
+    }
+
+    const groupTitle = target.closest && target.closest(".nav-group-title");
+    if (groupTitle && groupTitle.tagName === "SPAN") {
+      const group = groupTitle.closest(".nav-group");
+      if (group) {
+        toggleClass(group, "is-open");
+      }
+      event.preventDefault();
+      return;
+    }
+
+    if (menu && menu.classList.contains("active") && !menu.contains(target)) {
+      toggleAll();
+    }
+  }
+
+  document.addEventListener("click", handleEvent);
+
+  document.body.addEventListener("htmx:afterRequest", (event) => {
+    const targetLink = event.target.closest(".nav-link, .nav-sublink, .nav-group-title[href]");
+    if (targetLink) {
+      setActiveLink(targetLink);
+    }
+  });
+
+  document.body.addEventListener("htmx:historyRestore", syncNavigationFromUrl);
+  window.addEventListener("popstate", () => {
+    window.setTimeout(syncNavigationFromUrl, 0);
+  });
 }(this, this.document));

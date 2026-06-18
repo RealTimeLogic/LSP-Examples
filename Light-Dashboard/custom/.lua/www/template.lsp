@@ -74,6 +74,8 @@ end
     <title><?lsp=activeMenuItem.name?></title>
     <link rel="stylesheet" href="/static/styles.css">
     <script src="https://unpkg.com/htmx.org@2.0.3"></script>
+    <script src="/rtl/smq.js"></script>
+    <script src="/static/cms-smq.js"></script>
 </head>
 <body>
 
@@ -91,7 +93,7 @@ end
             </ul>
         </div>
     </div>
-    <div id="main" class="main-pane">
+    <div id="main" class="main-pane" hx-history-elt>
         <?lsp
              -- Call _ENV.lspPage (set by directory callback in cms.lua) and
              -- inject page content.

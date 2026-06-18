@@ -3,11 +3,11 @@
 -- We call cmsOnunload when app is stopped
 local cmsOnunload=io:dofile(".lua/cms.lua",app)
 
--- The following SMQ broker 'smq' is used by .lua/www/RoundSlider.html
-trace"Starting SMQ broker for the slider example"
+trace"Starting CMS SMQ broker"
 
 local smq -- Broker set below
 local angle=0 -- 0 to 180
+local rpcInterface={}
 
 local function newClient(tid)
    trace"New SMQ client"
@@ -19,9 +19,54 @@ end
 
 smq = require"smq.hub".create{onconnect=newClient,onclose=clientDisconnected}
 
-smq:subscribe("slider",{json=true,onmsg=function(data)
-   angle=data.angle
-   trace("Slider angle",angle)
+local function registerRpcMethod(name, callback)
+   rpcInterface[name]=callback
+end
+
+local function rpcError(message)
+   return {rsp=nil,err=message or "RPC failed"}
+end
+
+-- RPC handler
+smq:subscribe("self",{subtopic="$RpcReq",json=true,onmsg=function(request,ptid)
+   if "table" ~= type(request) then
+      smq:publish(rpcError"Invalid RPC request",ptid,"$RpcResp")
+      return
+   end
+
+   local id=request.id
+   local name=request.name
+   local args=request.args or {}
+
+   if nil == id or "string" ~= type(name) or "table" ~= type(args) then
+      smq:publish({id=id,err="Invalid RPC request"},ptid,"$RpcResp")
+      return
+   end
+
+   local callback=rpcInterface[name]
+   if not callback then
+      smq:publish({id=id,err="RPC function not found"},ptid,"$RpcResp")
+      return
+   end
+
+   local ok,rsp,err=pcall(callback,table.unpack(args))
+   if not ok then
+      err=rsp
+      rsp=nil
+   elseif nil ~= rsp then
+      err=nil
+   end
+
+   smq:publish({id=id,rsp=rsp,err=err},ptid,"$RpcResp")
+end})
+
+-- Demo handlers used by .lua/www/RoundSlider.html.
+smq:subscribe("self",{subtopic="setSlider",json=true,onmsg=function(data)
+   if "table" == type(data) and "number" == type(data.angle) then
+      angle=math.max(0,math.min(180,math.floor(data.angle)))
+      trace("Slider angle",angle)
+      smq:publish({angle=angle},"slider")
+   end
 end})
 
 smq:subscribe("self",{subtopic="getSlider",onmsg=function(data,ptid)
@@ -29,10 +74,37 @@ smq:subscribe("self",{subtopic="getSlider",onmsg=function(data,ptid)
    smq:publish({angle=angle},ptid,"slider")
 end})
 
+-- Example page-specific RPC method. Add product/page methods here or register
+-- them from broker modules loaded by this preload script.
+registerRpcMethod("echo",function(...)
+   return {...}
+end)
 
--- .lua/www/RoundSlider.html calls this function when new client
--- connects.
-function connectClientSlider(cmd)
+registerRpcMethod("multiply",function(a,b)
+   if "number" ~= type(a) or "number" ~= type(b) then
+      return nil,"multiply expects two numbers"
+   end
+   return a * b
+end)
+
+registerRpcMethod("failfunc",function()
+   return nil,"this function fails"
+end)
+
+registerRpcMethod("serverInfo",function()
+   return {
+      app="Light Dashboard",
+      variant="custom",
+      rpc=true
+   }
+end)
+
+registerRpcMethod("getSliderAngle",function()
+   return {angle=angle}
+end)
+
+-- SMQ/index.lsp calls this function when a browser client connects.
+function connectSmqClient(cmd)
    smq:connect(cmd)
 end
 

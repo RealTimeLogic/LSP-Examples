@@ -1,0 +1,104 @@
+.rpc-demo code {
+    padding: 0.1rem 0.35rem;
+    border-radius: 6px;
+    background: var(--surface-muted);
+    color: var(--text);
+    font-size: 0.92em;
+}
+
+.rpc-intro {
+    display: grid;
+    gap: 0.85rem;
+}
+
+.rpc-input-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.rpc-input-grid .form-field span {
+    font-weight: 600;
+    color: var(--text);
+}
+
+.rpc-button-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+.rpc-button-row .btn {
+    border: 1px solid rgba(15, 23, 42, 0.12);
+    background: var(--surface-muted);
+    color: var(--text);
+}
+
+.rpc-button-row .btn-primary {
+    border-color: transparent;
+    background: var(--accent);
+    color: var(--accent-ink);
+}
+
+.rpc-status-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 1rem;
+}
+
+.rpc-status-grid > div {
+    padding: 1rem;
+    border-radius: var(--radius-sm);
+    background: var(--surface-muted);
+    border: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.rpc-label {
+    display: block;
+    margin-bottom: 0.25rem;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+}
+
+.rpc-log {
+    list-style: none;
+    display: grid;
+    gap: 0.55rem;
+    margin: 0;
+    padding: 0;
+}
+
+.rpc-log li {
+    display: grid;
+    gap: 0.25rem;
+    padding: 0.8rem 0.9rem;
+    border-radius: var(--radius-sm);
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    background: var(--surface-muted);
+}
+
+.rpc-log li.pass {
+    border-color: rgba(22, 163, 74, 0.25);
+    background: #ecfdf3;
+}
+
+.rpc-log li.fail {
+    border-color: rgba(220, 38, 38, 0.25);
+    background: #fef2f2;
+}
+
+.rpc-log strong {
+    color: var(--text);
+}
+
+.rpc-log pre {
+    margin: 0;
+    white-space: pre-wrap;
+    word-break: break-word;
+    color: var(--muted);
+    font: 0.86rem/1.45 "Cascadia Mono", "Consolas", monospace;
+}

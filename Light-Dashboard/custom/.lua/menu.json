@@ -13,6 +13,10 @@
       {
         "name": "WebSockets",
         "href": "RoundSlider.html"
+      },
+      {
+        "name": "SMQ RPC",
+        "href": "SMQ-RPC.html"
       }
     ]
   },

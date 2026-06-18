@@ -1,39 +1,87 @@
-#SliderContainer {
-    position:relative;
-    height: 200px;
+.slider-panel {
+    display: grid;
+    justify-items: center;
+    gap: 1rem;
+    max-width: 360px;
+    margin: 0 auto 1.5rem;
+    padding: 1.5rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+    box-shadow: var(--shadow);
 }
-#Slider {
-    width: 260px;
-    height: 130px;
-    padding: 20px;
+
+.slider-gauge {
+    --slider-percent: 0;
+    position: relative;
+    width: min(280px, 100%);
+    aspect-ratio: 2 / 1;
+    overflow: hidden;
+}
+
+.slider-arc {
     position: absolute;
-    top: 50%;
+    inset: 0;
+    border-radius: 999px 999px 0 0;
+    background:
+        conic-gradient(from 270deg at 50% 100%,
+            var(--accent) 0deg,
+            var(--accent) calc(var(--slider-percent) * 1.8deg),
+            rgba(15, 23, 42, 0.14) 0deg,
+            rgba(15, 23, 42, 0.14) 180deg,
+            transparent 180deg);
+}
+
+.slider-arc::after {
+    content: "";
+    position: absolute;
+    left: 16px;
+    right: 16px;
+    bottom: -16px;
+    height: calc(100% - 16px);
+    border-radius: 999px 999px 0 0;
+    background: var(--surface);
+}
+
+.slider-needle {
+    position: absolute;
     left: 50%;
-    margin: -85px 0 0 -130px;
+    bottom: 0;
+    width: 42%;
+    height: 3px;
+    background: var(--text);
+    border-radius: 999px;
+    transform: rotate(calc(-180deg + var(--slider-percent) * 1.8deg));
+    transform-origin: left center;
 }
-#Slider .rs-handle  {
-    background-color: transparent;
-    border: 8px solid transparent;
-    border-right-color: black;
-    margin: -8px 0 0 14px !important;
-}
-#Slider .rs-handle:before  {
-    display: block;
-    content: " ";
+
+.slider-needle::before {
+    content: "";
     position: absolute;
-    height: 12px;
-    width: 12px;
-    background: black;
-    right: -6px;
-    bottom: -6px;
-    border-radius: 100%;
+    left: -7px;
+    top: 50%;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--text);
+    transform: translateY(-50%);
 }
-#Slider .rs-handle:after  {
-    display: block;
-    content: " ";
-    width: 106px;
+
+#SliderValue {
     position: absolute;
-    top: -1px;
-    right: 0px;
-    border-top: 2px solid black;
+    left: 50%;
+    bottom: 1.25rem;
+    transform: translateX(-50%);
+    color: var(--text);
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.slider-label {
+    color: var(--muted);
+    font-weight: 600;
+}
+
+.slider-range {
+    max-width: 280px;
 }

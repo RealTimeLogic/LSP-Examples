@@ -1,58 +1,81 @@
-$(function() {
-  //SMQ Doc: https://realtimelogic.com/ba/doc/en/JavaScript/SMQ.html 
-  var smq = SMQ.Client("/SMQ/"); // Connect to /SMQ/index.lsp
-  let running=true;
-  let active=true;
+(function (window, document) {
+  "use strict";
 
-  smq.onclose=function(message,canreconnect) {
-    if(!running) return;
-    console.log("SMQ disconnected");
-    if(canreconnect) return 3000;
-  };
+  function initRoundSlider() {
+    const slider = document.getElementById("Slider");
+    const gauge = document.querySelector(".slider-gauge");
+    const valueOutput = document.getElementById("SliderValue");
 
-  //SMQ callback for data sent to the topic "slider" and "self"
-  function onSmqMsg(d,ptid) {
-    if(ptid != smq.gettid()) { //Ignore messages from 'self'
-      active=true;
-      $("#Slider").roundSlider("option", "value", Math.floor(d.angle * 100 / 180));
-      active=false;
+    if (!slider || !gauge || !valueOutput) {
+      return;
     }
-  }
-  
-  // Subscribe to one-to-one messages sent from server directly to client
-  smq.subscribe("self","slider",{datatype:"json",onmsg:onSmqMsg});
-  // Request broker to send us the slider angle position: this triggers above.
-  // Note: we must subscribe before we can publish.
-  smq.publish("", 1, "getSlider");
-  // Subscribe to one-to-many (broadcast), the messages the server sends to all clients
-  smq.subscribe("slider",{datatype:"json",onmsg:onSmqMsg});
 
-  function onChange (e) {
-    if(!active)
-      smq.pubjson({angle:Math.floor(e.value * 180 / 100)}, "slider");
-  }
-
-  $("#Slider").roundSlider({
-    animation:false,
-    sliderType: "min-range",
-    radius: 130,
-    showTooltip: false,
-    width: 16,
-    value: 0,
-    handleSize: 0,
-    handleShape: "square",
-    circleShape: "half-top",
-    change: onChange,
-    tooltipFormat: onChange
-  });
-  active=false;
-
-  $('body').on('htmx:beforeSwap', function (event) {
-    running=false;
-    const target = event.originalEvent.detail.target; // Access native event detail via jQuery
-    if (target && target.id === 'main') {
-      console.log('WebSocket fragment is about to be unloaded, stopping SMQ');
-      smq.disconnect();
+    if (!window.cmsSmq) {
+      valueOutput.textContent = "SMQ unavailable";
+      slider.disabled = true;
+      return;
     }
-  });
-});
+
+    let pageScope = null;
+    let applyingRemoteValue = false;
+
+    function angleFromPercent(percent) {
+      return Math.floor(percent * 180 / 100);
+    }
+
+    function percentFromAngle(angle) {
+      return Math.floor(angle * 100 / 180);
+    }
+
+    function renderPercent(percent) {
+      const boundedPercent = Math.max(0, Math.min(100, percent));
+      slider.value = String(boundedPercent);
+      gauge.style.setProperty("--slider-percent", String(boundedPercent));
+      valueOutput.textContent = `${angleFromPercent(boundedPercent)}\u00b0`;
+    }
+
+    function applyServerValue(data) {
+      if (!data || typeof data.angle !== "number") {
+        return;
+      }
+
+      applyingRemoteValue = true;
+      renderPercent(percentFromAngle(data.angle));
+      applyingRemoteValue = false;
+    }
+
+    function publishSliderValue() {
+      if (applyingRemoteValue || !pageScope) {
+        return;
+      }
+
+      pageScope.sendToBroker("setSlider", {
+        angle: angleFromPercent(Number(slider.value))
+      });
+    }
+
+    renderPercent(Number(slider.value));
+    function handleSliderChange() {
+      renderPercent(Number(slider.value));
+      publishSliderValue();
+    }
+
+    slider.addEventListener("input", handleSliderChange);
+    slider.addEventListener("change", handleSliderChange);
+
+    window.cmsSmq.mountPage("RoundSlider", (scope) => {
+      pageScope = scope;
+
+      scope.subscribeToDirectMessage("slider", applyServerValue);
+      scope.subscribeToEvent("slider", applyServerValue);
+      scope.onReady(() => {
+        scope.sendToBroker("getSlider", {});
+      });
+      scope.onCleanup(() => {
+        pageScope = null;
+      });
+    });
+  }
+
+  initRoundSlider();
+}(this, this.document));
