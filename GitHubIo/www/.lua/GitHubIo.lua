@@ -1,9 +1,5 @@
--- GitHubIo.lua; ChatGPT generated with manual fixes and improvements.
--- GitHub-backed LuaIo for BAS: https://realtimelogic.com/ba/doc/en/lua/auxlua.html#luaio
--- Re-entrant (no shared httpc), directory-aware, recursive delete, mtime = 1759270202
-
 local mtime=1759270202
-local json,sfind = ba.json,string.find
+local json,sfind,sfmt = ba.json,string.find,string.format
 local dirMeta={ mtime = mtime, size = 0, isdir = true }
 local function strip(path) return path:gsub("^/",""):gsub("/+$","") end
 local ua="BAS-LuaIo/1.4"
@@ -95,6 +91,21 @@ local function create(op)
       }
    end
 
+   local function githubError(action, path, code, body, header)
+      local message
+      local ok, decoded = pcall(json.decode, body or "")
+      if ok and type(decoded) == "table" then message = decoded.message end
+      if not message or message == "" then message = tostring(body or ""):sub(1, 240) end
+      local meta = responseMeta(header, code)
+      local rate = ""
+      if meta.rateRemaining ~= nil or meta.rateReset ~= nil then
+	 rate = sfmt(" rateRemaining=%s rateReset=%s",
+	    tostring(meta.rateRemaining), tostring(meta.rateReset))
+      end
+      return sfmt("%s %s: GitHub HTTP %s%s%s",
+	 action, strip(path or ""), tostring(code), message ~= "" and ": " .. message or "", rate)
+   end
+
    local function ghReq(method, url, hdr, bodyStr, query, okCodes)
       local httpc = hCreate()
       local header = {
@@ -136,15 +147,16 @@ local function create(op)
 	 },
 	 query	= ref and { ref = ref } or nil,
       }
-      if not ok then return nil, "noaccess" end
+      if not ok then hClose(httpc); return nil, "noaccess" end
       local body = httpc:read("a") or ""
       local status=httpc:status()
+      local header=httpc:header()
       hClose(httpc)
-      return (status == 200) and body or nil, "noaccess"
+      return (status == 200) and body or nil, githubError("read raw", path, status, body, header)
    end
 
    -- Raw-by-blob SHA (great for large files too)
-   local function ghGetBlobRaw(sha)
+   local function ghGetBlobRaw(sha, path)
       local httpc = hCreate()
       local ok = httpc:request{
 	 url	= api .. "/repos/" .. op.owner .. "/" .. op.repo .. "/git/blobs/" .. sha,
@@ -155,22 +167,23 @@ local function create(op)
 	    ["User-Agent"]    = ua,
 	 }
       }
-      if not ok then return nil, "noaccess" end
+      if not ok then hClose(httpc); return nil, "noaccess" end
       local body = httpc:read("a") or ""
       local status=httpc:status()
+      local header=httpc:header()
       hClose(httpc)
-      return (status == 200) and body or nil, "noaccess"
+      return (status == 200) and body or nil, githubError("read blob", path or sha, status, body, header)
    end
 
    -- -------- GitHub Contents helpers --------
    local function ghGetMeta(path, ref)
-      local code, body = ghReq("GET", urlFor(path), nil, nil, ref and { ref = ref } or nil)
+      local code, body, header = ghReq("GET", urlFor(path), nil, nil, ref and { ref = ref } or nil)
       if code == 200 then
 	 return json.decode(body)
       elseif code == 404 then
 	 return nil, "enoent"
       else
-	 return nil, "notfound"
+	 return nil, githubError("metadata", path, code, body, header)
       end
    end
 
@@ -371,15 +384,16 @@ local function create(op)
    local function open(name, mode)
       name=strip(name)
       mode = mode or "r"
-      local node = ghGetMeta(name, branch)
+      local node, nodeErr = ghGetMeta(name, branch)
       if mode == "r" then
 	 local m=fCache[name]
 	 if m then return readAPI(m.payload) end
-	 if not node or node.type ~= "file" then return nil, "enoent" end
-	 local content = ghGetRawByPath(name, branch)
+	 if not node then return nil, nodeErr or "enoent" end
+	 if node.type ~= "file" then return nil, "enoent" end
+	 local content, contentErr = ghGetRawByPath(name, branch)
 	 if not content then
-	    content = ghGetBlobRaw(node.sha)
-	    if not content then return nil, "noaccess" end
+	    content, contentErr = ghGetBlobRaw(node.sha, name)
+	    if not content then return nil, contentErr or "noaccess" end
 	 end
 	 return readAPI(content)
       elseif mode == "w" then
