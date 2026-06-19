@@ -127,7 +127,7 @@ openid={
 4.  Save `mako.conf` and run the example using the Mako Server:
 
     ``` bash
-    cd LSP-Examples/fs-sso
+    cd fs-sso
     mako -l::www
     ```
 
@@ -142,7 +142,7 @@ documentation.
 > error message.
 
 
-Once the Mako Server is running, navigate to `http://localhost` and
+Once the Mako Server is running, open the HTTP URL printed in the Mako console and
 click the **Login** button. You should be prompted to log in using
 Microsoft Entra ID and will gain access if your Microsoft Entra App is
 configured correctly.

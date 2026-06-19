@@ -56,7 +56,7 @@ zip -r ../mako.zip .lua/mqttbroker.lua
 Start the example with Mako Server:
 
 ```bash
-cd modules/MQTT-Broker
+cd MQTT-Broker
 mako -l::www
 ```
 

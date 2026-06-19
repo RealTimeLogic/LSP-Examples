@@ -1,0 +1,38 @@
+{
+  "name": "HTML Form",
+  "path": "html-form",
+  "summary": "Beginner LSP example showing an HTML form, POST handling with request:data, and simple session storage in one page.",
+  "compatibility": [
+    "mako",
+    "xedge"
+  ],
+  "run": [
+    "cd html-form",
+    "mako -l::www"
+  ],
+  "protocols": [
+    "HTTP"
+  ],
+  "topics": [
+    "HTML forms",
+    "Lua Server Pages",
+    "sessions",
+    "request:data",
+    "beginner"
+  ],
+  "use_when": [
+    "The user wants a minimal form-handling example.",
+    "The user wants to understand POST data in LSP.",
+    "The user wants a tiny session example."
+  ],
+  "avoid_when": [
+    "The user wants production authentication.",
+    "The user wants AJAX or WebSocket form handling.",
+    "The user wants a multi-page application structure."
+  ],
+  "read_next": [
+    "AGENTS.md",
+    "README.md",
+    "www/index.lsp"
+  ]
+}

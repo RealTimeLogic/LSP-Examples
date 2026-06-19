@@ -33,12 +33,15 @@ var smq = SMQ.Client("ws://localhost/smq.lsp");
 3. Start Mako Server in this directory:
 
 ```bash
+cd SMQ-examples/LightSwitch-And-LightBulb-App
 mako -l::www
 ```
 
 For more detail on starting the Mako Server, see the [command line video tutorial](https://youtu.be/vwQ52ZC5RRg) and the [command line options documentation](https://realtimelogic.com/ba/doc/?url=Mako.html#loadapp).
 
 4. Drag and drop the modified `switch.html` and `bulb.html` into browser windows to connect to your local broker.
+
+Expected result: toggling the switch page changes the bulb page through SMQ messages.
 
 ## How it works
 

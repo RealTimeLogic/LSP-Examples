@@ -1,0 +1,40 @@
+{
+  "name": "WebDAV And Web File Server",
+  "path": "File-Server",
+  "summary": "BAS Web File Server and WebDAV example mounted at /fs/ with simple authentication, writable IO selection, lock-directory setup, and cleanup on unload.",
+  "compatibility": [
+    "mako",
+    "xedge"
+  ],
+  "run": [
+    "cd File-Server",
+    "mako -l::www"
+  ],
+  "protocols": [
+    "HTTP",
+    "WebDAV"
+  ],
+  "topics": [
+    "Web File Server",
+    "WebDAV",
+    "file upload",
+    "authentication",
+    "BAS IO",
+    "lock directory"
+  ],
+  "use_when": [
+    "The user wants to mount a BAS Web File Server.",
+    "The user wants a WebDAV endpoint example.",
+    "The user wants to adapt file storage and authentication for Mako or Xedge."
+  ],
+  "avoid_when": [
+    "The user wants encrypted-at-rest storage; use CryptoIO instead.",
+    "The user wants SSO-protected file server behavior; use fs-sso instead.",
+    "The user wants a database-backed document system."
+  ],
+  "read_next": [
+    "AGENTS.md",
+    "README.md",
+    "www/.preload"
+  ]
+}

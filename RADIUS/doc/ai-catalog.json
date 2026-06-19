@@ -1,0 +1,19 @@
+{
+  "name": "RADIUS",
+  "path": "RADIUS",
+  "summary": "Demonstrates RADIUS-backed authentication in a BAS web app by wiring a Lua RADIUS client into BAS authentication callbacks.",
+  "compatibility": ["mako", "xedge"],
+  "run": ["cd RADIUS", "mako -l::www"],
+  "use_when": [
+    "The user wants BAS authentication backed by a RADIUS server.",
+    "The user wants an example of UDP protocol code combined with BAS auth callbacks."
+  ],
+  "avoid_when": [
+    "The user needs OAuth, SAML, or a browser-only authentication example.",
+    "The target cannot reach a RADIUS server."
+  ],
+  "read_next": ["AGENTS.md", "README.md", "www/.preload", "www/.lua/radius.lua", "www/.login/form.lsp"],
+  "protocols": ["RADIUS", "UDP", "HTTP Basic authentication", "form authentication"],
+  "topics": ["authentication", "BAS authenticator", "Lua socket", "crypto hash"],
+  "notes": ["Xedge use may require deployment and loader adjustments for the target environment."]
+}

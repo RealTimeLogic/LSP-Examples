@@ -1,0 +1,24 @@
+{
+  "name": "WebAuthn",
+  "path": "WebAuthn",
+  "summary": "BAS WebAuthn/passkey module with two example applications: an introductory registration/authentication flow and a fuller protected-login flow with optional email activation.",
+  "compatibility": ["mako", "xedge"],
+  "run": ["cd WebAuthn", "mako"],
+  "use_when": [
+    "The user wants to add passkey/FIDO2 WebAuthn authentication to a BAS-powered web application.",
+    "The user wants examples of server-side WebAuthn callbacks, user database persistence, and protected app login."
+  ],
+  "avoid_when": [
+    "The deployment cannot provide trusted HTTPS, a valid origin, or a browser-supported WebAuthn environment.",
+    "The user only needs simple password or RADIUS authentication."
+  ],
+  "read_next": ["AGENTS.md", "README.md", "WebAuthn.md", "mako.conf", "WebAuthnModule/.lua/webauthn.lua", "example1/.preload", "example2/.preload"],
+  "variants": {
+    "WebAuthnModule": "Reusable server-side WebAuthn module.",
+    "example1": "Introductory registration and authentication example.",
+    "example2": "More complete protected-login example with registration activation and optional email."
+  },
+  "protocols": ["WebAuthn", "FIDO2", "HTTPS", "CBOR", "JSON"],
+  "topics": ["passkeys", "authentication", "BAS authenticator", "SimpleWebAuthn", "protected file server"],
+  "notes": ["Mako is the documented local run target; Xedge use requires correct .config deployment, trusted HTTPS/origin setup, storage, and email configuration."]
+}

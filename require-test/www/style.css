@@ -1,0 +1,25 @@
+body {
+  margin: 0;
+  padding: 32px;
+  background: #1e1f22;
+  color: #d7dbd8;
+  font: 16px/1.5 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+main {
+  max-width: 860px;
+  margin: 0 auto;
+}
+
+h1 {
+  color: #f2f4f3;
+}
+
+pre {
+  overflow-x: auto;
+  border: 1px solid #454856;
+  border-radius: 8px;
+  padding: 16px;
+  background: #2d2f34;
+  color: #f2f4f3;
+}

@@ -19,6 +19,8 @@ mako -l::sample-oauth2-client
 
 For more detail on starting the Mako Server, see the [command line video tutorial](https://youtu.be/vwQ52ZC5RRg) and the [command line options documentation](https://realtimelogic.com/ba/doc/?url=Mako.html#loadapp).
 
+After the server starts, open the HTTP URL printed in the Mako console. The OAuth flow will only complete after the GitHub OAuth application, callback URL, and client credentials have been configured.
+
 ## How it works
 
 The example follows the same overall flow as the original PHP sample: it redirects the browser to GitHub for authorization, receives the callback, exchanges the authorization data for access data, and then uses that data in the application flow.

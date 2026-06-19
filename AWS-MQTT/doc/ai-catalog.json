@@ -1,0 +1,41 @@
+{
+  "name": "AWS MQTT",
+  "path": "AWS-MQTT",
+  "summary": "AWS IoT Core MQTT example using ALPN and mutual TLS. The startup script loads AWS certificates, creates a SharkSSL-backed MQTT client, subscribes to topics, and publishes JSON messages.",
+  "compatibility": [
+    "mako",
+    "xedge"
+  ],
+  "run": [
+    "cd AWS-MQTT",
+    "mako -l::www"
+  ],
+  "protocols": [
+    "MQTT",
+    "TLS",
+    "ALPN"
+  ],
+  "topics": [
+    "AWS IoT Core",
+    "SharkSSL",
+    "certificates",
+    "mutual TLS",
+    "JSON",
+    "timer"
+  ],
+  "use_when": [
+    "The user wants to connect BAS Lua code to AWS IoT Core over MQTT.",
+    "The user needs an ALPN and mutual TLS MQTT example.",
+    "The user wants MQTT subscription, publishing, and cleanup lifecycle code."
+  ],
+  "avoid_when": [
+    "The user does not have AWS IoT Core certificates and broker endpoint settings.",
+    "The user wants a generic local MQTT broker example.",
+    "The user wants production secret storage without adapting certificate handling."
+  ],
+  "read_next": [
+    "AGENTS.md",
+    "README.md",
+    "www/.preload"
+  ]
+}

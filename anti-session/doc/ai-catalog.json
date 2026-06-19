@@ -1,0 +1,18 @@
+{
+  "name": "anti-session",
+  "path": "anti-session",
+  "summary": "Demonstrates a stateless multi-page LSP form workflow where encrypted JSON state is carried by the browser instead of stored in the server-side session object.",
+  "compatibility": ["mako", "xedge"],
+  "run": ["cd anti-session", "mako -l::www"],
+  "use_when": [
+    "The user wants a small multi-step form without allocating server-side session state.",
+    "The user wants to learn ba.aesencode, ba.aesdecode, and JSON state handling in LSP pages."
+  ],
+  "avoid_when": [
+    "The workflow state is large, long-lived, or needs server-side revocation.",
+    "The user needs authentication, authorization, or a replacement for persistent storage."
+  ],
+  "read_next": ["AGENTS.md", "README.md", "www/.preload", "www/index.lsp", "www/name.lsp", "www/food.lsp", "www/summary.lsp"],
+  "topics": ["encrypted form state", "anti-session", "AES", "JSON", "LSP", "multi-page form"],
+  "notes": ["The AES key is generated at app startup, so browser-carried state from before a restart cannot be decoded."]
+}

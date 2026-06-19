@@ -23,7 +23,7 @@ mako -l::www
 
 For more detail on starting the Mako Server, see the [command line video tutorial](https://youtu.be/vwQ52ZC5RRg).
 
-After the server starts, open `http://localhost:portno`, where `portno` is the HTTP port printed in the console. Enter data into the form and click `Submit`.
+After the server starts, open the HTTP URL printed in the Mako console. Enter data into the form and click `Submit`.
 
 ## How it works
 

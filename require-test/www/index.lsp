@@ -1,3 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Lua Require Path Test</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main>
+<h1>Lua Require Path Test</h1>
+<p>This page shows how modules can be loaded with <code>dofile</code> and <code>require</code> from the application IO tree.</p>
 <pre>
 <?lsp
 
@@ -27,3 +38,6 @@ require"subdir.helloworld3".hello(_ENV)
 
 ?>
 </pre>
+</main>
+</body>
+</html>

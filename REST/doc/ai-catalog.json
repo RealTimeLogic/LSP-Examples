@@ -1,0 +1,19 @@
+{
+  "name": "REST",
+  "path": "REST",
+  "summary": "Provides a minimal REST-style Lua router for BAS applications and an in-memory /api/users example service.",
+  "compatibility": ["mako", "xedge"],
+  "run": ["cd REST", "mako -l::www"],
+  "use_when": [
+    "The user wants to build REST-style endpoints using BAS directories and Lua request handling.",
+    "The user wants a small router module that can be reused in an embedded web app."
+  ],
+  "avoid_when": [
+    "The user needs a full web framework or persistent database-backed service out of the box.",
+    "The user needs authentication, authorization, or rate limiting already built in."
+  ],
+  "read_next": ["AGENTS.md", "README.md", "REST-API.md", "www/.lua/rest.lua", "www/.preload", "TestApi.py"],
+  "protocols": ["HTTP", "JSON", "REST"],
+  "topics": ["BAS VFS", "directory function", "route matching", "request body parsing"],
+  "notes": ["The example data store is in memory and resets on app restart."]
+}

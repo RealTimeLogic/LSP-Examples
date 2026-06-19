@@ -21,19 +21,17 @@ end
 ?>
 <html>
   <head>
-    <style>
-      textarea {
-        width:100%;
-        height:300px;
-      }
-    </style>
+    <title>Modify Wiki Page</title>
+    <link rel="stylesheet" href="../style.css">
   </head>
   <body>
-    <h1>Modify Wiki Page</h1>
-    <?lsp=app.text2html(wikidata)?>
-    <form method="post">
-      <textarea name="data"><?lsp=wikidata?></textarea>
-      <input type="submit" />
-    </form>
+    <main>
+      <h1>Modify Wiki Page</h1>
+      <?lsp=app.text2html(wikidata)?>
+      <form method="post">
+        <textarea name="data"><?lsp=wikidata?></textarea>
+        <input type="submit" value="Save changes" />
+      </form>
+    </main>
   </body>
 </html>

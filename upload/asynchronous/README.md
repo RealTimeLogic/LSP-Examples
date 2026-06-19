@@ -25,6 +25,8 @@ mako -l::www
 
 For more detail on starting the Mako Server, see the [command line video tutorial](https://youtu.be/vwQ52ZC5RRg) and the [command line options documentation](https://realtimelogic.com/ba/doc/?url=Mako.html#loadapp).
 
+After the server starts, open the HTTP URL printed in the Mako console. Select a ZIP file with the form or drag and drop it onto the page; non-`GET` requests are handed to the asynchronous upload object.
+
 ## How it works
 
 `index.lsp` serves a regular upload form for browsers that do not use drag and drop, and it also exposes the drag-and-drop UI used by `upload.js`. Any non-`GET` request is handed to the upload object created in `.preload`, which processes the incoming upload asynchronously. That separation lets the app keep the browser UI simple while the upload directory object manages the concurrent upload workload.

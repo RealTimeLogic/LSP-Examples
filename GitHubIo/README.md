@@ -46,13 +46,7 @@ mako -l::www
 
 For more detail on starting the Mako Server, see the [command line video tutorial](https://youtu.be/vwQ52ZC5RRg) and the [command line options documentation](https://realtimelogic.com/ba/doc/?url=Mako.html#loadapp).
 
-After the server starts, open:
-
-```text
-http://localhost/git/
-```
-
-You can then use the Web File Manager for upload and download operations, or mount `http://localhost/git/` as a WebDAV drive.
+After the server starts, open the HTTP URL printed in the Mako console with `/git/` appended. You can then use the Web File Manager for upload and download operations, or mount the same `/git/` URL as a WebDAV drive.
 
 ## How it works
 

@@ -23,6 +23,8 @@ mako -l::www
 
 For more detail on starting the Mako Server, see the [command line video tutorial](https://youtu.be/vwQ52ZC5RRg) and the [command line options documentation](https://realtimelogic.com/ba/doc/?url=Mako.html#loadapp).
 
+Expected result: trace output from the configured peer appears in the local console or log.
+
 ## How it works
 
 The startup logic connects to the configured peer's trace service and forwards the incoming trace stream to the local server environment. If the Mako Server is running in the foreground, you see the trace output in the console. If it is running in the background, the trace output is written to `mako.log`.

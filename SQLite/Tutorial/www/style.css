@@ -1,33 +1,72 @@
-#form, div.messages {
-  max-width:600px;
-  margin:auto;
-  padding:0;
+body {
+  margin: 0;
+  padding: 32px;
+  background: #1e1f22;
+  color: #d7dbd8;
+  font: 16px/1.5 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+#form,
+div.messages {
+  max-width: 640px;
+  margin: 0 auto 18px;
+}
+
+#form {
+  border: 1px solid #454856;
+  border-radius: 8px;
+  padding: 20px;
+  background: #2d2f34;
 }
 
 #form textarea {
   width: 100%;
-  height:100px;
+  height: 110px;
+  box-sizing: border-box;
+  border: 1px solid #454856;
+  border-radius: 6px;
+  padding: 10px 12px;
+  background: #252526;
+  color: #f2f4f3;
+  font: inherit;
 }
 
 #form p:first-of-type {
-  font-weight:bold;
+  margin-top: 0;
+  color: #f2f4f3;
+  font-weight: 700;
+}
+
+input[type="submit"] {
+  border: 0;
+  border-radius: 6px;
+  padding: 10px 16px;
+  background: #69c575;
+  color: #1e1f22;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
 }
 
 div.messages {
-  border: 1px solid #999;
+  border: 1px solid #454856;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #2d2f34;
 }
 
-
-div.messages div{
-  background-color: #D4D4E8;
-  margin:0;
-  padding:3px 10px 5px 10px;
+div.messages div {
+  margin: 0;
+  padding: 10px 14px;
+  border-bottom: 1px solid #454856;
+  background-color: #2d2f34;
 }
 
-div.messages div:nth-of-type(odd){
-  background-color: #E8E8FC;
+div.messages div:nth-of-type(odd) {
+  background-color: #33363d;
 }
 
-div.messages div h3{
-  margin:0;
+div.messages div h3 {
+  margin: 0;
+  color: #69c575;
 }

@@ -64,6 +64,12 @@ Use these consolidated files as the primary references:
 
 SMQ is the built-in publish/subscribe messaging system used by the Barracuda App Server.
 
+### Detailed SMQ skill
+
+For non-trivial SMQ work, read the centralized SMQ AI skill before modifying broker setup, browser clients, topic naming, publish/subscribe flow, direct messaging, reconnect behavior, or cleanup logic:
+
+- https://realtimelogic.com/downloads/ai-skills/SMQ-Skill.md
+
 ### Official SMQ documentation
 
 - **SMQ JavaScript API (client-side)**  

@@ -24,7 +24,7 @@ mako -l::www
 
 For more detail on starting the Mako Server, see the [command line video tutorial](https://youtu.be/vwQ52ZC5RRg) and the [command line options documentation](https://realtimelogic.com/ba/doc/?url=Mako.html#loadapp).
 
-After the server starts, open `http://localhost:portno`, where `portno` is the HTTP port shown in the Mako console. Log in with:
+After the server starts, open the HTTP URL printed in the Mako console. Log in with:
 
 - Username: `admin`
 - Password: `password`
@@ -41,4 +41,3 @@ Each protected page includes the shared header logic from `.header.lsp`, which g
 
 - This example uses hashed passwords in the user database, so the realm configured in `.preload` must match the stored HA1 values.
 - If you change the realm or the stored hashes, update both sides together.
-

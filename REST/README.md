@@ -15,7 +15,7 @@ This directory contains the example source code for the tutorial [Designing REST
 Start the example with the Mako Server:
 
 ```bash
-cd LSP-Examples/REST
+cd REST
 mako -l::www
 ```
 

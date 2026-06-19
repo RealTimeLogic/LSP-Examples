@@ -19,18 +19,16 @@ end
 ?>
 <html>
   <head>
-    <style>
-      textarea {
-        width:100%;
-        height:300px;
-      }
-    </style>
+    <title>Create Wiki Page</title>
+    <link rel="stylesheet" href="../style.css">
   </head>
   <body>
-    <h1>Create New Wiki Page</h1>
-    <form method="post">
-      <textarea name="data"></textarea>
-      <input type="submit" />
-    </form>
+    <main>
+      <h1>Create New Wiki Page</h1>
+      <form method="post">
+        <textarea name="data"></textarea>
+        <input type="submit" value="Save page" />
+      </form>
+    </main>
   </body>
 </html>

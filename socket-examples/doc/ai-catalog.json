@@ -1,0 +1,19 @@
+{
+  "name": "socket-examples",
+  "path": "socket-examples",
+  "summary": "Collection of BAS socket and WebSocket examples covering UDP, NTP, blocking sockets, cosockets, WebSocket services, a proxy, a simple server, and an Eliza chatbot.",
+  "compatibility": ["mako", "xedge"],
+  "run": ["cd socket-examples", "mako -l::www"],
+  "use_when": [
+    "The user wants to learn BAS socket, UDP, WebSocket, or cosocket APIs.",
+    "The user wants small isolated socket examples rather than a full application."
+  ],
+  "avoid_when": [
+    "The user needs only SMQ messaging examples.",
+    "The target cannot support the required outbound or inbound socket operations."
+  ],
+  "read_next": ["AGENTS.md", "README.md", "www/index.lsp", "www/.preload", "www/Blocking-WS-Server/ws.lsp", "www/Cosocket-WS-Server/ws.lsp"],
+  "protocols": ["TCP", "UDP", "WebSocket", "HTTP", "NTP"],
+  "topics": ["BAS socket library", "cosocket", "blocking socket", "proxy", "WebSocket server"],
+  "notes": ["Blocking examples are educational and should be reviewed before use on constrained embedded targets."]
+}

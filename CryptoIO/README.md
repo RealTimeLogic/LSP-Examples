@@ -20,6 +20,8 @@ cd CryptoIO
 mako -l::www
 ```
 
+Expected startup result: the console prints the encrypted file size, the original plaintext size reported through CryptoIO, and `.preload encrypt/decrypt test: OK`. To test the encrypted Web File Manager, open the HTTP URL printed in the Mako console with `/fs/` appended and log in with `admin` / `admin`.
+
 ## How it works
 
 ### Example 1: Basic Encrypt/Decrypt Smoke Test
@@ -43,7 +45,7 @@ If the comparison matches, encryption + decryption are working as expected.
 
 The second section in `.preload` sets up an encrypted file service mounted at `/fs/`. The example is similar to the [WebDAV and Web File Server example](../File-Server/README.md), but it uses CryptoIO to encrypt all files stored on the file system. It creates an `encrypted` sub-directory and uses it as the base for all encrypted resources.
 
-After starting the Mako Server, open a browser and go to `http://localhost:portno/fs/`, where `portno` is the HTTP port printed by the server.
+After starting the Mako Server, open the HTTP URL printed in the Mako console with `/fs/` appended.
 
 **Login credentials:**
 

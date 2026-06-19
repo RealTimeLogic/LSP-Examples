@@ -1,0 +1,50 @@
+{
+  "name": "Lua Authentication Examples",
+  "path": "authentication",
+  "summary": "Container of three BAS authentication examples showing full-root protection, protected-subdirectory authentication, and manual per-page authentication with shared page helpers. The examples are run with Mako Server commands, but the BAS authentication patterns can be adapted to Xedge app paths.",
+  "compatibility": [
+    "mako",
+    "xedge"
+  ],
+  "variants": {
+    "root": "Protects the whole application resource reader with dir:setauth.",
+    "subdir": "Protects only my-protected/ using a prologue directory.",
+    "semiautomatic": "Manually authenticates pages through shared emitHeader and emitFooter functions."
+  },
+  "run": [
+    "cd authentication",
+    "mako -l::root",
+    "mako -l::root digest",
+    "mako -l::root form",
+    "mako -l::subdir",
+    "mako -l::subdir digest",
+    "mako -l::subdir form",
+    "mako -l::semiautomatic"
+  ],
+  "topics": [
+    "authentication",
+    "Basic auth",
+    "Digest auth",
+    "form login",
+    "Lua Server Pages",
+    "security",
+    "resource reader"
+  ],
+  "use_when": [
+    "The user wants examples of BAS authenticator setup in Lua.",
+    "The user wants to protect an entire app root, a specific subdirectory, or manually protected pages.",
+    "The user wants to compare Basic, Digest, and form authentication behavior in Mako Server."
+  ],
+  "avoid_when": [
+    "The user wants production credential storage or password hashing rather than demo credentials.",
+    "The user wants OAuth, OpenID Connect, WebAuthn, or external identity provider integration.",
+    "The user wants an Xedge deployment without reviewing root/subdirectory mounting and app-path adjustments."
+  ],
+  "read_next": [
+    "AGENTS.md",
+    "README.md",
+    "root/.preload",
+    "subdir/.preload",
+    "semiautomatic/.preload"
+  ]
+}

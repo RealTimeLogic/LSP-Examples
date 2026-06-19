@@ -2,7 +2,7 @@
 
 ## Overview
 
-This example provides ready-to-use client-side and server-side libraries for REST-, AJAX-, and RPC-style communication over SMQ. From the browser, you call server functions asynchronously and receive responses without reloading the page.
+This example provides ready-to-use client-side and server-side libraries for REST-, AJAX-, and RPC-style communication over [SMQ](https://realtimelogic.com/ba/doc/en/SMQ.html). From the browser, you call server functions asynchronously and receive responses without reloading the page.
 
 Although the example uses an RPC-style programming model, the practical interaction pattern is the same one you already know from AJAX and many REST APIs:
 
@@ -20,25 +20,27 @@ A few terminology notes help frame the example:
 
 ### What is SMQ?
 
-[SMQ](https://realtimelogic.com/products/simplemq/) is a lightweight, message-based communication layer designed for low-latency, bidirectional messaging between browsers and servers. It avoids repeated HTTP request overhead and is well suited for interactive applications where responsiveness matters.
+[SMQ](https://realtimelogic.com/ba/doc/en/SMQ.html) is a lightweight, message-based communication layer designed for low-latency, bidirectional messaging between browsers and servers. It avoids repeated HTTP request overhead and is well suited for interactive applications where responsiveness matters.
 
 That is why it maps well to RPC-style browser calls. If your browser already needs an SMQ connection for live updates or publish/subscribe traffic, adding method-call support on top of the same connection is often simpler than maintaining a second HTTP API just for request/response operations.
 
 ## Files
 
-- `.preload` - Starts the SMQ broker, registers a few basic one-to-one demo messages, mounts the broker at `/smq`, and exposes the RPC interface.
-- `.lua/smqrpc.lua` - Server-side SMQ RPC helper that dispatches `$RpcReq` messages and publishes `$RpcResp` replies.
-- `smqrpc.js` - Client-side library that creates an RPC proxy on top of an SMQ client.
-- `index.html` - Browser example that exercises the RPC library.
+- `www/.preload` - Starts the SMQ broker, registers a few basic one-to-one demo messages, mounts the broker at `/smq`, and exposes the RPC interface.
+- `www/.lua/smqrpc.lua` - Server-side SMQ RPC helper that dispatches `$RpcReq` messages and publishes `$RpcResp` replies.
+- `www/smqrpc.js` - Client-side library that creates an RPC proxy on top of an SMQ client.
+- `www/index.html` - Browser example that exercises the RPC library.
 
 ## How to run
 
 Start the example with the Mako Server:
 
 ```bash
-cd LSP-Examples/SMQ-examples
-mako -l::RPC
+cd SMQ-examples/RPC
+mako -l::www
 ```
+
+After the server starts, open the HTTP URL printed in the Mako console and run the buttons on the page. Successful calls should show RPC results in the browser; the intentional failure example should report an error response.
 
 ## How it works
 
@@ -48,7 +50,7 @@ The startup script creates an SMQ broker and exposes it through a BAS directory 
 - `multiply(a, b)`
 - `failfunc()`
 
-On the server side, `.lua/smqrpc.lua` listens for `$RpcReq` messages sent to `self`, looks up the requested function name in the interface table, runs it with `pcall(...)`, and publishes the result or error back to the calling client as `$RpcResp`.
+On the server side, `www/.lua/smqrpc.lua` listens for `$RpcReq` messages sent to `self`, looks up the requested function name in the interface table, runs it with `pcall(...)`, and publishes the result or error back to the calling client as `$RpcResp`.
 
 The server-side helper stays deliberately small. Its job is to translate one incoming SMQ request into one Lua function call and one SMQ response message. That keeps the flow easy to study and easy to reuse in other apps.
 
@@ -68,7 +70,7 @@ require"smqrpc".create(smq, interface)
 
 Each function exposed in that table becomes callable from the browser.
 
-On the client side, `smqrpc.js` turns those message exchanges into Promise-based method calls, so browser code can use either `.then(...)` or `async` / `await`.
+On the client side, `www/smqrpc.js` turns those message exchanges into Promise-based method calls, so browser code can use either `.then(...)` or `async` / `await`.
 
 ### Client-side usage pattern
 
@@ -109,6 +111,10 @@ The advantage is that one SMQ connection can now support both publish/subscribe 
 The original tutorial also frames this as the SMQ equivalent of the AJAX-over-WebSockets pattern: the transport changes, but the application idea stays the same.
 
 If you need to send very large payloads, use LSP pages or the [REST plugin](https://realtimelogic.com/articles/Designing-RESTful-Services-in-Lua) instead. SMQ is designed for messaging, and a recommended upper bound for this RPC layer is roughly 65,400 bytes per message.
+
+## See Also
+
+- [REST / AJAX / RPC over WebSockets](../../AJAX-Over-WebSockets/README.md)
 
 ## Notes / Troubleshooting
 

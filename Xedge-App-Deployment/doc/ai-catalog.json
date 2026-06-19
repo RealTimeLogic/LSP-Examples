@@ -1,0 +1,18 @@
+{
+  "name": "Xedge App Deployment",
+  "path": "Xedge-App-Deployment",
+  "summary": "Source layout for the MyApp.zip Xedge deployment tutorial, showing .config metadata, .preload startup logic, an LSP page, and an .xlua script packaged from the www directory.",
+  "compatibility": ["mako", "xedge"],
+  "run": ["cd Xedge-App-Deployment", "mako -l::www"],
+  "use_when": [
+    "The user wants to learn how an Xedge application ZIP should be structured.",
+    "The user wants a small source example for packaging and uploading an Xedge app."
+  ],
+  "avoid_when": [
+    "The user needs a feature-rich web app instead of a deployment packaging example.",
+    "The user needs an ESP32-specific hardware example."
+  ],
+  "read_next": ["AGENTS.md", "README.md", "www/.config", "www/.preload", "www/index.lsp", "www/MyTest.xlua"],
+  "topics": ["Xedge deployment", "app packaging", ".config", ".preload", ".xlua", "LSP"],
+  "notes": ["Create MyApp.zip from inside www with: zip -D -q -u -r -9 ../MyApp.zip ."]
+}

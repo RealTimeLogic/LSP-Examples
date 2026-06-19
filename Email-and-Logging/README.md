@@ -24,11 +24,18 @@ The `text`, `html`, and `eml` examples all use the Mako Server's log settings in
 
 Run the email examples in this order:
 
-1. `mako -l::text`
-2. `mako -l::html`
-3. `mako -l::eml`
+```bash
+cd Email-and-Logging
+mako -l::text
+mako -l::html
+mako -l::eml
+```
 
-All examples except `log` exit the Mako Server after the email is sent.
+Run one command at a time. The `text`, `html`, and `eml` examples exit the Mako Server after the email send attempt completes. To test the logging example, run:
+
+```bash
+mako -l::log
+```
 
 ## How it works
 

@@ -19,21 +19,27 @@ end
     <title>Cannot Log Out</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #f4f4f4;
+            margin: 0;
+            padding: 32px;
+            background: #1e1f22;
+            color: #d7dbd8;
+            font: 16px/1.5 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
         }
         .message-container {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            max-width:500px;
+            max-width: 620px;
+            margin: 8vh auto 0;
+            border: 1px solid #454856;
+            border-radius: 8px;
+            padding: 22px;
+            background: #2d2f34;
         }
-        h2{text-align: center;}
+        h2 {
+            color: #f2f4f3;
+            text-align: center;
+        }
+        a {
+            color: #ffd12b;
+        }
     </style>
 </head>
 <body>

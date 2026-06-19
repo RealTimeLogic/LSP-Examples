@@ -10,24 +10,24 @@ This directory contains the source code for the SMQ tutorials published at makos
 
 ## Files
 
-- `.preload` - Starts the SMQ support used by the example bundle.
-- `index.lsp` - Landing page for the bundled examples.
-- `smq.lsp` - SMQ broker endpoint used by the browser examples.
-- `chat/BasicChat.html` - Basic chat example.
-- `chat/index.html` - Improved chat example.
-- `led-control/index.html` - Device LED control example.
-- `chat/` and `led-control/` assets - Supporting CSS and sound files used by the demos.
+- `www/.preload` - Starts the SMQ support used by the example bundle.
+- `www/index.lsp` - Landing page for the bundled examples.
+- `www/smq.lsp` - SMQ broker endpoint used by the browser examples.
+- `www/chat/BasicChat.html` - Basic chat example.
+- `www/chat/index.html` - Improved chat example.
+- `www/led-control/index.html` - Device LED control example.
+- `www/chat/` and `www/led-control/` assets - Supporting CSS and sound files used by the demos.
 
 ## How to run
 
 Start the bundle with the Mako Server:
 
 ```bash
-cd LSP-Examples/SMQ-examples
-mako -l::IoT
+cd SMQ-examples/IoT
+mako -l::www
 ```
 
-After the server starts, open `http://localhost`.
+After the server starts, open the HTTP URL printed in the Mako console.
 
 ## How it works
 

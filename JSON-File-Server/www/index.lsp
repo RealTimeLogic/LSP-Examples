@@ -30,47 +30,59 @@ end
     <title>Auto Login</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #f4f4f4;
+            margin: 0;
+            padding: 32px;
+            background: #1e1f22;
+            color: #d7dbd8;
+            font: 16px/1.5 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
         }
         .login-container {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            text-align: center;
+            max-width: 560px;
+            margin: 8vh auto 0;
+            border: 1px solid #454856;
+            border-radius: 8px;
+            padding: 22px;
+            background: #2d2f34;
+        }
+        h2 {
+            color: #f2f4f3;
+        }
+        a {
+            color: #ffd12b;
         }
         select, button {
-            padding: 10px;
-            margin-top: 10px;
-            font-size: 16px;
+            box-sizing: border-box;
+            border-radius: 6px;
+            padding: 10px 12px;
+            font: inherit;
         }
-        li{
-            list-style: none;
-            text-align: left;
-           margin-bottom:5px;
-
-        } 
-        li::before{ 
-            content: "\1F882";
-
+        select {
+            width: 100%;
+            border: 1px solid #454856;
+            background: #252526;
+            color: #f2f4f3;
         }
-        li
+        button {
+            border: 0;
+            background: #69c575;
+            color: #1e1f22;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        li {
+            margin-bottom: 8px;
+        }
     </style>
 </head>
 <body>
     <div class="login-container">
-        <h2>Two Login Options:</h2>
+        <h2>Two Login Options</h2>
         <ul>
             <li><a href="fs/">Navigate to the File Server</a> and log in using HTTP Digest Authentication</li>
             <li>Select a user below to auto-login via <code>request:login(username)</code></li>
         </ul>
 
-        <h2>Auto Login</h2>
+        <h2>Programmatic Login</h2>
         <form method="POST" action="">
             <select id="userSelect" name="username">
                 <option value="mom">Mom</option>

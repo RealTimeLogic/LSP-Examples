@@ -1,0 +1,46 @@
+{
+  "name": "LMQTT Broker",
+  "path": "MQTT-Broker",
+  "summary": "Lua MQTT 3.1.1/5.0 broker for BAS-derived runtimes, with TLS/plain listeners, authentication and publish-policy callbacks, in-process client support, design notes, and Python tests.",
+  "compatibility": [
+    "mako",
+    "xedge"
+  ],
+  "run": [
+    "cd MQTT-Broker",
+    "mako -l::www",
+    "python design/test_mqtt_broker.py --tls --port 8883 --all"
+  ],
+  "protocols": [
+    "MQTT",
+    "TLS"
+  ],
+  "topics": [
+    "MQTT broker",
+    "MQTT 3.1.1",
+    "MQTT 5",
+    "SharkSSL",
+    "QoS 0",
+    "authentication",
+    "publish policy",
+    "Python tests"
+  ],
+  "use_when": [
+    "The user wants to host an MQTT broker in a BAS/Mako/Xedge app.",
+    "The user wants a compact Lua MQTT broker implementation.",
+    "The user wants broker callbacks for authentication or publish policy."
+  ],
+  "avoid_when": [
+    "The user needs retained messages, persistent sessions, QoS 1/2, shared subscriptions, or topic aliases as-is.",
+    "The user only needs an MQTT client connecting to an external broker.",
+    "The user cannot open listener ports on the target deployment."
+  ],
+  "read_next": [
+    "AGENTS.md",
+    "README.md",
+    "LMQTT-Broker.md",
+    "www/.lua/mqttbroker.lua",
+    "www/.preload",
+    "design/README.md"
+  ]
+}

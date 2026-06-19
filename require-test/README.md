@@ -23,6 +23,8 @@ mako -l::www
 
 For more detail on starting the Mako Server, see the [command line video tutorial](https://youtu.be/vwQ52ZC5RRg) and the [command line options documentation](https://realtimelogic.com/ba/doc/?url=Mako.html#loadapp).
 
+After the server starts, open the HTTP URL printed in the Mako console. The page prints the output from each `dofile(...)` and `require(...)` variant.
+
 ## How it works
 
 The startup script creates a loader bound to the application's IO. That makes it possible to use Lua's normal `require(...)` mechanism for modules stored inside the application package instead of relying only on the default global search path.

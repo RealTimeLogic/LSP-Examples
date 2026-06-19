@@ -1,0 +1,40 @@
+{
+  "name": "OAuth 2.0 Example",
+  "path": "oauth",
+  "summary": "GitHub OAuth 2.0 client example converted from PHP to LSP, demonstrating redirect login, state validation, token exchange, session storage, and GitHub API calls.",
+  "compatibility": [
+    "mako"
+  ],
+  "run": [
+    "cd oauth",
+    "mako -l::sample-oauth2-client"
+  ],
+  "protocols": [
+    "HTTP",
+    "OAuth 2.0"
+  ],
+  "topics": [
+    "OAuth",
+    "GitHub",
+    "sessions",
+    "redirect URI",
+    "state validation",
+    "token exchange",
+    "mako.sharkclient"
+  ],
+  "use_when": [
+    "The user wants a small GitHub OAuth 2.0 flow in LSP.",
+    "The user wants to understand OAuth redirects and callback handling.",
+    "The user wants a starting point for adapting OAuth to a more secure BAS app."
+  ],
+  "avoid_when": [
+    "The user wants production credential handling as-is.",
+    "The user wants Xedge compatibility without replacing mako.sharkclient and embedded secrets.",
+    "The user wants OpenID Connect/SSO; use fs-sso instead."
+  ],
+  "read_next": [
+    "AGENTS.md",
+    "README.md",
+    "sample-oauth2-client/github.lsp"
+  ]
+}

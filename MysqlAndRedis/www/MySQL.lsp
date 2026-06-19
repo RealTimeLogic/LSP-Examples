@@ -1,3 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>MySQL Driver Test</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main>
+<h1>MySQL Driver Test</h1>
+<p>This page runs the MySQL driver test against the local database configured in the example.</p>
 <pre>
 <?lsp
 
@@ -42,3 +53,6 @@ ba.socket.event(mySqlTest)
 
 ?>
 </pre>
+</main>
+</body>
+</html>

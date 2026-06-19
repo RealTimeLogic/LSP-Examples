@@ -1,29 +1,28 @@
-body{
-  background: url(https://realtimelogic.com/mainp/images/monetor.png) no-repeat fixed;
-  background-size: cover;
-  background-position: 50%;
-}
-
 * {
   box-sizing: border-box;
 }
 
+body {
+  margin: 0;
+  padding: 32px;
+  min-height: 100vh;
+  background: #1e1f22;
+  color: #d7dbd8;
+  font: 16px/1.5 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
 h1 {
-  color:gray;
-  font-size: 50px;
+  color: #f2f4f3;
+  text-align: center;
 }
 
 .login-form {
-  width: 350px;
-  padding: 0 30px 30px 30px;
-  background: #eee;
-  border-radius: 4px;
-  margin: auto;
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
+  width: min(360px, calc(100vw - 48px));
+  padding: 24px;
+  border: 1px solid #454856;
+  border-radius: 8px;
+  background: #2d2f34;
+  margin: 12vh auto 0;
 }
 
 .form-group {
@@ -33,74 +32,72 @@ h1 {
 
 .form-control {
   width: 100%;
-  height: 50px;
-  border: none;
-  padding: 5px 7px 5px 15px;
-  background: #fff;
-  color: #666;
-  border: 2px solid #ddd;
-  border-radius: 4px;
+  border: 1px solid #454856;
+  border-radius: 6px;
+  padding: 11px 12px;
+  background: #252526;
+  color: #f2f4f3;
+  font: inherit;
 }
-.form-control:focus, .form-control:focus + .fa {
-  border-color: #10CE88;
-  color: #10CE88;
+
+.form-control:focus,
+.form-control:focus + .fa {
+  border-color: #69c575;
+  color: #69c575;
+  outline: none;
 }
 
 .form-group .fa {
   position: absolute;
   right: 15px;
-  top: 17px;
-  color: #999;
+  top: 13px;
+  color: #aab0ad;
 }
 
 .wrong-entry {
   animation: wrong-log 0.3s;
 }
 
-.wrong-entry .form-control, .wrong-entry .form-control + .fa {
-  border-color: #ed1c24;
-  color: #ed1c24;
+.wrong-entry .form-control,
+.wrong-entry .form-control + .fa {
+  border-color: #ffd12b;
+  color: #ffd12b;
 }
 
 .log-btn {
-  background: #0AC986;
-  dispaly: inline-block;
+  display: inline-block;
   width: 100%;
-  font-size: 16px;
-  height: 50px;
-  color: #fff;
-  text-decoration: none;
+  height: 46px;
   border: none;
-  border-radius: 4px;
+  border-radius: 6px;
+  background: #69c575;
+  color: #1e1f22;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
 }
 
 .link {
-  text-decoration: none;
-  color: #C6C6C6;
   float: right;
-  font-size: 12px;
   margin-bottom: 15px;
+  color: #ffd12b;
+  font-size: 12px;
+  text-decoration: none;
 }
+
 .link:hover {
   text-decoration: underline;
-  color: #8C918F;
 }
 
 .alert {
   display: none;
-  font-size: 12px;
-  color: #f00;
   float: left;
+  color: #ffd12b;
+  font-size: 12px;
 }
 
 @keyframes wrong-log {
-  0%, 100% {
-    left: 0px;
-  }
-  20% , 60% {
-    left: 15px;
-  }
-  40% , 80% {
-    left: -15px;
-  }
+  0%, 100% { left: 0; }
+  20%, 60% { left: 10px; }
+  40%, 80% { left: -10px; }
 }

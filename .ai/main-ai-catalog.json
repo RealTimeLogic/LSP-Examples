@@ -1,0 +1,1691 @@
+{
+  "schema_version": 1,
+  "generated_by": ".ai/build-main-ai-catalog.py",
+  "catalog_count": 38,
+  "entries": [
+    {
+      "name": "AJAX",
+      "path": "AJAX",
+      "summary": "Minimal Lua Server Pages AJAX example where one LSP page serves HTML, accepts browser POST requests from fetch, and returns JSON without a full page reload.",
+      "compatibility": [
+        "mako",
+        "xedge"
+      ],
+      "run": [
+        "cd AJAX",
+        "mako -l::www"
+      ],
+      "protocols": [
+        "HTTP"
+      ],
+      "topics": [
+        "AJAX",
+        "Lua Server Pages",
+        "fetch",
+        "JSON",
+        "request response",
+        "beginner"
+      ],
+      "use_when": [
+        "The user wants a minimal AJAX example using LSP and browser fetch.",
+        "The user wants one page that handles both HTML rendering and POST-based JSON responses.",
+        "The user wants to understand request:data and response:json in a small example."
+      ],
+      "avoid_when": [
+        "The user wants persistent WebSocket communication.",
+        "The user wants SMQ publish/subscribe or RPC over SMQ.",
+        "The user wants a larger app structure with separate routes and assets."
+      ],
+      "read_next": [
+        "AGENTS.md",
+        "README.md",
+        "www/index.lsp"
+      ],
+      "catalog_path": "AJAX/doc/ai-catalog.json"
+    },
+    {
+      "name": "AJAX Over WebSockets",
+      "path": "AJAX-Over-WebSockets",
+      "summary": "AJAX/RPC-style browser-to-Lua calls over a persistent WebSocket connection. The example includes a server-side LSP WebSocket endpoint and both modern Promise-based and older jQuery browser clients.",
+      "compatibility": [
+        "mako",
+        "xedge"
+      ],
+      "run": [
+        "cd AJAX-Over-WebSockets",
+        "mako -l::www"
+      ],
+      "protocols": [
+        "WebSocket",
+        "HTTP"
+      ],
+      "topics": [
+        "AJAX",
+        "RPC",
+        "WebSocket",
+        "Lua Server Pages",
+        "JSON",
+        "Promises",
+        "jQuery"
+      ],
+      "use_when": [
+        "The user wants request-response browser calls over a persistent WebSocket transport.",
+        "The user wants a small custom RPC dispatcher implemented in LSP and Lua.",
+        "The user wants to compare modern Promise-based browser code with an older jQuery implementation."
+      ],
+      "avoid_when": [
+        "The user wants plain HTTP AJAX without WebSockets.",
+        "The user wants SMQ-based RPC or publish/subscribe messaging.",
+        "The user wants a production authorization model for exposed server-side functions."
+      ],
+      "read_next": [
+        "AGENTS.md",
+        "README.md",
+        "www/service.lsp",
+        "www/promise.html"
+      ],
+      "catalog_path": "AJAX-Over-WebSockets/doc/ai-catalog.json"
+    },
+    {
+      "name": "anti-session",
+      "path": "anti-session",
+      "summary": "Demonstrates a stateless multi-page LSP form workflow where encrypted JSON state is carried by the browser instead of stored in the server-side session object.",
+      "compatibility": [
+        "mako",
+        "xedge"
+      ],
+      "run": [
+        "cd anti-session",
+        "mako -l::www"
+      ],
+      "use_when": [
+        "The user wants a small multi-step form without allocating server-side session state.",
+        "The user wants to learn ba.aesencode, ba.aesdecode, and JSON state handling in LSP pages."
+      ],
+      "avoid_when": [
+        "The workflow state is large, long-lived, or needs server-side revocation.",
+        "The user needs authentication, authorization, or a replacement for persistent storage."
+      ],
+      "read_next": [
+        "AGENTS.md",
+        "README.md",
+        "www/.preload",
+        "www/index.lsp",
+        "www/name.lsp",
+        "www/food.lsp",
+        "www/summary.lsp"
+      ],
+      "topics": [
+        "encrypted form state",
+        "anti-session",
+        "AES",
+        "JSON",
+        "LSP",
+        "multi-page form"
+      ],
+      "notes": [
+        "The AES key is generated at app startup, so browser-carried state from before a restart cannot be decoded."
+      ],
+      "catalog_path": "anti-session/doc/ai-catalog.json"
+    },
+    {
+      "name": "Lua Authentication Examples",
+      "path": "authentication",
+      "summary": "Container of three BAS authentication examples showing full-root protection, protected-subdirectory authentication, and manual per-page authentication with shared page helpers. The examples are run with Mako Server commands, but the BAS authentication patterns can be adapted to Xedge app paths.",
+      "compatibility": [
+        "mako",
+        "xedge"
+      ],
+      "variants": {
+        "root": "Protects the whole application resource reader with dir:setauth.",
+        "subdir": "Protects only my-protected/ using a prologue directory.",
+        "semiautomatic": "Manually authenticates pages through shared emitHeader and emitFooter functions."
+      },
+      "run": [
+        "cd authentication",
+        "mako -l::root",
+        "mako -l::root digest",
+        "mako -l::root form",
+        "mako -l::subdir",
+        "mako -l::subdir digest",
+        "mako -l::subdir form",
+        "mako -l::semiautomatic"
+      ],
+      "topics": [
+        "authentication",
+        "Basic auth",
+        "Digest auth",
+        "form login",
+        "Lua Server Pages",
+        "security",
+        "resource reader"
+      ],
+      "use_when": [
+        "The user wants examples of BAS authenticator setup in Lua.",
+        "The user wants to protect an entire app root, a specific subdirectory, or manually protected pages.",
+        "The user wants to compare Basic, Digest, and form authentication behavior in Mako Server."
+      ],
+      "avoid_when": [
+        "The user wants production credential storage or password hashing rather than demo credentials.",
+        "The user wants OAuth, OpenID Connect, WebAuthn, or external identity provider integration.",
+        "The user wants an Xedge deployment without reviewing root/subdirectory mounting and app-path adjustments."
+      ],
+      "read_next": [
+        "AGENTS.md",
+        "README.md",
+        "root/.preload",
+        "subdir/.preload",
+        "semiautomatic/.preload"
+      ],
+      "catalog_path": "authentication/doc/ai-catalog.json"
+    },
+    {
+      "name": "AWS MQTT",
+      "path": "AWS-MQTT",
+      "summary": "AWS IoT Core MQTT example using ALPN and mutual TLS. The startup script loads AWS certificates, creates a SharkSSL-backed MQTT client, subscribes to topics, and publishes JSON messages.",
+      "compatibility": [
+        "mako",
+        "xedge"
+      ],
+      "run": [
+        "cd AWS-MQTT",
+        "mako -l::www"
+      ],
+      "protocols": [
+        "MQTT",
+        "TLS",
+        "ALPN"
+      ],
+      "topics": [
+        "AWS IoT Core",
+        "SharkSSL",
+        "certificates",
+        "mutual TLS",
+        "JSON",
+        "timer"
+      ],
+      "use_when": [
+        "The user wants to connect BAS Lua code to AWS IoT Core over MQTT.",
+        "The user needs an ALPN and mutual TLS MQTT example.",
+        "The user wants MQTT subscription, publishing, and cleanup lifecycle code."
+      ],
+      "avoid_when": [
+        "The user does not have AWS IoT Core certificates and broker endpoint settings.",
+        "The user wants a generic local MQTT broker example.",
+        "The user wants production secret storage without adapting certificate handling."
+      ],
+      "read_next": [
+        "AGENTS.md",
+        "README.md",
+        "www/.preload"
+      ],
+      "catalog_path": "AWS-MQTT/doc/ai-catalog.json"
+    },
+    {
+      "name": "CGI",
+      "path": "CGI",
+      "summary": "Lua CGI adapter for Mako Server-style deployments using the forkpty plugin and external CGI scripts. It mounts a CGI directory into the BAS virtual file system and translates requests into CGI process execution.",
+      "compatibility": [
+        "mako"
+      ],
+      "run": [
+        "mkdir -p /tmp/cgi-test/",
+        "cp scripts/* /tmp/cgi-test/",
+        "chmod +x /tmp/cgi-test/*",
+        "cd CGI",
+        "mako -l::www"
+      ],
+      "topics": [
+        "CGI",
+        "forkpty",
+        "virtual file system",
+        "external processes",
+        "Lua Server Pages"
+      ],
+      "use_when": [
+        "The user wants to study or modify a CGI compatibility layer for BAS/Mako.",
+        "The user needs to run external shell or Python CGI scripts behind a BAS directory.",
+        "The user is working on Linux, macOS, or QNX-like environments with forkpty support."
+      ],
+      "avoid_when": [
+        "The user wants generic Xedge deployment.",
+        "The user wants an embedded target without external process execution.",
+        "The user wants a pure LSP/Lua server-side implementation without CGI scripts."
+      ],
+      "read_next": [
+        "AGENTS.md",
+        "README.md",
+        "www/.preload",
+        "www/.lua/cgi.lua"
+      ],
+      "catalog_path": "CGI/doc/ai-catalog.json"
+    },
+    {
+      "name": "Command Environment",
+      "path": "command-env",
+      "summary": "Container with two small LSP examples demonstrating the BAS request/response command environment through response:include and response:forward behavior.",
+      "compatibility": [
+        "mako",
+        "xedge"
+      ],
+      "variants": {
+        "include": "Shared header/footer rendering using response:include.",
+        "forward": "Page control transfer and command environment behavior using response:forward."
+      },
+      "run": [
+        "cd command-env",
+        "mako -l::include",
+        "mako -l::forward"
+      ],
+      "topics": [
+        "command environment",
+        "response:include",
+        "response:forward",
+        "session",
+        "Lua Server Pages"
+      ],
+      "use_when": [
+        "The user wants to understand BAS request/response command environment lifetime.",
+        "The user wants examples of response:include or response:forward.",
+        "The user needs to compare per-request variables with session state."
+      ],
+      "avoid_when": [
+        "The user wants a single cohesive application.",
+        "The user wants authentication, database, or real-time messaging examples.",
+        "The user wants browser-only JavaScript examples."
+      ],
+      "read_next": [
+        "AGENTS.md",
+        "README.md",
+        "include/.header.lsp",
+        "forward/first.lsp"
+      ],
+      "catalog_path": "command-env/doc/ai-catalog.json"
+    },
+    {
+      "name": "CryptoIO",
+      "path": "CryptoIO",
+      "summary": "Reusable Lua module that wraps a BAS IO with AES-GCM encryption, plus a startup example that verifies encrypted file round-tripping and mounts an encrypted Web File Server/WebDAV endpoint.",
+      "compatibility": [
+        "mako",
+        "xedge"
+      ],
+      "run": [
+        "cd CryptoIO",
+        "mako -l::www"
+      ],
+      "topics": [
+        "encrypted storage",
+        "CryptoIO",
+        "AES-GCM",
+        "TPM",
+        "WebDAV",
+        "Web File Server",
+        "Lua IO"
+      ],
+      "use_when": [
+        "The user wants encrypted-at-rest file storage using BAS IO APIs.",
+        "The user wants to wrap existing IO objects with transparent encryption.",
+        "The user wants an encrypted Web File Server or WebDAV example."
+      ],
+      "avoid_when": [
+        "The user wants database encryption instead of file IO encryption.",
+        "The user wants to change encrypted file format without migration planning.",
+        "The user wants production key policy without reviewing the target trust model."
+      ],
+      "read_next": [
+        "AGENTS.md",
+        "README.md",
+        "www/.lua/CryptoIO.lua",
+        "www/.preload"
+      ],
+      "catalog_path": "CryptoIO/doc/ai-catalog.json"
+    },
+    {
+      "name": "Documentation Examples",
+      "path": "docex",
+      "summary": "Index directory for runnable examples referenced from Real Time Logic documentation. The current child example is a shopping-cart route demonstrating BAS virtual file system directory logic.",
+      "compatibility": [
+        "mako",
+        "xedge"
+      ],
+      "variants": {
+        "cart": "Shopping-cart route example using a BAS directory function and response forwarding."
+      },
+      "topics": [
+        "documentation examples",
+        "virtual file system",
+        "directory function",
+        "response:forward",
+        "Lua Server Pages"
+      ],
+      "use_when": [
+        "The user wants examples referenced from BAS documentation.",
+        "The user wants the shopping-cart VFS directory example.",
+        "The user is adding or organizing documentation companion examples."
+      ],
+      "avoid_when": [
+        "The user wants one runnable app at the docex root.",
+        "The user wants a full e-commerce cart implementation.",
+        "The user wants examples not tied to BAS documentation."
+      ],
+      "read_next": [
+        "AGENTS.md",
+        "README.md",
+        "cart/README.md",
+        "cart/www/.preload"
+      ],
+      "catalog_path": "docex/doc/ai-catalog.json"
+    },
+    {
+      "name": "Dynamic Navigation Menu",
+      "path": "Dynamic-Nav-Menu",
+      "summary": "Multi-page LSP application with shared dynamic navigation, custom 404 handling, and form authentication using a JSON user database with HA1 password hashes.",
+      "compatibility": [
+        "mako",
+        "xedge"
+      ],
+      "run": [
+        "cd Dynamic-Nav-Menu",
+        "mako -l::www"
+      ],
+      "topics": [
+        "navigation menu",
+        "authentication",
+        "JSON user database",
+        "HA1 hashes",
+        "custom 404",
+        "Lua Server Pages"
+      ],
+      "use_when": [
+        "The user wants a protected multi-page LSP app with shared navigation.",
+        "The user wants form authentication with hashed credentials.",
+        "The user wants custom 404 forwarding and public login assets."
+      ],
+      "avoid_when": [
+        "The user wants a client-side SPA framework.",
+        "The user wants OAuth, SSO, or WebAuthn authentication.",
+        "The user wants a database-backed user management system."
+      ],
+      "read_next": [
+        "AGENTS.md",
+        "README.md",
+        "www/.preload",
+        "www/.header.lsp",
+        "www/.login-form.lsp"
+      ],
+      "catalog_path": "Dynamic-Nav-Menu/doc/ai-catalog.json"
+    },
+    {
+      "name": "Email And Logging",
+      "path": "Email-and-Logging",
+      "summary": "Mixed collection of SMTP examples and Mako logging/email examples. Direct text, HTML, and EML email examples use socket.mail and can be adapted to Xedge email settings; the log variant is Mako-specific.",
+      "compatibility": [
+        "mako",
+        "xedge"
+      ],
+      "variants": {
+        "text": "Plain-text socket.mail example.",
+        "html": "HTML email with inline image.",
+        "eml": "EML parser and template email example.",
+        "log": "Mako-specific mako.log and emailed error-reporting example."
+      },
+      "run": [
+        "cd Email-and-Logging",
+        "mako -l::text",
+        "mako -l::html",
+        "mako -l::eml",
+        "mako -l::log"
+      ],
+      "protocols": [
+        "SMTP"
+      ],
+      "topics": [
+        "email",
+        "SMTP",
+        "socket.mail",
+        "HTML email",
+        "EML parser",
+        "Mako logging",
+        "error reports"
+      ],
+      "use_when": [
+        "The user wants direct SMTP email examples using socket.mail.",
+        "The user wants HTML or EML-based email templates.",
+        "The user wants to understand Mako Server email logging behavior."
+      ],
+      "avoid_when": [
+        "The user wants a single homogeneous app root.",
+        "The user wants Xedge deployment of the mako.log variant without adaptation.",
+        "The user wants production secret handling without replacing demo SMTP configuration."
+      ],
+      "read_next": [
+        "AGENTS.md",
+        "README.md",
+        "mako.conf",
+        "text/.preload",
+        "html/.preload",
+        "eml/.preload",
+        "log/.preload"
+      ],
+      "catalog_path": "Email-and-Logging/doc/ai-catalog.json"
+    },
+    {
+      "name": "ESP32 Xedge32 Examples",
+      "path": "ESP32",
+      "summary": "Collection of independent Xedge32 examples for ESP32-class hardware. The examples demonstrate LSP and XLua for GPIO, I2C sensors, camera capture and streaming, Wi-Fi diagnostics, ADC audio streaming, PWM servo control, MQTT, SMQ, and Mako Server simulation support.",
+      "compatibility": [
+        "Xedge32"
+      ],
+      "variants": {
+        "misc": "Independent Xedge32 scripts and pages; upload only the files needed for the selected hardware example.",
+        "simulator": "Support files for running selected Xedge32 examples in Mako Server simulation mode.",
+        "grafana": "Grafana dashboard JSON for the ESP32/MySQL weather-station tutorial."
+      },
+      "protocols": [
+        "SMQ",
+        "MQTT",
+        "WebSocket",
+        "HTTP"
+      ],
+      "targets": [
+        "ESP32",
+        "Xedge32",
+        "embedded hardware",
+        "Mako Server simulation mode"
+      ],
+      "topics": [
+        "Lua Server Pages",
+        "XLua startup scripts",
+        "GPIO",
+        "I2C",
+        "BME280",
+        "ESP32 camera",
+        "Wi-Fi diagnostics",
+        "ADC audio",
+        "PWM servo control",
+        "Grafana",
+        "hardware configuration"
+      ],
+      "use_when": [
+        "The user wants small Xedge32 examples for ESP32 hardware features.",
+        "The user wants to adapt GPIO, I2C, ADC, PWM, camera, Wi-Fi, MQTT, or SMQ code for an ESP32 board.",
+        "The user wants independent LSP or XLua files that can be uploaded selectively to an Xedge32 app.",
+        "The user wants to run selected Xedge32 examples in Mako Server simulation mode before hardware deployment.",
+        "The user wants the ESP32/MySQL weather-station Grafana dashboard asset."
+      ],
+      "avoid_when": [
+        "The user wants a normal Mako Server example that runs directly with one local app command.",
+        "The user wants a single cohesive web application where every file in the directory is deployed together.",
+        "The user wants generic browser-only examples without ESP32 or Xedge32 APIs.",
+        "The user wants production-ready board support without confirming GPIO pins, I2C pins, ADC channels, PWM settings, camera pin maps, power wiring, and MQTT settings."
+      ],
+      "read_next": [
+        "AGENTS.md",
+        "README.md"
+      ],
+      "catalog_path": "ESP32/doc/ai-catalog.json"
+    },
+    {
+      "name": "WebDAV And Web File Server",
+      "path": "File-Server",
+      "summary": "BAS Web File Server and WebDAV example mounted at /fs/ with simple authentication, writable IO selection, lock-directory setup, and cleanup on unload.",
+      "compatibility": [
+        "mako",
+        "xedge"
+      ],
+      "run": [
+        "cd File-Server",
+        "mako -l::www"
+      ],
+      "protocols": [
+        "HTTP",
+        "WebDAV"
+      ],
+      "topics": [
+        "Web File Server",
+        "WebDAV",
+        "file upload",
+        "authentication",
+        "BAS IO",
+        "lock directory"
+      ],
+      "use_when": [
+        "The user wants to mount a BAS Web File Server.",
+        "The user wants a WebDAV endpoint example.",
+        "The user wants to adapt file storage and authentication for Mako or Xedge."
+      ],
+      "avoid_when": [
+        "The user wants encrypted-at-rest storage; use CryptoIO instead.",
+        "The user wants SSO-protected file server behavior; use fs-sso instead.",
+        "The user wants a database-backed document system."
+      ],
+      "read_next": [
+        "AGENTS.md",
+        "README.md",
+        "www/.preload"
+      ],
+      "catalog_path": "File-Server/doc/ai-catalog.json"
+    },
+    {
+      "name": "File Server SSO",
+      "path": "fs-sso",
+      "summary": "Microsoft Entra ID OpenID Connect SSO example that protects a BAS Web File Server/WebDAV endpoint and provides session URLs for non-browser WebDAV clients.",
+      "compatibility": [
+        "mako",
+        "xedge"
+      ],
+      "run": [
+        "cd fs-sso",
+        "mako -l::www"
+      ],
+      "protocols": [
+        "HTTP",
+        "OpenID Connect",
+        "WebDAV"
+      ],
+      "topics": [
+        "SSO",
+        "Microsoft Entra ID",
+        "OAuth2",
+        "OpenID Connect",
+        "JWT",
+        "Web File Server",
+        "session URL",
+        "authentication"
+      ],
+      "use_when": [
+        "The user wants Microsoft Entra ID SSO for a BAS application.",
+        "The user wants to protect a Web File Server with SSO.",
+        "The user needs session URL behavior for WebDAV clients that cannot perform browser login."
+      ],
+      "avoid_when": [
+        "The user wants simple username/password authentication.",
+        "The user wants WebAuthn, RADIUS, or local JSON-user authentication.",
+        "The user wants Xedge deployment without replacing mako.conf secret storage and validating HTTPS/origin settings."
+      ],
+      "read_next": [
+        "AGENTS.md",
+        "README.md",
+        "www/.preload",
+        "www/.lua/ms-sso.lua",
+        "www/index.lsp"
+      ],
+      "catalog_path": "fs-sso/doc/ai-catalog.json"
+    },
+    {
+      "name": "GitHub IO",
+      "path": "GitHubIo",
+      "summary": "LuaIO-compatible GitHub repository driver that exposes GitHub contents as BAS file storage and can be mounted behind the Web File Server/WebDAV endpoint.",
+      "compatibility": [
+        "mako",
+        "xedge"
+      ],
+      "run": [
+        "cd GitHubIo",
+        "mako -l::www"
+      ],
+      "protocols": [
+        "HTTP",
+        "WebDAV",
+        "GitHub API"
+      ],
+      "topics": [
+        "LuaIO",
+        "GitHub",
+        "Web File Server",
+        "WebDAV",
+        "remote storage",
+        "xedge.auxapp"
+      ],
+      "use_when": [
+        "The user wants to expose a GitHub repository as a BAS IO.",
+        "The user wants a WebDAV/Web File Server backed by GitHub.",
+        "The user wants to adapt repository-backed storage for Xedge IDE integration."
+      ],
+      "avoid_when": [
+        "The user wants high-volume binary file storage.",
+        "The user cannot provide a GitHub repository and suitable token.",
+        "The user wants local filesystem storage without remote API rate limits."
+      ],
+      "read_next": [
+        "AGENTS.md",
+        "README.md",
+        "www/.lua/GitHubIo.lua",
+        "www/.preload"
+      ],
+      "catalog_path": "GitHubIo/doc/ai-catalog.json"
+    },
+    {
+      "name": "HTML Form",
+      "path": "html-form",
+      "summary": "Beginner LSP example showing an HTML form, POST handling with request:data, and simple session storage in one page.",
+      "compatibility": [
+        "mako",
+        "xedge"
+      ],
+      "run": [
+        "cd html-form",
+        "mako -l::www"
+      ],
+      "protocols": [
+        "HTTP"
+      ],
+      "topics": [
+        "HTML forms",
+        "Lua Server Pages",
+        "sessions",
+        "request:data",
+        "beginner"
+      ],
+      "use_when": [
+        "The user wants a minimal form-handling example.",
+        "The user wants to understand POST data in LSP.",
+        "The user wants a tiny session example."
+      ],
+      "avoid_when": [
+        "The user wants production authentication.",
+        "The user wants AJAX or WebSocket form handling.",
+        "The user wants a multi-page application structure."
+      ],
+      "read_next": [
+        "AGENTS.md",
+        "README.md",
+        "www/index.lsp"
+      ],
+      "catalog_path": "html-form/doc/ai-catalog.json"
+    },
+    {
+      "name": "htmx Examples",
+      "path": "htmx",
+      "summary": "Introductory htmx plus LSP example where the browser requests a server-rendered HTML fragment and swaps it into the page.",
+      "compatibility": [
+        "mako",
+        "xedge"
+      ],
+      "variants": {
+        "introduction": "Basic htmx example using hx-get to load an LSP-generated user list fragment."
+      },
+      "run": [
+        "cd htmx",
+        "mako -l::introduction"
+      ],
+      "protocols": [
+        "HTTP"
+      ],
+      "topics": [
+        "htmx",
+        "Lua Server Pages",
+        "server-rendered HTML",
+        "HTML fragments"
+      ],
+      "use_when": [
+        "The user wants a small htmx and LSP example.",
+        "The user wants server-rendered HTML fragments instead of JSON.",
+        "The user wants a lightweight alternative to SPA frameworks."
+      ],
+      "avoid_when": [
+        "The user wants a complete dashboard; use Light-Dashboard.",
+        "The user wants WebSocket or SMQ updates.",
+        "The user wants a JSON REST API example."
+      ],
+      "read_next": [
+        "AGENTS.md",
+        "README.md",
+        "introduction/index.html",
+        "introduction/users.lsp"
+      ],
+      "catalog_path": "htmx/doc/ai-catalog.json"
+    },
+    {
+      "name": "JSON File Server",
+      "path": "JSON-File-Server",
+      "summary": "Authentication and authorization example using a BAS JSON user database, ACL authorizer constraints, Digest authentication, request:login, and a protected Web File Server/WebDAV endpoint.",
+      "compatibility": [
+        "mako",
+        "xedge"
+      ],
+      "run": [
+        "cd JSON-File-Server",
+        "mako -l::www"
+      ],
+      "protocols": [
+        "HTTP",
+        "WebDAV"
+      ],
+      "topics": [
+        "authentication",
+        "authorization",
+        "JSON user database",
+        "ACL",
+        "Digest authentication",
+        "request:login",
+        "Web File Server"
+      ],
+      "use_when": [
+        "The user wants JSON-backed BAS authentication and authorization.",
+        "The user wants file-server access control by user, role, path, and method.",
+        "The user wants to test request:login with an authorizer."
+      ],
+      "avoid_when": [
+        "The user wants OAuth, SSO, WebAuthn, or external identity providers.",
+        "The user wants encrypted file storage; use CryptoIO.",
+        "The user wants a production credential store without replacing demo users."
+      ],
+      "read_next": [
+        "AGENTS.md",
+        "README.md",
+        "www/.preload",
+        "www/index.lsp",
+        "mako.conf"
+      ],
+      "catalog_path": "JSON-File-Server/doc/ai-catalog.json"
+    },
+    {
+      "name": "Light Dashboard",
+      "path": "Light-Dashboard",
+      "summary": "Three database-free embedded dashboard UI variants for Mako Server and Xedge. Designed for small embedded targets such as routers, gateways, RTOS devices, and firmware-backed products.",
+      "compatibility": [
+        "mako",
+        "xedge"
+      ],
+      "variants": {
+        "www": "Server-rendered dashboard using Pure.css.",
+        "htmx": "HTMX dashboard using Pure.css and fragment navigation.",
+        "custom": "HTMX dashboard using custom CSS, two-level navigation, CMS-level SMQ, page scopes, and page-scoped SMQ RPC."
+      },
+      "default_variant": "custom",
+      "run": [
+        "mako -l::custom",
+        "mako -l::htmx",
+        "mako -l::www"
+      ],
+      "use_when": [
+        "The user wants a ready-to-run embedded dashboard UI.",
+        "The user wants a small database-free CMS-style page and menu system.",
+        "The user wants an HTMX dashboard that behaves like an SPA without a SPA framework.",
+        "The user wants full-page fallback when JavaScript is disabled or direct URLs are loaded.",
+        "The user wants persistent SMQ behavior across HTMX page fragments.",
+        "The user wants page-scoped SMQ subscriptions, cleanup, or RPC over SMQ.",
+        "The user wants an example that can run under Mako Server or be packaged for Xedge."
+      ],
+      "avoid_when": [
+        "The user wants a database-driven CMS for larger Embedded Linux or QNX systems.",
+        "The user wants a generic REST API example without dashboard UI.",
+        "The user wants low-level SMQ protocol examples without the dashboard/CMS layer."
+      ],
+      "read_next": [
+        "AGENTS.md",
+        "README.md",
+        "doc/custom-skill.md",
+        "doc/custom-design.md"
+      ],
+      "topics": [
+        "dashboard",
+        "embedded-ui",
+        "database-free",
+        "cms",
+        "htmx",
+        "smq",
+        "rpc",
+        "Barracuda App Server",
+        "rtos"
+      ],
+      "catalog_path": "Light-Dashboard/doc/ai-catalog.json"
+    },
+    {
+      "name": "Lua Debug",
+      "path": "Lua-Debug",
+      "summary": "Mako Server Lua/LSP debugging tutorial companion for Visual Studio Code and the BAS debug monitor, with a primary debug target app and helper FileServer app for remote source mapping.",
+      "compatibility": [
+        "mako"
+      ],
+      "run": [
+        "cd Lua-Debug",
+        "mako -l::www",
+        "mako -l::FileServer"
+      ],
+      "topics": [
+        "debugging",
+        "Visual Studio Code",
+        "Lua Debug",
+        "debug monitor",
+        "source maps",
+        "Lua Server Pages",
+        "Mako Server"
+      ],
+      "notes": [
+        "As written this is Mako Server focused. It can be adapted by AI to an Xedge-oriented debugging workflow, but requires changes to debug monitor startup, app loading, restart behavior, and source mapping."
+      ],
+      "use_when": [
+        "The user wants to debug Lua or LSP code with VS Code and Mako Server.",
+        "The user wants to understand source mapping and debug monitor setup.",
+        "The user wants a starting point for adapting Mako debugging concepts to Xedge."
+      ],
+      "avoid_when": [
+        "The user wants an app feature example rather than debugger workflow.",
+        "The user wants generic Xedge deployment with no Mako debug monitor assumptions.",
+        "The user wants browser-only JavaScript debugging."
+      ],
+      "read_next": [
+        "AGENTS.md",
+        "README.md",
+        "www/.preload",
+        "www/.vscode/launch.json",
+        "www/index.lsp"
+      ],
+      "catalog_path": "Lua-Debug/doc/ai-catalog.json"
+    },
+    {
+      "name": "MinnowSim",
+      "path": "MinnowSim",
+      "summary": "Server-side simulated device backend for the Minnow SPA tutorial. It requires the separate RealTimeLogic/MinnowServer repository for the browser SPA and must be run as a two-app Mako setup.",
+      "compatibility": [
+        "mako",
+        "xedge"
+      ],
+      "run": [
+        "mako -lminnow::MinnowServer/www -l::LSP-Examples/MinnowSim/www",
+        "mako -lminnow::../MinnowServer/www -l::MinnowSim/www"
+      ],
+      "protocols": [
+        "WebSocket",
+        "HTTP"
+      ],
+      "topics": [
+        "single page application",
+        "device simulator",
+        "WebSocket",
+        "JSONS",
+        "GPIO simulation",
+        "firmware upload",
+        "authentication"
+      ],
+      "use_when": [
+        "The user wants the backend/device side of the Minnow SPA tutorial.",
+        "The user wants a WebSocket JSON application with simulated embedded state.",
+        "The user has or is willing to clone the companion MinnowServer repository."
+      ],
+      "avoid_when": [
+        "The user expects this directory alone to serve the SPA UI.",
+        "The companion MinnowServer repository is unavailable and cannot be cloned or otherwise provided.",
+        "The user wants real ESP32 GPIO without adapting the simulator branch.",
+        "The user wants an SMQ example rather than raw WebSocket JSON messaging."
+      ],
+      "read_next": [
+        "AGENTS.md",
+        "README.md",
+        "www/.preload",
+        "www/index.lsp"
+      ],
+      "prerequisites": [
+        "The companion repository https://github.com/RealTimeLogic/MinnowServer must be available as a sibling checkout or at a known path.",
+        "If MinnowServer is missing, clone it with: git clone https://github.com/RealTimeLogic/MinnowServer",
+        "Run Mako with MinnowServer/www mounted as /minnow/ and MinnowSim/www mounted as the root app."
+      ],
+      "setup": [
+        "Recommended layout: place MinnowServer and LSP-Examples in the same parent directory.",
+        "From the common parent directory: mako -lminnow::MinnowServer/www -l::LSP-Examples/MinnowSim/www",
+        "From inside LSP-Examples with MinnowServer as a sibling: mako -lminnow::../MinnowServer/www -l::MinnowSim/www"
+      ],
+      "catalog_path": "MinnowSim/doc/ai-catalog.json"
+    },
+    {
+      "name": "LMQTT Broker",
+      "path": "MQTT-Broker",
+      "summary": "Lua MQTT 3.1.1/5.0 broker for BAS-derived runtimes, with TLS/plain listeners, authentication and publish-policy callbacks, in-process client support, design notes, and Python tests.",
+      "compatibility": [
+        "mako",
+        "xedge"
+      ],
+      "run": [
+        "cd MQTT-Broker",
+        "mako -l::www",
+        "python design/test_mqtt_broker.py --tls --port 8883 --all"
+      ],
+      "protocols": [
+        "MQTT",
+        "TLS"
+      ],
+      "topics": [
+        "MQTT broker",
+        "MQTT 3.1.1",
+        "MQTT 5",
+        "SharkSSL",
+        "QoS 0",
+        "authentication",
+        "publish policy",
+        "Python tests"
+      ],
+      "use_when": [
+        "The user wants to host an MQTT broker in a BAS/Mako/Xedge app.",
+        "The user wants a compact Lua MQTT broker implementation.",
+        "The user wants broker callbacks for authentication or publish policy."
+      ],
+      "avoid_when": [
+        "The user needs retained messages, persistent sessions, QoS 1/2, shared subscriptions, or topic aliases as-is.",
+        "The user only needs an MQTT client connecting to an external broker.",
+        "The user cannot open listener ports on the target deployment."
+      ],
+      "read_next": [
+        "AGENTS.md",
+        "README.md",
+        "LMQTT-Broker.md",
+        "www/.lua/mqttbroker.lua",
+        "www/.preload",
+        "design/README.md"
+      ],
+      "catalog_path": "MQTT-Broker/doc/ai-catalog.json"
+    },
+    {
+      "name": "MySQL And Redis Drivers",
+      "path": "MysqlAndRedis",
+      "summary": "OpenResty-style MySQL and Redis drivers adapted for BAS socket and cosocket behavior, with a reusable package layout and LSP test pages for blocking and ba.socket.event execution.",
+      "compatibility": [
+        "mako",
+        "xedge"
+      ],
+      "run": [
+        "cd MysqlAndRedis/MySQL",
+        "zip -D -q -u -r -9 ../MySQL.zip .",
+        "cd ..",
+        "mako -l::MySQL.zip -l::www"
+      ],
+      "protocols": [
+        "MySQL",
+        "Redis",
+        "TCP"
+      ],
+      "topics": [
+        "database drivers",
+        "OpenResty compatibility",
+        "cosockets",
+        "ba.socket.event",
+        "MySQL",
+        "Redis",
+        "ZIP app packaging"
+      ],
+      "use_when": [
+        "The user wants MySQL or Redis access from BAS Lua.",
+        "The user wants OpenResty-style driver compatibility.",
+        "The user wants a persistent MySQL connection pattern for BAS cosockets."
+      ],
+      "avoid_when": [
+        "The user does not have reachable MySQL or Redis services.",
+        "The user wants ORM-style database abstractions.",
+        "The user wants connection pooling without implementing it."
+      ],
+      "read_next": [
+        "AGENTS.md",
+        "README.md",
+        "MySQL/.lua/resty/mysql.lua",
+        "MySQL/.lua/resty/redis.lua",
+        "www/MySQL.lsp",
+        "www/Redis.lsp"
+      ],
+      "catalog_path": "MysqlAndRedis/doc/ai-catalog.json"
+    },
+    {
+      "name": "OAuth 2.0 Example",
+      "path": "oauth",
+      "summary": "GitHub OAuth 2.0 client example converted from PHP to LSP, demonstrating redirect login, state validation, token exchange, session storage, and GitHub API calls.",
+      "compatibility": [
+        "mako"
+      ],
+      "run": [
+        "cd oauth",
+        "mako -l::sample-oauth2-client"
+      ],
+      "protocols": [
+        "HTTP",
+        "OAuth 2.0"
+      ],
+      "topics": [
+        "OAuth",
+        "GitHub",
+        "sessions",
+        "redirect URI",
+        "state validation",
+        "token exchange",
+        "mako.sharkclient"
+      ],
+      "use_when": [
+        "The user wants a small GitHub OAuth 2.0 flow in LSP.",
+        "The user wants to understand OAuth redirects and callback handling.",
+        "The user wants a starting point for adapting OAuth to a more secure BAS app."
+      ],
+      "avoid_when": [
+        "The user wants production credential handling as-is.",
+        "The user wants Xedge compatibility without replacing mako.sharkclient and embedded secrets.",
+        "The user wants OpenID Connect/SSO; use fs-sso instead."
+      ],
+      "read_next": [
+        "AGENTS.md",
+        "README.md",
+        "sample-oauth2-client/github.lsp"
+      ],
+      "catalog_path": "oauth/doc/ai-catalog.json"
+    },
+    {
+      "name": "PostgreSQL",
+      "path": "PostgreSQL",
+      "summary": "Demonstrates a persistent PostgreSQL connection helper for a Mako Server application, with database work run on a BAS thread and rendered from an LSP page.",
+      "compatibility": [
+        "mako"
+      ],
+      "run": [
+        "cd PostgreSQL",
+        "mako"
+      ],
+      "use_when": [
+        "The user wants to reuse one PostgreSQL connection from a Mako Server app.",
+        "The user wants to study deferred responses and database work on BAS threads."
+      ],
+      "avoid_when": [
+        "The user needs a generic Xedge example without a native PostgreSQL binding.",
+        "The user wants a production-ready database abstraction or connection pool."
+      ],
+      "read_next": [
+        "AGENTS.md",
+        "README.md",
+        "mako.conf",
+        "www/.preload",
+        "www/.lua/pg.lua",
+        "www/index.lsp"
+      ],
+      "topics": [
+        "PostgreSQL",
+        "LSP",
+        "deferred response",
+        "BAS thread",
+        "native Lua binding"
+      ],
+      "notes": [
+        "Requires a host-compiled pgsql.so and valid database credentials in mako.conf."
+      ],
+      "catalog_path": "PostgreSQL/doc/ai-catalog.json"
+    },
+    {
+      "name": "QNX",
+      "path": "QNX",
+      "summary": "Contains QNX-specific BAS integration code, currently a PPS-to-SMQ bridge that exposes QNX Persistent Publish Subscribe messages to browser and device clients through SMQ.",
+      "compatibility": [
+        "mako",
+        "QNX"
+      ],
+      "use_when": [
+        "The user needs to bridge QNX PPS data into an SMQ-based web or device UI.",
+        "The user is working on BAS code running in a QNX environment."
+      ],
+      "avoid_when": [
+        "The user needs a standalone local Mako demo without QNX PPS.",
+        "The user needs generic Xedge compatibility."
+      ],
+      "read_next": [
+        "AGENTS.md",
+        "PPS/README.md",
+        "PPS/www/.lua/pps.lua"
+      ],
+      "variants": {
+        "PPS": "QNX Persistent Publish Subscribe bridge module that maps PPS messages to SMQ topics."
+      },
+      "protocols": [
+        "SMQ",
+        "QNX PPS"
+      ],
+      "topics": [
+        "QNX",
+        "PPS",
+        "SMQ bridge",
+        "pipe API"
+      ],
+      "notes": [
+        "This directory is platform-specific and does not contain a complete standalone web app."
+      ],
+      "catalog_path": "QNX/doc/ai-catalog.json"
+    },
+    {
+      "name": "RADIUS",
+      "path": "RADIUS",
+      "summary": "Demonstrates RADIUS-backed authentication in a BAS web app by wiring a Lua RADIUS client into BAS authentication callbacks.",
+      "compatibility": [
+        "mako",
+        "xedge"
+      ],
+      "run": [
+        "cd RADIUS",
+        "mako -l::www"
+      ],
+      "use_when": [
+        "The user wants BAS authentication backed by a RADIUS server.",
+        "The user wants an example of UDP protocol code combined with BAS auth callbacks."
+      ],
+      "avoid_when": [
+        "The user needs OAuth, SAML, or a browser-only authentication example.",
+        "The target cannot reach a RADIUS server."
+      ],
+      "read_next": [
+        "AGENTS.md",
+        "README.md",
+        "www/.preload",
+        "www/.lua/radius.lua",
+        "www/.login/form.lsp"
+      ],
+      "protocols": [
+        "RADIUS",
+        "UDP",
+        "HTTP Basic authentication",
+        "form authentication"
+      ],
+      "topics": [
+        "authentication",
+        "BAS authenticator",
+        "Lua socket",
+        "crypto hash"
+      ],
+      "notes": [
+        "Xedge use may require deployment and loader adjustments for the target environment."
+      ],
+      "catalog_path": "RADIUS/doc/ai-catalog.json"
+    },
+    {
+      "name": "require-test",
+      "path": "require-test",
+      "summary": "Shows how a Mako Server app uses mako.createloader(io) so Lua require and dofile can load modules from the app IO tree.",
+      "compatibility": [
+        "mako"
+      ],
+      "run": [
+        "cd require-test",
+        "mako -l::www"
+      ],
+      "use_when": [
+        "The user wants to understand app-local Lua module loading in Mako Server.",
+        "The user needs examples of require paths under www/.lua and nested module directories."
+      ],
+      "avoid_when": [
+        "The user needs generic Xedge module loading guidance.",
+        "The user wants an application feature example rather than loader behavior."
+      ],
+      "read_next": [
+        "AGENTS.md",
+        "README.md",
+        "www/.preload",
+        "www/index.lsp",
+        "www/.lua/helloworld2.lua"
+      ],
+      "topics": [
+        "Lua require",
+        "mako.createloader",
+        "application IO",
+        "LSP environment"
+      ],
+      "notes": [
+        "This example intentionally targets Mako Server loader behavior."
+      ],
+      "catalog_path": "require-test/doc/ai-catalog.json"
+    },
+    {
+      "name": "REST",
+      "path": "REST",
+      "summary": "Provides a minimal REST-style Lua router for BAS applications and an in-memory /api/users example service.",
+      "compatibility": [
+        "mako",
+        "xedge"
+      ],
+      "run": [
+        "cd REST",
+        "mako -l::www"
+      ],
+      "use_when": [
+        "The user wants to build REST-style endpoints using BAS directories and Lua request handling.",
+        "The user wants a small router module that can be reused in an embedded web app."
+      ],
+      "avoid_when": [
+        "The user needs a full web framework or persistent database-backed service out of the box.",
+        "The user needs authentication, authorization, or rate limiting already built in."
+      ],
+      "read_next": [
+        "AGENTS.md",
+        "README.md",
+        "REST-API.md",
+        "www/.lua/rest.lua",
+        "www/.preload",
+        "TestApi.py"
+      ],
+      "protocols": [
+        "HTTP",
+        "JSON",
+        "REST"
+      ],
+      "topics": [
+        "BAS VFS",
+        "directory function",
+        "route matching",
+        "request body parsing"
+      ],
+      "notes": [
+        "The example data store is in memory and resets on app restart."
+      ],
+      "catalog_path": "REST/doc/ai-catalog.json"
+    },
+    {
+      "name": "SMQ-examples",
+      "path": "SMQ-examples",
+      "summary": "Index of Simple Message Queue examples covering direct messaging, RPC over SMQ, IoT chat and LED control, browser switch/bulb demos, multiplayer game variants, and a Mako-specific cluster experiment.",
+      "compatibility": [
+        "mako",
+        "xedge"
+      ],
+      "use_when": [
+        "The user wants examples of SMQ publish/subscribe, one-to-one messaging, or browser/device communication.",
+        "The user wants to build an embedded real-time UI using SMQ."
+      ],
+      "avoid_when": [
+        "The user needs a single self-contained app with one startup command for the entire directory.",
+        "The user needs generic WebSocket examples unrelated to SMQ."
+      ],
+      "read_next": [
+        "AGENTS.md",
+        "README.md",
+        "one2one/README.md",
+        "RPC/README.md",
+        "IoT/README.md",
+        "BlobArena/README.md"
+      ],
+      "protocols": [
+        "SMQ",
+        "WebSocket",
+        "JSON"
+      ],
+      "variants": {
+        "BlobArena": "AI-generated multiplayer browser game variants using SMQ.",
+        "one2one": "Basic direct browser-to-server SMQ messaging.",
+        "RPC": "Promise-style browser RPC over SMQ with Lua server dispatch.",
+        "LightSwitch-And-LightBulb-App": "Browser switch and bulb pages communicating through SMQ.",
+        "IoT": "Chat and LED-control tutorial examples.",
+        "cluster": "Mako-specific local multi-node cluster simulation."
+      },
+      "topics": [
+        "publish subscribe",
+        "RPC",
+        "IoT UI",
+        "browser messaging",
+        "multiplayer game"
+      ],
+      "notes": [
+        "The cluster subexample is Mako-specific as written and should not be treated as generic Xedge code."
+      ],
+      "catalog_path": "SMQ-examples/doc/ai-catalog.json"
+    },
+    {
+      "name": "socket-examples",
+      "path": "socket-examples",
+      "summary": "Collection of BAS socket and WebSocket examples covering UDP, NTP, blocking sockets, cosockets, WebSocket services, a proxy, a simple server, and an Eliza chatbot.",
+      "compatibility": [
+        "mako",
+        "xedge"
+      ],
+      "run": [
+        "cd socket-examples",
+        "mako -l::www"
+      ],
+      "use_when": [
+        "The user wants to learn BAS socket, UDP, WebSocket, or cosocket APIs.",
+        "The user wants small isolated socket examples rather than a full application."
+      ],
+      "avoid_when": [
+        "The user needs only SMQ messaging examples.",
+        "The target cannot support the required outbound or inbound socket operations."
+      ],
+      "read_next": [
+        "AGENTS.md",
+        "README.md",
+        "www/index.lsp",
+        "www/.preload",
+        "www/Blocking-WS-Server/ws.lsp",
+        "www/Cosocket-WS-Server/ws.lsp"
+      ],
+      "protocols": [
+        "TCP",
+        "UDP",
+        "WebSocket",
+        "HTTP",
+        "NTP"
+      ],
+      "topics": [
+        "BAS socket library",
+        "cosocket",
+        "blocking socket",
+        "proxy",
+        "WebSocket server"
+      ],
+      "notes": [
+        "Blocking examples are educational and should be reviewed before use on constrained embedded targets."
+      ],
+      "catalog_path": "socket-examples/doc/ai-catalog.json"
+    },
+    {
+      "name": "Sparkplug",
+      "path": "Sparkplug",
+      "summary": "Demonstrates MQTT Sparkplug B with an Edge of Network node example and a Sparkplug Explorer that subscribes to and decodes Sparkplug payloads.",
+      "compatibility": [
+        "mako",
+        "xedge"
+      ],
+      "run": [
+        "cd Sparkplug",
+        "mako -l::SparkplugExplorer",
+        "mako -l::EoN"
+      ],
+      "use_when": [
+        "The user wants to work with MQTT Sparkplug B in BAS, Mako Server, or Xedge.",
+        "The user wants examples of Sparkplug birth, data, command, and state flows."
+      ],
+      "avoid_when": [
+        "The user needs plain MQTT without Sparkplug topic and payload rules.",
+        "The target cannot reach the configured MQTT broker."
+      ],
+      "read_next": [
+        "AGENTS.md",
+        "README.md",
+        "EoN/.preload",
+        "SparkplugExplorer/.preload"
+      ],
+      "protocols": [
+        "MQTT",
+        "Sparkplug B",
+        "Protocol Buffers"
+      ],
+      "variants": {
+        "EoN": "Edge of Network node example that publishes Sparkplug birth and data messages.",
+        "SparkplugExplorer": "MQTT Sparkplug explorer that subscribes to wildcard topics and decodes payloads."
+      },
+      "topics": [
+        "Sparkplug client",
+        "MQTT subscription",
+        "NBIRTH",
+        "NDATA",
+        "NCMD",
+        "DCMD"
+      ],
+      "notes": [
+        "Broker settings and credentials in the demo files must be reviewed before production use."
+      ],
+      "catalog_path": "Sparkplug/doc/ai-catalog.json"
+    },
+    {
+      "name": "SQLite",
+      "path": "SQLite",
+      "summary": "Index of SQLite examples covering a basic Lua SQLite tutorial, URL-to-database wiki mapping, and shared-connection behavior under request load.",
+      "compatibility": [
+        "mako"
+      ],
+      "run": [
+        "cd SQLite/Tutorial",
+        "mako -l::www",
+        "cd SQLite/Wiki",
+        "mako -l::www",
+        "cd SQLite/Shared-Connection",
+        "mako -l::www"
+      ],
+      "use_when": [
+        "The user wants to learn SQLite usage from BAS Lua and LSP pages.",
+        "The user wants examples of URL-to-database mapping or shared SQLite connection behavior."
+      ],
+      "avoid_when": [
+        "The user needs an Xedge-ready SQLite example without Mako-specific app startup assumptions.",
+        "The user needs a production database layer with migrations and access control."
+      ],
+      "read_next": [
+        "AGENTS.md",
+        "README.md",
+        "Tutorial/README.md",
+        "Wiki/README.md",
+        "Shared-Connection/README.md"
+      ],
+      "variants": {
+        "Tutorial": "Basic form-driven Lua SQLite tutorial.",
+        "Wiki": "URL-to-database mapping wiki example.",
+        "Shared-Connection": "Shared SQLite connection and locking behavior example."
+      },
+      "topics": [
+        "SQLite",
+        "LSP",
+        "database-backed pages",
+        "shared connection",
+        "URL mapping"
+      ],
+      "notes": [
+        "Each SQLite subdirectory is a separate app with its own README and run command."
+      ],
+      "catalog_path": "SQLite/doc/ai-catalog.json"
+    },
+    {
+      "name": "TraceLogger",
+      "path": "TraceLogger",
+      "summary": "Mako Server TraceLogger client that connects to another BAS-enabled device and forwards the remote trace stream to the local console or log.",
+      "compatibility": [
+        "mako"
+      ],
+      "run": [
+        "cd TraceLogger",
+        "mako -l::www"
+      ],
+      "use_when": [
+        "The user wants to monitor trace output from another BAS-enabled device using a local Mako Server process.",
+        "The user wants to study the TraceLogger service protocol, HTTP client upgrade, and socket receive loop."
+      ],
+      "avoid_when": [
+        "The user needs a generic Xedge application without Mako configuration and local console/log assumptions.",
+        "The user needs a browser-only TraceLogger UI without a Lua trace-forwarding client."
+      ],
+      "read_next": [
+        "AGENTS.md",
+        "README.md",
+        "mako.conf",
+        "www/.preload",
+        "www/index.lsp"
+      ],
+      "protocols": [
+        "HTTP",
+        "WebSocket"
+      ],
+      "topics": [
+        "TraceLogger",
+        "Mako configuration",
+        "HTTP client",
+        "socket events",
+        "remote diagnostics"
+      ],
+      "notes": [
+        "Set trpeer in mako.conf before running; localhost is intentionally rejected."
+      ],
+      "catalog_path": "TraceLogger/doc/ai-catalog.json"
+    },
+    {
+      "name": "upload",
+      "path": "upload",
+      "summary": "Two BAS file-upload examples: a simpler blocking upload flow and an asynchronous upload flow for higher concurrency, both with form and drag-and-drop browser UI.",
+      "compatibility": [
+        "mako",
+        "xedge"
+      ],
+      "run": [
+        "cd upload/blocking",
+        "mako -l::www",
+        "cd upload/asynchronous",
+        "mako -l::www"
+      ],
+      "use_when": [
+        "The user wants to add file or firmware upload support to a BAS web application.",
+        "The user wants to compare simple blocking upload handling with ba.create.upload-based asynchronous handling."
+      ],
+      "avoid_when": [
+        "The target does not provide writable storage for uploaded files.",
+        "The user needs a complete file manager rather than focused upload examples."
+      ],
+      "read_next": [
+        "AGENTS.md",
+        "README.md",
+        "blocking/README.md",
+        "asynchronous/README.md"
+      ],
+      "variants": {
+        "blocking": "Simpler request-driven upload example and recommended starting point.",
+        "asynchronous": "Advanced ba.create.upload-based example for higher upload concurrency."
+      },
+      "topics": [
+        "file upload",
+        "firmware upload UI",
+        "LSP",
+        "IO objects",
+        "deferred response"
+      ],
+      "notes": [
+        "Xedge use requires adapting writable storage paths and IO selection to the target."
+      ],
+      "catalog_path": "upload/doc/ai-catalog.json"
+    },
+    {
+      "name": "Web-Shell",
+      "path": "Web-Shell",
+      "summary": "Linux-oriented browser shell that uses ba.forkpty for a server-side pseudo-terminal and SMQ plus xterm.js for the browser terminal UI.",
+      "compatibility": [
+        "mako"
+      ],
+      "run": [
+        "cd Web-Shell",
+        "mako -l::www"
+      ],
+      "use_when": [
+        "The user wants to study ba.forkpty, PTY lifecycle handling, and browser terminal integration.",
+        "The user wants a Linux web shell example that bridges terminal input and output over SMQ."
+      ],
+      "avoid_when": [
+        "The target does not include ba.forkpty or a Linux-style shell.",
+        "The user needs a safe production remote shell without a full authentication and authorization design.",
+        "The user needs a generic Xedge-compatible example."
+      ],
+      "read_next": [
+        "AGENTS.md",
+        "README.md",
+        "www/.preload",
+        "www/index.lsp"
+      ],
+      "protocols": [
+        "SMQ",
+        "WebSocket"
+      ],
+      "targets": [
+        "Linux"
+      ],
+      "topics": [
+        "web shell",
+        "ba.forkpty",
+        "PTY",
+        "xterm.js",
+        "SMQ",
+        "authentication"
+      ],
+      "notes": [
+        "This example is intentionally Linux/Mako-oriented and should not be exposed without strong access control."
+      ],
+      "catalog_path": "Web-Shell/doc/ai-catalog.json"
+    },
+    {
+      "name": "WebAuthn",
+      "path": "WebAuthn",
+      "summary": "BAS WebAuthn/passkey module with two example applications: an introductory registration/authentication flow and a fuller protected-login flow with optional email activation.",
+      "compatibility": [
+        "mako",
+        "xedge"
+      ],
+      "run": [
+        "cd WebAuthn",
+        "mako"
+      ],
+      "use_when": [
+        "The user wants to add passkey/FIDO2 WebAuthn authentication to a BAS-powered web application.",
+        "The user wants examples of server-side WebAuthn callbacks, user database persistence, and protected app login."
+      ],
+      "avoid_when": [
+        "The deployment cannot provide trusted HTTPS, a valid origin, or a browser-supported WebAuthn environment.",
+        "The user only needs simple password or RADIUS authentication."
+      ],
+      "read_next": [
+        "AGENTS.md",
+        "README.md",
+        "WebAuthn.md",
+        "mako.conf",
+        "WebAuthnModule/.lua/webauthn.lua",
+        "example1/.preload",
+        "example2/.preload"
+      ],
+      "variants": {
+        "WebAuthnModule": "Reusable server-side WebAuthn module.",
+        "example1": "Introductory registration and authentication example.",
+        "example2": "More complete protected-login example with registration activation and optional email."
+      },
+      "protocols": [
+        "WebAuthn",
+        "FIDO2",
+        "HTTPS",
+        "CBOR",
+        "JSON"
+      ],
+      "topics": [
+        "passkeys",
+        "authentication",
+        "BAS authenticator",
+        "SimpleWebAuthn",
+        "protected file server"
+      ],
+      "notes": [
+        "Mako is the documented local run target; Xedge use requires correct .config deployment, trusted HTTPS/origin setup, storage, and email configuration."
+      ],
+      "catalog_path": "WebAuthn/doc/ai-catalog.json"
+    },
+    {
+      "name": "Xedge App Deployment",
+      "path": "Xedge-App-Deployment",
+      "summary": "Source layout for the MyApp.zip Xedge deployment tutorial, showing .config metadata, .preload startup logic, an LSP page, and an .xlua script packaged from the www directory.",
+      "compatibility": [
+        "mako",
+        "xedge"
+      ],
+      "run": [
+        "cd Xedge-App-Deployment",
+        "mako -l::www"
+      ],
+      "use_when": [
+        "The user wants to learn how an Xedge application ZIP should be structured.",
+        "The user wants a small source example for packaging and uploading an Xedge app."
+      ],
+      "avoid_when": [
+        "The user needs a feature-rich web app instead of a deployment packaging example.",
+        "The user needs an ESP32-specific hardware example."
+      ],
+      "read_next": [
+        "AGENTS.md",
+        "README.md",
+        "www/.config",
+        "www/.preload",
+        "www/index.lsp",
+        "www/MyTest.xlua"
+      ],
+      "topics": [
+        "Xedge deployment",
+        "app packaging",
+        ".config",
+        ".preload",
+        ".xlua",
+        "LSP"
+      ],
+      "notes": [
+        "Create MyApp.zip from inside www with: zip -D -q -u -r -9 ../MyApp.zip ."
+      ],
+      "catalog_path": "Xedge-App-Deployment/doc/ai-catalog.json"
+    }
+  ]
+}

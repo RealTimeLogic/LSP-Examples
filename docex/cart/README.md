@@ -15,11 +15,13 @@ This example accompanies the documentation section [The Virtual File System: Dir
 Start the example with the Mako Server:
 
 ```bash
-cd LSP-Examples/docex/cart
+cd docex/cart
 mako -l::www
 ```
 
 For more detail on starting the Mako Server, see the [command line video tutorial](https://youtu.be/vwQ52ZC5RRg) and the [command line options documentation](https://realtimelogic.com/ba/doc/?url=Mako.html#loadapp).
+
+After the server starts, open the HTTP URL printed in the Mako console. The root page redirects into the cart directory handled by `.preload`.
 
 ## How it works
 

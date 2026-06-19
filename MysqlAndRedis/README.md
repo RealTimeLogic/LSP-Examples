@@ -99,8 +99,8 @@ VALUES(1,"Bond","James"," Old Bond Street","London");
 
 Then open:
 
-- `http://localhost:portno/MySQL.lsp`
-- `http://localhost:portno/Redis.lsp`
+- the HTTP URL printed in the Mako console with `/MySQL.lsp` appended
+- the HTTP URL printed in the Mako console with `/Redis.lsp` appended
 
 If you use WSL2, the Mako Server should also run inside WSL2. It is possible to run Mako on Windows and proxy into WSL2, but that adds extra setup. When the server runs inside WSL2, use the WSL2 IP address in the browser rather than `localhost`.
 

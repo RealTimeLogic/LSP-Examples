@@ -19,7 +19,7 @@ mako -l::www
 
 For more detail on starting the Mako Server, see the [command line video tutorial](https://youtu.be/vwQ52ZC5RRg) and the [command line options documentation](https://realtimelogic.com/ba/doc/?url=Mako.html#loadapp).
 
-After the server starts, open `http://localhost:portno`, enter any value in the login field, and click the `Login` button.
+After the server starts, open the HTTP URL printed in the Mako console, enter any value in the login field, and click the `Login` button.
 
 ## How it works
 

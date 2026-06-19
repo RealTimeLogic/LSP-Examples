@@ -1,0 +1,47 @@
+{
+  "name": "MySQL And Redis Drivers",
+  "path": "MysqlAndRedis",
+  "summary": "OpenResty-style MySQL and Redis drivers adapted for BAS socket and cosocket behavior, with a reusable package layout and LSP test pages for blocking and ba.socket.event execution.",
+  "compatibility": [
+    "mako",
+    "xedge"
+  ],
+  "run": [
+    "cd MysqlAndRedis/MySQL",
+    "zip -D -q -u -r -9 ../MySQL.zip .",
+    "cd ..",
+    "mako -l::MySQL.zip -l::www"
+  ],
+  "protocols": [
+    "MySQL",
+    "Redis",
+    "TCP"
+  ],
+  "topics": [
+    "database drivers",
+    "OpenResty compatibility",
+    "cosockets",
+    "ba.socket.event",
+    "MySQL",
+    "Redis",
+    "ZIP app packaging"
+  ],
+  "use_when": [
+    "The user wants MySQL or Redis access from BAS Lua.",
+    "The user wants OpenResty-style driver compatibility.",
+    "The user wants a persistent MySQL connection pattern for BAS cosockets."
+  ],
+  "avoid_when": [
+    "The user does not have reachable MySQL or Redis services.",
+    "The user wants ORM-style database abstractions.",
+    "The user wants connection pooling without implementing it."
+  ],
+  "read_next": [
+    "AGENTS.md",
+    "README.md",
+    "MySQL/.lua/resty/mysql.lua",
+    "MySQL/.lua/resty/redis.lua",
+    "www/MySQL.lsp",
+    "www/Redis.lsp"
+  ]
+}

@@ -25,6 +25,8 @@ mako -l::forward
 
 For more detail on starting the Mako Server, see the [command line video tutorial](https://youtu.be/vwQ52ZC5RRg) and the [command line options documentation](https://realtimelogic.com/ba/doc/?url=Mako.html#loadapp).
 
+Run one command at a time. After the server starts, open the HTTP URL printed in the Mako console and follow the links or redirects shown by the example.
+
 ## How it works
 
 The examples illustrate that the request/response command environment exists only for the lifetime of a single HTTP request, but can still be used across included or forwarded pages during that request. The `include` example keeps rendering in the same response stream, while the `forward` example transfers control to another page and stops executing the current one.

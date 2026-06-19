@@ -30,6 +30,8 @@ mako -l::www
 
 For more detail on starting the Mako Server, see the [command line video tutorial](https://youtu.be/vwQ52ZC5RRg) and the [command line options documentation](https://realtimelogic.com/ba/doc/?url=Mako.html#loadapp).
 
+After the server starts, open the HTTP URL printed in the Mako console. Select a ZIP file with the form or drag and drop it onto the page; the upload is saved under the temporary upload directory created by `.preload`.
+
 ## How it works
 
 The page accepts two upload styles from the browser. Standard form uploads are handled through `request:multipart()`, while drag-and-drop uploads use `request:rawrdr()`. Because the request is processed directly in the page flow, this version is easier to study than the asynchronous upload object example.

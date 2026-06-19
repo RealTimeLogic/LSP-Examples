@@ -6,17 +6,19 @@ This example demonstrates one-to-one communication between a browser and a serve
 
 ## Files
 
-- `.preload` - Starts the SMQ broker-side support used by the example.
-- `index.html` - Browser-side example showing the one-to-one publish and subscribe flow.
+- `www/.preload` - Starts the SMQ broker-side support used by the example.
+- `www/index.html` - Browser-side example showing the one-to-one publish and subscribe flow.
 
 ## How to run
 
 Start the example with the Mako Server:
 
 ```bash
-cd LSP-Examples/SMQ-examples
-mako -l::one2one
+cd SMQ-examples/one2one
+mako -l::www
 ```
+
+After the server starts, open the HTTP URL printed in the Mako console. Use the browser console and page output to observe the one-to-one SMQ round trip.
 
 ## How it works
 

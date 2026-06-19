@@ -24,16 +24,18 @@ Start either game from the `SMQ-examples/BlobArena` directory.
 To run the Codex version:
 
 ```bash
+cd SMQ-examples/BlobArena
 mako -l::codex
 ```
 
 To run the Gemini version:
 
 ```bash
+cd SMQ-examples/BlobArena
 mako -l::gemini
 ```
 
-Once the server is running, open your browser and navigate to the local Mako Server instance.
+After the server starts, open the HTTP URL printed in the Mako console. Open the game in two browser windows to confirm that multiplayer state is shared through SMQ.
 
 ### Running the game on Xedge, such as [Xedge32](https://realtimelogic.com/downloads/bas/ESP32/).
 - Choose either the `codex` or `gemini` directory.

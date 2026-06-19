@@ -1,0 +1,53 @@
+{
+  "name": "Email And Logging",
+  "path": "Email-and-Logging",
+  "summary": "Mixed collection of SMTP examples and Mako logging/email examples. Direct text, HTML, and EML email examples use socket.mail and can be adapted to Xedge email settings; the log variant is Mako-specific.",
+  "compatibility": [
+    "mako",
+    "xedge"
+  ],
+  "variants": {
+    "text": "Plain-text socket.mail example.",
+    "html": "HTML email with inline image.",
+    "eml": "EML parser and template email example.",
+    "log": "Mako-specific mako.log and emailed error-reporting example."
+  },
+  "run": [
+    "cd Email-and-Logging",
+    "mako -l::text",
+    "mako -l::html",
+    "mako -l::eml",
+    "mako -l::log"
+  ],
+  "protocols": [
+    "SMTP"
+  ],
+  "topics": [
+    "email",
+    "SMTP",
+    "socket.mail",
+    "HTML email",
+    "EML parser",
+    "Mako logging",
+    "error reports"
+  ],
+  "use_when": [
+    "The user wants direct SMTP email examples using socket.mail.",
+    "The user wants HTML or EML-based email templates.",
+    "The user wants to understand Mako Server email logging behavior."
+  ],
+  "avoid_when": [
+    "The user wants a single homogeneous app root.",
+    "The user wants Xedge deployment of the mako.log variant without adaptation.",
+    "The user wants production secret handling without replacing demo SMTP configuration."
+  ],
+  "read_next": [
+    "AGENTS.md",
+    "README.md",
+    "mako.conf",
+    "text/.preload",
+    "html/.preload",
+    "eml/.preload",
+    "log/.preload"
+  ]
+}

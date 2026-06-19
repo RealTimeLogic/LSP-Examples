@@ -1,0 +1,38 @@
+{
+  "name": "CryptoIO",
+  "path": "CryptoIO",
+  "summary": "Reusable Lua module that wraps a BAS IO with AES-GCM encryption, plus a startup example that verifies encrypted file round-tripping and mounts an encrypted Web File Server/WebDAV endpoint.",
+  "compatibility": [
+    "mako",
+    "xedge"
+  ],
+  "run": [
+    "cd CryptoIO",
+    "mako -l::www"
+  ],
+  "topics": [
+    "encrypted storage",
+    "CryptoIO",
+    "AES-GCM",
+    "TPM",
+    "WebDAV",
+    "Web File Server",
+    "Lua IO"
+  ],
+  "use_when": [
+    "The user wants encrypted-at-rest file storage using BAS IO APIs.",
+    "The user wants to wrap existing IO objects with transparent encryption.",
+    "The user wants an encrypted Web File Server or WebDAV example."
+  ],
+  "avoid_when": [
+    "The user wants database encryption instead of file IO encryption.",
+    "The user wants to change encrypted file format without migration planning.",
+    "The user wants production key policy without reviewing the target trust model."
+  ],
+  "read_next": [
+    "AGENTS.md",
+    "README.md",
+    "www/.lua/CryptoIO.lua",
+    "www/.preload"
+  ]
+}

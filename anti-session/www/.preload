@@ -1,0 +1,47 @@
+-- Shared helpers for the anti-session example.
+-- The browser carries encrypted JSON state in hidden form fields; the
+-- server owns the AES key and is the only party that can read or update it.
+
+local secret = ba.aeskey(32)
+
+local escSyms = {
+   ['&'] = '&amp;',
+   ['<'] = '&lt;',
+   ['>'] = '&gt;',
+   ['"'] = '&quot;',
+   ["'"] = '&#x27;'
+}
+
+local function escapeChar(c)
+   return escSyms[c]
+end
+
+function escapeHtml(value)
+   return tostring(value or ''):gsub('[&<>"\']', escapeChar)
+end
+
+function encodeState(state)
+   return ba.aesencode(secret, ba.json.encode(state))
+end
+
+function decodeState(encrypted)
+   if not encrypted or encrypted == '' then
+      return nil, 'The encrypted form state is missing.'
+   end
+
+   local json = ba.aesdecode(secret, encrypted)
+   if not json then
+      return nil, 'The encrypted form state could not be decoded.'
+   end
+
+   local ok, state = pcall(ba.json.decode, json)
+   if not ok or type(state) ~= 'table' then
+      return nil, 'The encrypted form state is invalid.'
+   end
+
+   return state
+end
+
+function trim(value)
+   return value and value:gsub('^%s*(.-)%s*$', '%1') or ''
+end

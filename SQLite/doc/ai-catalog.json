@@ -1,0 +1,46 @@
+{
+  "name": "SQLite",
+  "path": "SQLite",
+  "summary": "Index of SQLite examples covering a basic Lua SQLite tutorial, URL-to-database wiki mapping, and shared-connection behavior under request load.",
+  "compatibility": [
+    "mako"
+  ],
+  "run": [
+    "cd SQLite/Tutorial",
+    "mako -l::www",
+    "cd SQLite/Wiki",
+    "mako -l::www",
+    "cd SQLite/Shared-Connection",
+    "mako -l::www"
+  ],
+  "use_when": [
+    "The user wants to learn SQLite usage from BAS Lua and LSP pages.",
+    "The user wants examples of URL-to-database mapping or shared SQLite connection behavior."
+  ],
+  "avoid_when": [
+    "The user needs an Xedge-ready SQLite example without Mako-specific app startup assumptions.",
+    "The user needs a production database layer with migrations and access control."
+  ],
+  "read_next": [
+    "AGENTS.md",
+    "README.md",
+    "Tutorial/README.md",
+    "Wiki/README.md",
+    "Shared-Connection/README.md"
+  ],
+  "variants": {
+    "Tutorial": "Basic form-driven Lua SQLite tutorial.",
+    "Wiki": "URL-to-database mapping wiki example.",
+    "Shared-Connection": "Shared SQLite connection and locking behavior example."
+  },
+  "topics": [
+    "SQLite",
+    "LSP",
+    "database-backed pages",
+    "shared connection",
+    "URL mapping"
+  ],
+  "notes": [
+    "Each SQLite subdirectory is a separate app with its own README and run command."
+  ]
+}
