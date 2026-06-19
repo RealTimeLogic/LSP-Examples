@@ -1,0 +1,5 @@
+trace"MyApp: .preload starting"
+
+function onunload()
+   trace"MyApp: Stopping .preload"
+end

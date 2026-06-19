@@ -27,6 +27,14 @@ Use the official Markdown documentation bundles for native SMQ, Lua, LSP, JavaSc
 - BAS tutorials bundle: https://realtimelogic.com/downloads/tutorials.md
 - Mako Server tutorials bundle: https://makoserver.net/download/tutorials.md
 
+## Detailed SMQ Skill
+
+For any non-trivial SMQ code change, read the centralized SMQ AI skill before editing broker setup, browser clients, topic names, publish/subscribe flow, direct messaging, reconnect behavior, or cleanup logic:
+
+- https://realtimelogic.com/downloads/ai-skills/SMQ-Skill.md
+
+This local AGENTS.md explains the structure of the examples in this directory. The centralized SMQ skill provides reusable SMQ-specific implementation guidance for this and other repositories.
+
 ## Runtime And Compatibility
 
 - Most subexamples are portable between Mako and Xedge when the SMQ endpoint is available and paths are adapted for the target.

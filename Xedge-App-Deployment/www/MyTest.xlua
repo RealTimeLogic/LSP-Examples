@@ -1,0 +1,5 @@
+trace"MyApp: MyTest.xlua starting"
+
+function onunload()
+   trace"MyApp: Stopping MyTest.xlua"
+end
