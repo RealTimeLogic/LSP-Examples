@@ -166,6 +166,18 @@ Each block is written as `TAG` (16 bytes) followed by `CIPHERTEXT` (up to `op.si
 - On success returns table `st` with `st.size = plaintext_size`
 - On failure (not encrypted/corrupt trailer): returns `nil, "enoent"`.
 
+## Packaging for Xedge
+
+This example can be packaged as an Xedge app by creating a ZIP from the app directory, so the app files are at the ZIP root. See [Xedge App Deployment](../Xedge-App-Deployment/README.md) for the detailed deployment workflow.
+
+```bash
+cd www
+zip -D -q -u -r -9 ../CryptoIO.zip .
+```
+
+Upload the generated ZIP with the Xedge App Upload tool.
+
+
 ## Notes / Troubleshooting
 
 ### Keyname Security Note

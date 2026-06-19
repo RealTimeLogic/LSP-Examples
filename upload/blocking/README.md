@@ -36,6 +36,18 @@ After the server starts, open the HTTP URL printed in the Mako console. Select a
 
 The page accepts two upload styles from the browser. Standard form uploads are handled through `request:multipart()`, while drag-and-drop uploads use `request:rawrdr()`. Because the request is processed directly in the page flow, this version is easier to study than the asynchronous upload object example.
 
+## Packaging for Xedge
+
+This example can be packaged as an Xedge app by creating a ZIP from the `www/` directory, so the app files are at the ZIP root. See [Xedge App Deployment](../../Xedge-App-Deployment/README.md) for the detailed deployment workflow.
+
+```bash
+cd www
+zip -D -q -u -r -9 ../upload-blocking.zip .
+```
+
+Upload the generated ZIP with the Xedge App Upload tool.
+
+
 ## Notes / Troubleshooting
 
 - Use this version first unless you need to support many uploads at the same time.

@@ -192,6 +192,29 @@ While **BAS WebAuthn** does **not require email-based registration**, using **em
 - **`help.lsp`** - Activated when the **help button** is clicked in the Web File Server.
 
 
+## Packaging for Xedge
+
+This directory contains multiple app roots. Package the selected app directory, not the parent directory. See [Xedge App Deployment](../Xedge-App-Deployment/README.md) for the detailed deployment workflow.
+WebAuthn also requires correct HTTPS, trusted certificates, origin settings, storage, and optional email settings for the target.
+
+```bash
+cd WebAuthnModule
+zip -D -q -u -r -9 ../webauthn-module.zip .
+```
+
+```bash
+cd example1
+zip -D -q -u -r -9 ../webauthn-example1.zip .
+```
+
+```bash
+cd example2
+zip -D -q -u -r -9 ../webauthn-example2.zip .
+```
+
+Upload the generated ZIP with the Xedge App Upload tool.
+
+
 ## Notes / Troubleshooting
 
 ### WebAuthn Requirements

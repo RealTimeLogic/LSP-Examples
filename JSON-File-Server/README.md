@@ -93,6 +93,18 @@ This lets you test both the authentication flow and the role-based authorization
 
 The example also doubles as a concrete reminder that `request:login()` is a BAS login API, not just a file-server helper. That is why this README points to SSO and WebAuthn as natural follow-on examples.
 
+## Packaging for Xedge
+
+This example can be packaged as an Xedge app by creating a ZIP from the app directory, so the app files are at the ZIP root. See [Xedge App Deployment](../Xedge-App-Deployment/README.md) for the detailed deployment workflow.
+
+```bash
+cd www
+zip -D -q -u -r -9 ../JSON-File-Server.zip .
+```
+
+Upload the generated ZIP with the Xedge App Upload tool.
+
+
 ## Notes / Troubleshooting
 
 - Browsers cache Digest credentials aggressively. In some cases you must fully close the browser before you can test a different Digest user cleanly.

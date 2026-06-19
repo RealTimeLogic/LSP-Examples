@@ -24,6 +24,18 @@ After the server starts, open the HTTP URL printed in the Mako console. Use the 
 
 The browser creates an SMQ client with a clean start so each connection begins without retained local state. It then subscribes to messages addressed to `self`, which lets the server send one-to-one replies back to that specific browser instance. After the subscription is in place, the client publishes JSON messages to the broker to complete the round trip.
 
+## Packaging for Xedge
+
+This example can be packaged as an Xedge app by creating a ZIP from the `www/` directory, so the app files are at the ZIP root. See [Xedge App Deployment](../../Xedge-App-Deployment/README.md) for the detailed deployment workflow.
+
+```bash
+cd www
+zip -D -q -u -r -9 ../smq-one2one.zip .
+```
+
+Upload the generated ZIP with the Xedge App Upload tool.
+
+
 ## Notes / Troubleshooting
 
 - This example is a good foundation for the more advanced SMQ RPC example in the sibling `RPC/` directory.

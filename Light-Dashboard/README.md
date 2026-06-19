@@ -25,7 +25,7 @@ Authentication is optional and disabled by default. In the default `custom/` var
 
 #### How to run using [Xedge](https://realtimelogic.com/products/xedge/)
 
-When using Xedge, zip the selected variant, upload to Xedge, and unzip using the app uploader. See [Xedge Application Deployment](https://realtimelogic.com/articles/Mastering-Xedge-Application-Deployment-From-Installation-to-Creation) for details.
+When using Xedge, zip one selected variant and upload it with the Xedge App Upload tool. See [Packaging for Xedge](#packaging-for-xedge) below.
 
 #### How to run using [Mako Server](https://makoserver.net/)
 
@@ -206,6 +206,28 @@ have more than one request in flight or when Promise-style `async` / `await`
 code is clearer. Use `scope.sendToBroker(...)` and
 `scope.subscribeToDirectMessage(...)` only for simple one-off command/reply
 flows where named messages are clearer than RPC methods.
+
+## Packaging for Xedge
+
+This directory contains three dashboard variants. Package one selected variant at a time. See [Xedge App Deployment](../Xedge-App-Deployment/README.md) for the detailed deployment workflow.
+
+```bash
+cd custom
+zip -D -q -u -r -9 ../light-dashboard-custom.zip .
+```
+
+```bash
+cd htmx
+zip -D -q -u -r -9 ../light-dashboard-htmx.zip .
+```
+
+```bash
+cd www
+zip -D -q -u -r -9 ../light-dashboard-www.zip .
+```
+
+Upload the generated ZIP with the Xedge App Upload tool.
+
 
 ## Notes / Troubleshooting
 

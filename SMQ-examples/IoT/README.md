@@ -33,6 +33,18 @@ After the server starts, open the HTTP URL printed in the Mako console.
 
 The browser examples all connect to the SMQ endpoint exposed by `smq.lsp`. The basic chat example uses publish/subscribe for shared messages. The improved chat example extends that design with one-to-one messaging so each client can maintain a user list and typing indicators. The LED-control example shows how the same SMQ messaging model can be used for device-management style user interfaces.
 
+## Packaging for Xedge
+
+This example can be packaged as an Xedge app by creating a ZIP from the `www/` directory, so the app files are at the ZIP root. See [Xedge App Deployment](../../Xedge-App-Deployment/README.md) for the detailed deployment workflow.
+
+```bash
+cd www
+zip -D -q -u -r -9 ../smq-iot.zip .
+```
+
+Upload the generated ZIP with the Xedge App Upload tool.
+
+
 ## Notes / Troubleshooting
 
 - For the LED example, the web interface will not show active devices until at least one SMQ device client connects to your broker.

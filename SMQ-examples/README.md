@@ -26,6 +26,44 @@ There is no single startup command for the whole `SMQ-examples` directory. Open 
 
 The subdirectories demonstrate different communication patterns on top of the same SMQ model. Some focus on browser-to-server request/response flows, others on browser-to-browser or browser-to-device messaging, and the cluster example expands the idea into multi-node setups.
 
+## Packaging for Xedge
+
+This directory contains multiple app roots. Package the selected app directory, not the parent directory. See [Xedge App Deployment](../Xedge-App-Deployment/README.md) for the detailed deployment workflow.
+The `cluster` example is Mako-specific as written and is not included in the generic Xedge packaging commands.
+
+```bash
+cd one2one/www
+zip -D -q -u -r -9 ../../smq-one2one.zip .
+```
+
+```bash
+cd RPC/www
+zip -D -q -u -r -9 ../../smq-rpc.zip .
+```
+
+```bash
+cd IoT/www
+zip -D -q -u -r -9 ../../smq-iot.zip .
+```
+
+```bash
+cd LightSwitch-And-LightBulb-App/www
+zip -D -q -u -r -9 ../../smq-light-switch.zip .
+```
+
+```bash
+cd BlobArena/codex
+zip -D -q -u -r -9 ../blobarena-codex.zip .
+```
+
+```bash
+cd BlobArena/gemini
+zip -D -q -u -r -9 ../blobarena-gemini.zip .
+```
+
+Upload the generated ZIP with the Xedge App Upload tool.
+
+
 ## Notes / Troubleshooting
 
 - If you are new to SMQ, start with `one2one/` or `IoT/` first.

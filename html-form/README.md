@@ -25,6 +25,18 @@ After the server starts, open the HTTP URL printed in the Mako console, enter an
 
 The example keeps everything in a single LSP page so it is easy to see the full request flow. The page emits the HTML form on `GET` and reads the submitted form fields when the browser posts data back to the same URL.
 
+## Packaging for Xedge
+
+This example can be packaged as an Xedge app by creating a ZIP from the app directory, so the app files are at the ZIP root. See [Xedge App Deployment](../Xedge-App-Deployment/README.md) for the detailed deployment workflow.
+
+```bash
+cd www
+zip -D -q -u -r -9 ../html-form.zip .
+```
+
+Upload the generated ZIP with the Xedge App Upload tool.
+
+
 ## Notes / Troubleshooting
 
 - This example is intentionally simple and is meant to teach form handling, not production authentication design.

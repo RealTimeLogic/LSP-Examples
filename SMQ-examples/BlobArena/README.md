@@ -37,13 +37,22 @@ mako -l::gemini
 
 After the server starts, open the HTTP URL printed in the Mako console. Open the game in two browser windows to confirm that multiplayer state is shared through SMQ.
 
-### Running the game on Xedge, such as [Xedge32](https://realtimelogic.com/downloads/bas/ESP32/).
-- Choose either the `codex` or `gemini` directory.
-- Zip everything in the selected directory, including the Xedge `.config` script; make sure to exclude the directory name itself in the ZIP file.
-- Open the Xedge IDE, click the menu in the top right corner, and click App Upload
-- Drag and drop the ZIP file onto the App Uploader
-- Click Save without selecting unpacking
-- Navigate to the root URL (http://ip-address/) to play the game
+## Packaging for Xedge
+
+Package one Blob Arena variant at a time. Create the ZIP from inside the selected variant directory so `.config`, `.preload`, `index.html`, and `smq.lsp` are at the ZIP root. See [Xedge App Deployment](../../Xedge-App-Deployment/README.md) for the detailed deployment workflow.
+
+```bash
+cd codex
+zip -D -q -u -r -9 ../blobarena-codex.zip .
+```
+
+```bash
+cd gemini
+zip -D -q -u -r -9 ../blobarena-gemini.zip .
+```
+
+Upload the generated ZIP with the Xedge App Upload tool.
+
 
 ## AI Prompt
 

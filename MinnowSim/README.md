@@ -59,6 +59,18 @@ On startup, the Lua code creates simulated GPIO objects when the native `esp32` 
 
 The example also includes a small AJAX-over-WebSocket dispatcher. Messages such as `math/add`, `math/subtract`, `math/mul`, and `math/div` are handled on the server and returned to the requesting browser over the existing WebSocket connection.
 
+## Packaging for Xedge
+
+This example can be packaged as an Xedge app by creating a ZIP from the app directory, so the app files are at the ZIP root. See [Xedge App Deployment](../Xedge-App-Deployment/README.md) for the detailed deployment workflow.
+
+```bash
+cd www
+zip -D -q -u -r -9 ../MinnowSim.zip .
+```
+
+Upload the generated ZIP with the Xedge App Upload tool.
+
+
 ## Notes
 
 - This example is designed to be run as the `www` application root.

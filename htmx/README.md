@@ -28,6 +28,18 @@ After the server starts, open the HTTP URL printed in the Mako console.
 
 The browser loads `index.html`, and htmx issues HTTP requests to `users.lsp` whenever the page needs updated server-rendered content. Instead of exchanging JSON and manually rebuilding the UI in JavaScript, the server returns ready-to-insert HTML fragments.
 
+## Packaging for Xedge
+
+The Xedge-compatible app in this directory is the `introduction` example. See [Xedge App Deployment](../Xedge-App-Deployment/README.md) for the detailed deployment workflow.
+
+```bash
+cd introduction
+zip -D -q -u -r -9 ../htmx-introduction.zip .
+```
+
+Upload the generated ZIP with the Xedge App Upload tool.
+
+
 ## Notes / Troubleshooting
 
 - If the page loads but nothing updates, confirm that `users.lsp` is being served and that JavaScript is enabled.

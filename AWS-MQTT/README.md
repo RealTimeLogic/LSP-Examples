@@ -38,6 +38,18 @@ The startup script creates a certificate store, loads the Amazon root CA and the
 
 The script also unlinks the application directory when running as an LSP app so that the private key files are not exposed through HTTP.
 
+## Packaging for Xedge
+
+This example can be packaged as an Xedge app by creating a ZIP from the app directory, so the app files are at the ZIP root. See [Xedge App Deployment](../Xedge-App-Deployment/README.md) for the detailed deployment workflow.
+
+```bash
+cd www
+zip -D -q -u -r -9 ../AWS-MQTT.zip .
+```
+
+Upload the generated ZIP with the Xedge App Upload tool.
+
+
 ## Notes / Troubleshooting
 
 - The example will not connect until `awsBroker` is set correctly in `www/.preload`.

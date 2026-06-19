@@ -40,6 +40,18 @@ The example app in `www/.preload` mounts the router under `/api` and defines the
 
 The example keeps the user records in memory, validates the submitted JSON, and returns JSON responses with appropriate HTTP status codes. `TestApi.py` then creates, queries, updates, and deletes users against that API.
 
+## Packaging for Xedge
+
+This example can be packaged as an Xedge app by creating a ZIP from the app directory, so the app files are at the ZIP root. See [Xedge App Deployment](../Xedge-App-Deployment/README.md) for the detailed deployment workflow.
+
+```bash
+cd www
+zip -D -q -u -r -9 ../REST.zip .
+```
+
+Upload the generated ZIP with the Xedge App Upload tool.
+
+
 ## Notes / Troubleshooting
 
 - The example uses in-memory storage only. Restarting the app resets the user list.

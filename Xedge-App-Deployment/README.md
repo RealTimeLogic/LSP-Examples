@@ -13,7 +13,7 @@ The example shows the layout expected by Xedge when packaging an application ZIP
 - `www/index.lsp` - Simple LSP page shown at the app URL.
 - `www/MyTest.xlua` - Small Xedge `.xlua` startup/shutdown example.
 
-## How to package
+## Packaging for Xedge
 
 Create `MyApp.zip` by zipping the contents of `www/` from inside that directory:
 

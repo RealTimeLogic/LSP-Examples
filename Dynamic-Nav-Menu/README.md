@@ -37,6 +37,18 @@ The application's `www/.preload` script sets up two main pieces of behavior. Fir
 
 Each protected page includes the shared header logic from `.header.lsp`, which generates the menu and highlights the active tab. Static resources under `www/public/` stay public so the login page can load its styles and scripts before the user is authenticated.
 
+## Packaging for Xedge
+
+This example can be packaged as an Xedge app by creating a ZIP from the app directory, so the app files are at the ZIP root. See [Xedge App Deployment](../Xedge-App-Deployment/README.md) for the detailed deployment workflow.
+
+```bash
+cd www
+zip -D -q -u -r -9 ../Dynamic-Nav-Menu.zip .
+```
+
+Upload the generated ZIP with the Xedge App Upload tool.
+
+
 ## Notes / Troubleshooting
 
 - This example uses hashed passwords in the user database, so the realm configured in `.preload` must match the stored HA1 values.

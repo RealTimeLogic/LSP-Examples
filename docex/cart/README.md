@@ -27,6 +27,18 @@ After the server starts, open the HTTP URL printed in the Mako console. The root
 
 The example uses the BAS virtual file system model to maintain the shopping-cart interaction through directory-based logic and LSP pages.
 
+## Packaging for Xedge
+
+This example can be packaged as an Xedge app by creating a ZIP from the `www/` directory, so the app files are at the ZIP root. See [Xedge App Deployment](../../Xedge-App-Deployment/README.md) for the detailed deployment workflow.
+
+```bash
+cd www
+zip -D -q -u -r -9 ../docex-cart.zip .
+```
+
+Upload the generated ZIP with the Xedge App Upload tool.
+
+
 ## Notes / Troubleshooting
 
 - This example is primarily intended to be read together with the documentation section it accompanies.

@@ -277,6 +277,29 @@ This is useful when the email includes generated data such as:
 
 The BAS function [ba.parselsp()](https://realtimelogic.com/ba/doc/en/lua/lua.html#ba_parselsp) parses Lua Server Page content and returns Lua source code that can be compiled with `load()`. Note that ba.parselsp()can be used with any text format, including HTML. The parser simply converts text into Lua code and preserves the embedded Lua code within <?lsp ?> and <?lsp= ?> tags.
 
+## Packaging for Xedge
+
+This directory contains multiple app roots. Package the selected app directory, not the parent directory. See [Xedge App Deployment](../Xedge-App-Deployment/README.md) for the detailed deployment workflow.
+The `log` example is Mako-specific and should not be packaged as a generic Xedge app without redesigning the logging setup.
+
+```bash
+cd text
+zip -D -q -u -r -9 ../email-text.zip .
+```
+
+```bash
+cd html
+zip -D -q -u -r -9 ../email-html.zip .
+```
+
+```bash
+cd eml
+zip -D -q -u -r -9 ../email-eml.zip .
+```
+
+Upload the generated ZIP with the Xedge App Upload tool.
+
+
 ## Notes / Troubleshooting
 
 - The parser normalizes message structure internally and decodes quoted-printable and base64 body content.

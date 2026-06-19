@@ -119,6 +119,18 @@ The full test covers:
 - Invalid wildcard rejection.
 - MQTT 5 Topic Alias rejection.
 
+## Packaging for Xedge
+
+This example can be packaged as an Xedge app by creating a ZIP from the app directory, so the app files are at the ZIP root. See [Xedge App Deployment](../Xedge-App-Deployment/README.md) for the detailed deployment workflow.
+
+```bash
+cd www
+zip -D -q -u -r -9 ../MQTT-Broker.zip .
+```
+
+Upload the generated ZIP with the Xedge App Upload tool.
+
+
 ## Notes and Troubleshooting
 
 - If `mako -l::www` fails with a bind error, another Mako instance may already be using ports `1883`, `1884`, or `8883`.

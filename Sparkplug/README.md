@@ -456,6 +456,23 @@ end)
 ```
 
 
+## Packaging for Xedge
+
+This directory contains multiple app roots. Package the selected app directory, not the parent directory. See [Xedge App Deployment](../Xedge-App-Deployment/README.md) for the detailed deployment workflow.
+
+```bash
+cd EoN
+zip -D -q -u -r -9 ../sparkplug-eon.zip .
+```
+
+```bash
+cd SparkplugExplorer
+zip -D -q -u -r -9 ../sparkplug-explorer.zip .
+```
+
+Upload the generated ZIP with the Xedge App Upload tool.
+
+
 ## Notes / Troubleshooting
 
 - The Sparkplug client library itself is included with Mako Server and Xedge; this directory mainly provides examples and the explorer.

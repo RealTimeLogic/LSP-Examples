@@ -42,14 +42,7 @@ Keeping that structure intact makes `require "resty.mysql"` and `require "resty.
 
 ## How to run
 
-If you want to package the reusable drivers into a BAS ZIP app, create the ZIP from the `MySQL` directory:
-
-```bash
-cd MySQL
-zip -D -q -u -r -9 ../MySQL.zip .
-```
-
-The hidden files and directories are intentionally included.
+For Xedge packaging, see [Packaging for Xedge](#packaging-for-xedge) below.
 
 To run the example pages with Mako Server:
 
@@ -187,6 +180,18 @@ end
 The recommendation from the original example still applies: study the implementation at the end of `MySQL/.lua/resty/mysql.lua` if you plan to use the persistent connection pattern in your own app.
 
 That part of the file is where the BAS-specific enhancements live, so it is the best place to compare the original OpenResty driver design with the additional persistent-connection support added for this example.
+
+## Packaging for Xedge
+
+The reusable Xedge package in this directory is the `MySQL` driver bundle. See [Xedge App Deployment](../Xedge-App-Deployment/README.md) for the detailed deployment workflow.
+
+```bash
+cd MySQL
+zip -D -q -u -r -9 ../MySQL.zip .
+```
+
+Upload the generated ZIP with the Xedge App Upload tool.
+
 
 ## Notes / Troubleshooting
 

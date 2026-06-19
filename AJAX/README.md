@@ -25,6 +25,18 @@ After the server starts, open the HTTP URL printed in the Mako console. Type int
 
 When the page loads, the JavaScript in `index.lsp` attaches a `keypress` handler to the text field. Each keypress is URL-encoded and sent back to the same page with `fetch(...)` as a `POST` request. The LSP code reads the `key` field, converts the numeric key code to a printable character when possible, traces the value on the server, and replies with `response:json(...)`. The browser then appends the returned character to the output area.
 
+## Packaging for Xedge
+
+This example can be packaged as an Xedge app by creating a ZIP from the app directory, so the app files are at the ZIP root. See [Xedge App Deployment](../Xedge-App-Deployment/README.md) for the detailed deployment workflow.
+
+```bash
+cd www
+zip -D -q -u -r -9 ../AJAX.zip .
+```
+
+Upload the generated ZIP with the Xedge App Upload tool.
+
+
 ## Notes / Troubleshooting
 
 - This example is intentionally small and focused on the request/response pattern, not on production-grade input handling.

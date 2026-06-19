@@ -31,6 +31,23 @@ Run one command at a time. After the server starts, open the HTTP URL printed in
 
 The examples illustrate that the request/response command environment exists only for the lifetime of a single HTTP request, but can still be used across included or forwarded pages during that request. The `include` example keeps rendering in the same response stream, while the `forward` example transfers control to another page and stops executing the current one.
 
+## Packaging for Xedge
+
+This directory contains multiple app roots. Package the selected app directory, not the parent directory. See [Xedge App Deployment](../Xedge-App-Deployment/README.md) for the detailed deployment workflow.
+
+```bash
+cd include
+zip -D -q -u -r -9 ../command-env-include.zip .
+```
+
+```bash
+cd forward
+zip -D -q -u -r -9 ../command-env-forward.zip .
+```
+
+Upload the generated ZIP with the Xedge App Upload tool.
+
+
 ## Notes / Troubleshooting
 
 - Start only one of the two example apps at a time unless you intentionally want to compare them in separate server sessions.

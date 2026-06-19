@@ -66,6 +66,28 @@ The `semiautomatic` example shows how to call the authenticator explicitly from 
 
 One reason this example exists is that per-page authentication is easy to get wrong. When protection is handled centrally at the directory level, any new page added beneath that directory is automatically protected. When protection is handled manually, forgetting one page can create a security hole. The shared header/footer approach helps reduce that risk by making the common authentication step part of the page structure.
 
+## Packaging for Xedge
+
+This directory contains multiple app roots. Package the selected app directory, not the parent directory. See [Xedge App Deployment](../Xedge-App-Deployment/README.md) for the detailed deployment workflow.
+
+```bash
+cd root
+zip -D -q -u -r -9 ../authentication-root.zip .
+```
+
+```bash
+cd subdir
+zip -D -q -u -r -9 ../authentication-subdir.zip .
+```
+
+```bash
+cd semiautomatic
+zip -D -q -u -r -9 ../authentication-semiautomatic.zip .
+```
+
+Upload the generated ZIP with the Xedge App Upload tool.
+
+
 ## Notes / Troubleshooting
 
 - Form-based authentication is more flexible because it lets you build a custom login page, but plain HTTP form login is not secure unless you use the encrypted-password approach described here: https://realtimelogic.com/ba/doc/en/lua/lua.html#EncryptedPasswords

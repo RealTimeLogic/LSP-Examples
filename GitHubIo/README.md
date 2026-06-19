@@ -125,6 +125,18 @@ Lock-directory name used when the IO is mounted behind WebDAV. The default is `.
 - `mtime` is normalized because the GitHub contents API does not expose normal filesystem timestamps in the same way a local file system does.
 - The `lockdir` value should match the WebDAV lock-directory configuration if you combine the driver with a WebDAV server.
 
+## Packaging for Xedge
+
+This example can be packaged as an Xedge app by creating a ZIP from the app directory, so the app files are at the ZIP root. See [Xedge App Deployment](../Xedge-App-Deployment/README.md) for the detailed deployment workflow.
+
+```bash
+cd www
+zip -D -q -u -r -9 ../GitHubIo.zip .
+```
+
+Upload the generated ZIP with the Xedge App Upload tool.
+
+
 ## Notes / Troubleshooting
 
 - The shipped `.preload` intentionally stops with an error until you edit it. That prevents accidental use with placeholder credentials.

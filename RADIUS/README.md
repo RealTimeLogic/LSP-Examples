@@ -124,6 +124,18 @@ The `.preload` file does five important things:
 - creates the BAS authenticator
 - applies the authenticator to the application directory with `dir:setauth()`
 
+## Packaging for Xedge
+
+This example can be packaged as an Xedge app by creating a ZIP from the app directory, so the app files are at the ZIP root. See [Xedge App Deployment](../Xedge-App-Deployment/README.md) for the detailed deployment workflow.
+
+```bash
+cd www
+zip -D -q -u -r -9 ../RADIUS.zip .
+```
+
+Upload the generated ZIP with the Xedge App Upload tool.
+
+
 ## Notes / Troubleshooting
 
 - The shared secret in `www/.preload` must match the `secret` configured in FreeRADIUS.

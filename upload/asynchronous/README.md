@@ -31,6 +31,18 @@ After the server starts, open the HTTP URL printed in the Mako console. Select a
 
 `index.lsp` serves a regular upload form for browsers that do not use drag and drop, and it also exposes the drag-and-drop UI used by `upload.js`. Any non-`GET` request is handed to the upload object created in `.preload`, which processes the incoming upload asynchronously. That separation lets the app keep the browser UI simple while the upload directory object manages the concurrent upload workload.
 
+## Packaging for Xedge
+
+This example can be packaged as an Xedge app by creating a ZIP from the `www/` directory, so the app files are at the ZIP root. See [Xedge App Deployment](../../Xedge-App-Deployment/README.md) for the detailed deployment workflow.
+
+```bash
+cd www
+zip -D -q -u -r -9 ../upload-asynchronous.zip .
+```
+
+Upload the generated ZIP with the Xedge App Upload tool.
+
+
 ## Notes / Troubleshooting
 
 - This example is more complex than the blocking example and is best used when you truly need high upload concurrency.

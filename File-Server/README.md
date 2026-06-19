@@ -43,6 +43,18 @@ For WebDAV drive mapping guidance, see:
 
 The startup script opens a writable IO, creates a lock directory, loads the `wfs` support, and mounts a Web File Server instance at `/fs/`. It then creates a small username/password callback that authenticates `admin` / `admin`, wraps that callback in a BAS authenticator, and applies the authenticator to the mounted directory. When the app unloads, the `/fs/` mount is removed cleanly.
 
+## Packaging for Xedge
+
+This example can be packaged as an Xedge app by creating a ZIP from the app directory, so the app files are at the ZIP root. See [Xedge App Deployment](../Xedge-App-Deployment/README.md) for the detailed deployment workflow.
+
+```bash
+cd www
+zip -D -q -u -r -9 ../File-Server.zip .
+```
+
+Upload the generated ZIP with the Xedge App Upload tool.
+
+
 ## Notes / Troubleshooting
 
 - On Windows, avoid mapping `http://localhost/fs/` directly. Use a more specific path such as `http://localhost/fs/C/` to avoid recursive lookup issues.

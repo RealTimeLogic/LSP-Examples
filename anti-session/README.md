@@ -111,3 +111,15 @@ In this example, the browser carries the full workflow state, but the state is e
 - [`ba.json.encode`](https://realtimelogic.com/ba/doc/?url=lua/lua.html#json_encode)
 - [`ba.json.decode`](https://realtimelogic.com/ba/doc/?url=lua/lua.html#json_decode)
 - [`ba.datetime`](https://realtimelogic.com/ba/doc/?url=lua/lua.html#ba_datetime)
+
+## Packaging for Xedge
+
+This example can be packaged as an Xedge app by creating a ZIP from the app directory, so the app files are at the ZIP root. See [Xedge App Deployment](../Xedge-App-Deployment/README.md) for the detailed deployment workflow.
+
+```bash
+cd www
+zip -D -q -u -r -9 ../anti-session.zip .
+```
+
+Upload the generated ZIP with the Xedge App Upload tool.
+

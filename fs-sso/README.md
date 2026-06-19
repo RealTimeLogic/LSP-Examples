@@ -257,6 +257,18 @@ sso = ssoModule.init(openid, login [, log])
          + **errorMessage:** A string detailing the error, which can be presented to the user.
          + **errorCodes:** An array of [error codes](https://learn.microsoft.com/en-us/entra/identity-platform/reference-error-codes) returned by MS Entra. The index.lsp example page manages the two error codes 7000215 and 7000222 related to invalid client secret.
 
+## Packaging for Xedge
+
+This example can be packaged as an Xedge app by creating a ZIP from the app directory, so the app files are at the ZIP root. See [Xedge App Deployment](../Xedge-App-Deployment/README.md) for the detailed deployment workflow.
+
+```bash
+cd www
+zip -D -q -u -r -9 ../fs-sso.zip .
+```
+
+Upload the generated ZIP with the Xedge App Upload tool.
+
+
 ## Notes / Troubleshooting
 
 ### Redirect URI Requirements

@@ -24,6 +24,23 @@ The blocking example uses direct request-handling APIs and is a good starting po
 
 You may also want to consider the ready-to-use [Web File Manager](https://realtimelogic.com/ba/doc/?url=lua.html#ba_create_wfs), which already includes upload support. You can test that interface in the [online tutorial](https://tutorial.realtimelogic.com/fs/).
 
+## Packaging for Xedge
+
+This directory contains multiple app roots. Package the selected app directory, not the parent directory. See [Xedge App Deployment](../Xedge-App-Deployment/README.md) for the detailed deployment workflow.
+
+```bash
+cd blocking/www
+zip -D -q -u -r -9 ../../upload-blocking.zip .
+```
+
+```bash
+cd asynchronous/www
+zip -D -q -u -r -9 ../../upload-asynchronous.zip .
+```
+
+Upload the generated ZIP with the Xedge App Upload tool.
+
+
 ## Notes / Troubleshooting
 
 - Choose the blocking example first unless you specifically need high upload concurrency.

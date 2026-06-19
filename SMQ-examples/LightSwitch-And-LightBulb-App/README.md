@@ -47,6 +47,18 @@ Expected result: toggling the switch page changes the bulb page through SMQ mess
 
 The switch page publishes state changes over SMQ, and the bulb page subscribes to the same channel so it can react visually. The local `smq.lsp` file provides the broker endpoint when you want to test the entire flow on your own machine instead of against the hosted test service.
 
+## Packaging for Xedge
+
+This example can be packaged as an Xedge app by creating a ZIP from the `www/` directory, so the app files are at the ZIP root. See [Xedge App Deployment](../../Xedge-App-Deployment/README.md) for the detailed deployment workflow.
+
+```bash
+cd www
+zip -D -q -u -r -9 ../smq-light-switch.zip .
+```
+
+Upload the generated ZIP with the Xedge App Upload tool.
+
+
 ## Notes / Troubleshooting
 
 - SMQ documentation: https://realtimelogic.com/ba/doc/?url=SMQ.html

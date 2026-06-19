@@ -116,6 +116,18 @@ If you need to send very large payloads, use LSP pages or the [REST plugin](http
 
 - [REST / AJAX / RPC over WebSockets](../../AJAX-Over-WebSockets/README.md)
 
+## Packaging for Xedge
+
+This example can be packaged as an Xedge app by creating a ZIP from the `www/` directory, so the app files are at the ZIP root. See [Xedge App Deployment](../../Xedge-App-Deployment/README.md) for the detailed deployment workflow.
+
+```bash
+cd www
+zip -D -q -u -r -9 ../smq-rpc.zip .
+```
+
+Upload the generated ZIP with the Xedge App Upload tool.
+
+
 ## Notes / Troubleshooting
 
 - If the SMQ connection closes, make sure your client calls the library's disconnect handling so pending RPC Promises do not hang.

@@ -33,6 +33,18 @@ After the server starts, open the HTTP URL printed in the Mako console. The land
 
 The `www` app acts as a small example hub. Each LSP page or subdirectory exercises a different part of the BAS socket APIs, so you can inspect the server-side code in isolation without having to build a larger application around it first.
 
+## Packaging for Xedge
+
+This example can be packaged as an Xedge app by creating a ZIP from the app directory, so the app files are at the ZIP root. See [Xedge App Deployment](../Xedge-App-Deployment/README.md) for the detailed deployment workflow.
+
+```bash
+cd www
+zip -D -q -u -r -9 ../socket-examples.zip .
+```
+
+Upload the generated ZIP with the Xedge App Upload tool.
+
+
 ## Notes / Troubleshooting
 
 - Some examples are blocking by design and are best run on a thread-enabled server such as Mako.
