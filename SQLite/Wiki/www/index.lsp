@@ -1,5 +1,10 @@
 <html>
+<head>
+  <title>Wiki Index</title>
+  <link rel="stylesheet" href="style.css">
+</head>
 <body>
+<main>
 
 <h1>Wiki Index</h1>
 <?lsp
@@ -25,5 +30,6 @@ end
 
 ?>
 
+</main>
 </body>
 </html>

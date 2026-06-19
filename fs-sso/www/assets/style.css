@@ -1,0 +1,96 @@
+html {
+  color-scheme: dark;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: #1e1f22;
+  color: #d7dbd8;
+  font-family: Arial, Helvetica, sans-serif;
+  line-height: 1.55;
+}
+
+a {
+  color: #69c575;
+}
+
+a:hover,
+a:focus {
+  color: #8ddc96;
+}
+
+.container {
+  max-width: 860px;
+  padding-top: 48px;
+  padding-bottom: 48px;
+}
+
+.jumbotron {
+  background: #2d2f34;
+  border: 1px solid #454856;
+  border-radius: 8px;
+  color: #d7dbd8;
+  padding: 32px;
+}
+
+.display-4 {
+  color: #f2f4f3;
+  font-size: 2rem;
+  line-height: 1.2;
+  margin-bottom: 1rem;
+}
+
+.lead {
+  color: #d7dbd8;
+}
+
+.btn-primary {
+  background: #69c575;
+  border-color: #69c575;
+  color: #111512;
+  font-weight: 700;
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+  background: #8ddc96;
+  border-color: #8ddc96;
+  color: #111512;
+}
+
+.alert {
+  border-radius: 8px;
+}
+
+.alert-primary {
+  background: #253329;
+  border-color: #4b7651;
+  color: #d7dbd8;
+}
+
+.alert-danger {
+  background: #3a2828;
+  border-color: #8f5757;
+  color: #f3dddd;
+}
+
+.alert-light {
+  background: #252526;
+  border-color: #454856;
+  color: #d7dbd8;
+  overflow-wrap: anywhere;
+}
+
+.form-control {
+  background: #252526;
+  border: 1px solid #454856;
+  color: #f2f4f3;
+}
+
+.form-control:focus {
+  background: #252526;
+  border-color: #69c575;
+  box-shadow: 0 0 0 0.2rem rgba(105, 197, 117, 0.2);
+  color: #f2f4f3;
+}

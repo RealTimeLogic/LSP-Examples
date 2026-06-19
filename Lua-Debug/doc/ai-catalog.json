@@ -1,0 +1,42 @@
+{
+  "name": "Lua Debug",
+  "path": "Lua-Debug",
+  "summary": "Mako Server Lua/LSP debugging tutorial companion for Visual Studio Code and the BAS debug monitor, with a primary debug target app and helper FileServer app for remote source mapping.",
+  "compatibility": [
+    "mako"
+  ],
+  "run": [
+    "cd Lua-Debug",
+    "mako -l::www",
+    "mako -l::FileServer"
+  ],
+  "topics": [
+    "debugging",
+    "Visual Studio Code",
+    "Lua Debug",
+    "debug monitor",
+    "source maps",
+    "Lua Server Pages",
+    "Mako Server"
+  ],
+  "notes": [
+    "As written this is Mako Server focused. It can be adapted by AI to an Xedge-oriented debugging workflow, but requires changes to debug monitor startup, app loading, restart behavior, and source mapping."
+  ],
+  "use_when": [
+    "The user wants to debug Lua or LSP code with VS Code and Mako Server.",
+    "The user wants to understand source mapping and debug monitor setup.",
+    "The user wants a starting point for adapting Mako debugging concepts to Xedge."
+  ],
+  "avoid_when": [
+    "The user wants an app feature example rather than debugger workflow.",
+    "The user wants generic Xedge deployment with no Mako debug monitor assumptions.",
+    "The user wants browser-only JavaScript debugging."
+  ],
+  "read_next": [
+    "AGENTS.md",
+    "README.md",
+    "www/.preload",
+    "www/.vscode/launch.json",
+    "www/index.lsp"
+  ]
+}

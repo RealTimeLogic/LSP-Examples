@@ -24,13 +24,7 @@ mako -l::www
 
 For more detail on starting the Mako Server, see the [command line video tutorial](https://youtu.be/vwQ52ZC5RRg) and the [command line options documentation](https://realtimelogic.com/ba/doc/en/Mako.html#cmdline).
 
-After the server starts, open:
-
-```text
-http://localhost:portno
-```
-
-where `portno` is the HTTP port printed in the Mako console.
+After the server starts, open the HTTP URL printed in the Mako console. `promise.html` is the easiest page to study first.
 
 ## How it works
 
@@ -57,6 +51,10 @@ Although the API is not expressed as REST-style URLs, the interaction pattern is
 - the browser updates the UI without a full reload
 
 Many real-world REST APIs are effectively RPC expressed through HTTP verbs and URLs. This example shows the same pattern implemented more directly using a persistent WebSocket channel.
+
+## See Also
+
+- [REST / AJAX / RPC over SMQ](../SMQ-examples/RPC/README.md)
 
 ## Notes / Troubleshooting
 

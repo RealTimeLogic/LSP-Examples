@@ -1,3 +1,13 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>UDP Broadcast Test</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main>
+<h1>UDP Broadcast Test</h1>
+<p>This page starts a UDP receiver and sender. Watch the Mako console for broadcast messages.</p>
 <pre>
 <?lsp
 
@@ -62,3 +72,6 @@ function sendclose() {
 };
 window.addEventListener('beforeunload', sendclose, false);
 </script>
+</main>
+</body>
+</html>

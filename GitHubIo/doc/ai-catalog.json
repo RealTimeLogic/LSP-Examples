@@ -1,0 +1,42 @@
+{
+  "name": "GitHub IO",
+  "path": "GitHubIo",
+  "summary": "LuaIO-compatible GitHub repository driver that exposes GitHub contents as BAS file storage and can be mounted behind the Web File Server/WebDAV endpoint.",
+  "compatibility": [
+    "mako",
+    "xedge"
+  ],
+  "run": [
+    "cd GitHubIo",
+    "mako -l::www"
+  ],
+  "protocols": [
+    "HTTP",
+    "WebDAV",
+    "GitHub API"
+  ],
+  "topics": [
+    "LuaIO",
+    "GitHub",
+    "Web File Server",
+    "WebDAV",
+    "remote storage",
+    "xedge.auxapp"
+  ],
+  "use_when": [
+    "The user wants to expose a GitHub repository as a BAS IO.",
+    "The user wants a WebDAV/Web File Server backed by GitHub.",
+    "The user wants to adapt repository-backed storage for Xedge IDE integration."
+  ],
+  "avoid_when": [
+    "The user wants high-volume binary file storage.",
+    "The user cannot provide a GitHub repository and suitable token.",
+    "The user wants local filesystem storage without remote API rate limits."
+  ],
+  "read_next": [
+    "AGENTS.md",
+    "README.md",
+    "www/.lua/GitHubIo.lua",
+    "www/.preload"
+  ]
+}

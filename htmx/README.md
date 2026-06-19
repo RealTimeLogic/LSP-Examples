@@ -16,13 +16,13 @@ This directory currently contains the introductory example used in the tutorial 
 Start the introduction example with the Mako Server:
 
 ```bash
-cd LSP-Examples/htmx
+cd htmx
 mako -l::introduction
 ```
 
 For more detail on starting the Mako Server, see the [command line video tutorial](https://youtu.be/vwQ52ZC5RRg) and the [command line options documentation](https://realtimelogic.com/ba/doc/?url=Mako.html#loadapp).
 
-After the server starts, open `http://localhost:portno`, where `portno` is the HTTP port printed in the console.
+After the server starts, open the HTTP URL printed in the Mako console.
 
 ## How it works
 

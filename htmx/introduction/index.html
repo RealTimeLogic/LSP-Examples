@@ -2,19 +2,23 @@
 <head>
   <title>LSP + htmx Example</title>
   <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>User Directory</h1>
+  <main>
+    <h1>User Directory</h1>
+    <p>Click the button to request a server-rendered HTML fragment from <code>users.lsp</code>.</p>
 
-  <button 
-    hx-get="/users.lsp" 
-    hx-target="#userList" 
-    hx-swap="innerHTML">
-    Load Users
-  </button>
+    <button
+      hx-get="/users.lsp"
+      hx-target="#userList"
+      hx-swap="innerHTML">
+      Load Users
+    </button>
 
-  <div id="userList">
-    <!-- User list will load here -->
-  </div>
+    <div id="userList">
+      User list will load here.
+    </div>
+  </main>
 </body>
 </html>

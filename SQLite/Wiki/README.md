@@ -22,13 +22,13 @@ mako -l::www
 
 For more detail on starting the Mako Server, see the [command line video tutorial](https://youtu.be/vwQ52ZC5RRg) and the [command line options documentation](https://realtimelogic.com/ba/doc/?url=Mako.html#loadapp).
 
-After the server starts, open `http://localhost:portno`, where `portno` is the HTTP port printed in the console.
+After the server starts, open the HTTP URL printed in the Mako console.
 
 ## How it works
 
 The wiki index page reads the stored entries from SQLite and renders them as links. When you navigate to a URL that does not yet exist, the directory-function logic can route that request into the create flow instead of returning a plain 404. Existing pages can later be updated through the modify flow.
 
-To create a page, enter a URL that does not already exist, such as `http://localhost/my-page`, type some text, and submit the form. The main wiki index at `http://localhost` shows the list of created pages.
+To create a page, enter a path that does not already exist, such as `/my-page` on the same server, type some text, and submit the form. The main wiki index shows the list of created pages.
 
 ## Notes / Troubleshooting
 

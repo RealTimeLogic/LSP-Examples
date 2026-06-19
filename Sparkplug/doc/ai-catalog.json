@@ -1,0 +1,48 @@
+{
+  "name": "Sparkplug",
+  "path": "Sparkplug",
+  "summary": "Demonstrates MQTT Sparkplug B with an Edge of Network node example and a Sparkplug Explorer that subscribes to and decodes Sparkplug payloads.",
+  "compatibility": [
+    "mako",
+    "xedge"
+  ],
+  "run": [
+    "cd Sparkplug",
+    "mako -l::SparkplugExplorer",
+    "mako -l::EoN"
+  ],
+  "use_when": [
+    "The user wants to work with MQTT Sparkplug B in BAS, Mako Server, or Xedge.",
+    "The user wants examples of Sparkplug birth, data, command, and state flows."
+  ],
+  "avoid_when": [
+    "The user needs plain MQTT without Sparkplug topic and payload rules.",
+    "The target cannot reach the configured MQTT broker."
+  ],
+  "read_next": [
+    "AGENTS.md",
+    "README.md",
+    "EoN/.preload",
+    "SparkplugExplorer/.preload"
+  ],
+  "protocols": [
+    "MQTT",
+    "Sparkplug B",
+    "Protocol Buffers"
+  ],
+  "variants": {
+    "EoN": "Edge of Network node example that publishes Sparkplug birth and data messages.",
+    "SparkplugExplorer": "MQTT Sparkplug explorer that subscribes to wildcard topics and decodes payloads."
+  },
+  "topics": [
+    "Sparkplug client",
+    "MQTT subscription",
+    "NBIRTH",
+    "NDATA",
+    "NCMD",
+    "DCMD"
+  ],
+  "notes": [
+    "Broker settings and credentials in the demo files must be reviewed before production use."
+  ]
+}

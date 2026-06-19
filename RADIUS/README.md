@@ -55,13 +55,13 @@ sudo freeradius -X
 5. Start the BAS example:
 
 ```bash
-cd LSP-Examples/RADIUS
+cd RADIUS
 mako -l::www
 ```
 
 For more detail on starting the Mako Server, see the [command line video tutorial](https://youtu.be/vwQ52ZC5RRg) and the [command line options documentation](https://realtimelogic.com/ba/doc/en/Mako.html#loadapp).
 
-Then open `http://localhost` and log in with:
+Then open the HTTP URL printed in the Mako console and log in with:
 
 - Username: `testuser`
 - Password: `testpass`
@@ -71,6 +71,8 @@ HTTP Basic authentication is also supported. You can test it with:
 ```bash
 curl -i -u "testuser:testpass" http://localhost
 ```
+
+If Mako selected a non-default port, include that port in the `curl` URL.
 
 ## How it works
 

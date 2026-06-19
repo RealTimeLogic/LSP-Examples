@@ -1,0 +1,45 @@
+{
+  "name": "File Server SSO",
+  "path": "fs-sso",
+  "summary": "Microsoft Entra ID OpenID Connect SSO example that protects a BAS Web File Server/WebDAV endpoint and provides session URLs for non-browser WebDAV clients.",
+  "compatibility": [
+    "mako",
+    "xedge"
+  ],
+  "run": [
+    "cd fs-sso",
+    "mako -l::www"
+  ],
+  "protocols": [
+    "HTTP",
+    "OpenID Connect",
+    "WebDAV"
+  ],
+  "topics": [
+    "SSO",
+    "Microsoft Entra ID",
+    "OAuth2",
+    "OpenID Connect",
+    "JWT",
+    "Web File Server",
+    "session URL",
+    "authentication"
+  ],
+  "use_when": [
+    "The user wants Microsoft Entra ID SSO for a BAS application.",
+    "The user wants to protect a Web File Server with SSO.",
+    "The user needs session URL behavior for WebDAV clients that cannot perform browser login."
+  ],
+  "avoid_when": [
+    "The user wants simple username/password authentication.",
+    "The user wants WebAuthn, RADIUS, or local JSON-user authentication.",
+    "The user wants Xedge deployment without replacing mako.conf secret storage and validating HTTPS/origin settings."
+  ],
+  "read_next": [
+    "AGENTS.md",
+    "README.md",
+    "www/.preload",
+    "www/.lua/ms-sso.lua",
+    "www/index.lsp"
+  ]
+}

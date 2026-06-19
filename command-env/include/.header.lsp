@@ -1,10 +1,13 @@
 <html>
-<header>
+<head>
 <title><?lsp=title?>
 </title>
-</header>
+<link rel="stylesheet" href="style.css">
+</head>
 <body>
-<a href="page1.lsp">Page 1</a>
-<a href="page2.lsp">Page 2</a>
+<main>
+<nav>
+  <a href="page1.lsp">Page 1</a>
+  <a href="page2.lsp">Page 2</a>
+</nav>
 <h1><?lsp=title?></h1>
-

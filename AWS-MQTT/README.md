@@ -30,6 +30,8 @@ mako -l::www
 
 For more detail on starting the Mako Server, see the [command line video tutorial](https://youtu.be/vwQ52ZC5RRg) and the [command line options documentation](https://realtimelogic.com/ba/doc/?url=Mako.html#loadapp).
 
+Expected result: the Mako console should report a successful MQTT connection, subscriptions to `topic_1` and `topic_2`, and periodic JSON publishes to `topic_1`.
+
 ## How it works
 
 The startup script creates a certificate store, loads the Amazon root CA and the device certificate/key pair, and builds a SharkSSL object for the AWS mutual TLS handshake. It then creates an MQTT client configured for port `443` with `alpn = "x-amzn-mqtt-ca"`. When the connection succeeds, the script subscribes to `topic_1` and `topic_2`, starts a timer, and publishes a JSON message to `topic_1` once per second. Incoming published data is decoded from JSON and printed to the trace output.

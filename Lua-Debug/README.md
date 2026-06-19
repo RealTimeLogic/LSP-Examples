@@ -72,9 +72,9 @@ as Lua scripts, perform the following steps:
 
 The Mako Server will be idle after you have run through the initial
 Lua startup code using VS. When the server idles, click the pause
-button in VS, open a browser, and navigate to http://localhost. VS
-will then halt the LSP page at the top of the file. See the comments
-in index.lsp for additional debugging tips.
+button in VS, open a browser, and navigate to the HTTP URL printed in
+the Mako console. VS will then halt the LSP page at the top of the
+file. See the comments in index.lsp for additional debugging tips.
 
 ### Editing and restarting the debug sessions
 

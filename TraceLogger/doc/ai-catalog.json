@@ -1,0 +1,19 @@
+{
+  "name": "TraceLogger",
+  "path": "TraceLogger",
+  "summary": "Mako Server TraceLogger client that connects to another BAS-enabled device and forwards the remote trace stream to the local console or log.",
+  "compatibility": ["mako"],
+  "run": ["cd TraceLogger", "mako -l::www"],
+  "use_when": [
+    "The user wants to monitor trace output from another BAS-enabled device using a local Mako Server process.",
+    "The user wants to study the TraceLogger service protocol, HTTP client upgrade, and socket receive loop."
+  ],
+  "avoid_when": [
+    "The user needs a generic Xedge application without Mako configuration and local console/log assumptions.",
+    "The user needs a browser-only TraceLogger UI without a Lua trace-forwarding client."
+  ],
+  "read_next": ["AGENTS.md", "README.md", "mako.conf", "www/.preload", "www/index.lsp"],
+  "protocols": ["HTTP", "WebSocket"],
+  "topics": ["TraceLogger", "Mako configuration", "HTTP client", "socket events", "remote diagnostics"],
+  "notes": ["Set trpeer in mako.conf before running; localhost is intentionally rejected."]
+}

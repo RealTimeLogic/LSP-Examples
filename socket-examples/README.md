@@ -27,7 +27,7 @@ mako -l::www
 
 For more detail on starting the Mako Server, see the [command line video tutorial](https://youtu.be/vwQ52ZC5RRg) and the [command line options documentation](https://realtimelogic.com/ba/doc/?url=Mako.html#loadapp).
 
-After the server starts, open `http://localhost:portno`.
+After the server starts, open the HTTP URL printed in the Mako console. The landing page links to each socket and WebSocket example.
 
 ## How it works
 

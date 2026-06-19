@@ -22,9 +22,9 @@ For more detail on starting the Mako Server, see the [command line video tutoria
 
 After the server starts:
 
-1. Open `http://localhost`.
+1. Open the HTTP URL printed in the Mako console.
 2. The database starts out empty. Enter data and submit the form to insert rows.
-3. To automate insertion, open `http://localhost?auto=`.
+3. To automate insertion, add `?auto=` to the same URL.
 4. The browser-side JavaScript then begins posting new data automatically as soon as the page loads.
 
 ## How it works

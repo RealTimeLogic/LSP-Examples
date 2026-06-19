@@ -10,6 +10,7 @@ If you are new to Lua, start with the [online Lua tutorial](https://tutorial.rea
 
 - [AGENTS.md](AGENTS.md) - Guidance for AI-assisted work in this repository.
 - [Basic HTML form](html-form) - Source code for the tutorial [HTML Forms and LSP for Beginners](https://makoserver.net/articles/HTML-Forms-and-LSP-for-Beginners).
+- [Anti-Session](anti-session) - Shows how to carry a browser state through multiple pages without using a server session.
 - [Authentication: General](authentication) - Introduction to the Barracuda App Server authentication mechanism.
 - [Authentication and Authorization](JSON-File-Server) - Use of the [JSON Authenticator](https://realtimelogic.com/ba/doc/en/lua/lua.html#ba_create_jsonuser) with a file server.
 - [Authentication: OAuth 2.0](oauth) - Example showing GitHub OAuth 2.0 access.

@@ -36,12 +36,12 @@ mako -l::www
 
 For more detail on starting the Mako Server, see the [command line video tutorial](https://youtu.be/vwQ52ZC5RRg) and the [command line options documentation](https://realtimelogic.com/ba/doc/?url=Mako.html#loadapp).
 
-After the server starts, open `http://localhost:portno`, where `portno` is the HTTP port shown in the console. You should be redirected to `http://localhost/cgi/sh.cgi`.
+After the server starts, open the HTTP URL printed in the Mako console. You should be redirected to `/cgi/sh.cgi`.
 
 To test the Python CGI script directly, open:
 
 ```text
-http://localhost/cgi/python.cgi?textcontent=Hello%20World
+/cgi/python.cgi?textcontent=Hello%20World
 ```
 
 ## How it works

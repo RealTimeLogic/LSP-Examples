@@ -1,0 +1,51 @@
+{
+  "name": "Light Dashboard",
+  "path": "Light-Dashboard",
+  "summary": "Three database-free embedded dashboard UI variants for Mako Server and Xedge. Designed for small embedded targets such as routers, gateways, RTOS devices, and firmware-backed products.",
+  "compatibility": [
+    "mako",
+    "xedge"
+  ],
+  "variants": {
+    "www": "Server-rendered dashboard using Pure.css.",
+    "htmx": "HTMX dashboard using Pure.css and fragment navigation.",
+    "custom": "HTMX dashboard using custom CSS, two-level navigation, CMS-level SMQ, page scopes, and page-scoped SMQ RPC."
+  },
+  "default_variant": "custom",
+  "run": [
+    "mako -l::custom",
+    "mako -l::htmx",
+    "mako -l::www"
+  ],
+  "use_when": [
+    "The user wants a ready-to-run embedded dashboard UI.",
+    "The user wants a small database-free CMS-style page and menu system.",
+    "The user wants an HTMX dashboard that behaves like an SPA without a SPA framework.",
+    "The user wants full-page fallback when JavaScript is disabled or direct URLs are loaded.",
+    "The user wants persistent SMQ behavior across HTMX page fragments.",
+    "The user wants page-scoped SMQ subscriptions, cleanup, or RPC over SMQ.",
+    "The user wants an example that can run under Mako Server or be packaged for Xedge."
+  ],
+  "avoid_when": [
+    "The user wants a database-driven CMS for larger Embedded Linux or QNX systems.",
+    "The user wants a generic REST API example without dashboard UI.",
+    "The user wants low-level SMQ protocol examples without the dashboard/CMS layer."
+  ],
+  "read_next": [
+    "AGENTS.md",
+    "README.md",
+    "doc/custom-skill.md",
+    "doc/custom-design.md"
+  ],
+  "topics": [
+    "dashboard",
+    "embedded-ui",
+    "database-free",
+    "cms",
+    "htmx",
+    "smq",
+    "rpc",
+    "Barracuda App Server",
+    "rtos"
+  ]
+}

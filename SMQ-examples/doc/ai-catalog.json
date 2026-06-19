@@ -1,0 +1,48 @@
+{
+  "name": "SMQ-examples",
+  "path": "SMQ-examples",
+  "summary": "Index of Simple Message Queue examples covering direct messaging, RPC over SMQ, IoT chat and LED control, browser switch/bulb demos, multiplayer game variants, and a Mako-specific cluster experiment.",
+  "compatibility": [
+    "mako",
+    "xedge"
+  ],
+  "use_when": [
+    "The user wants examples of SMQ publish/subscribe, one-to-one messaging, or browser/device communication.",
+    "The user wants to build an embedded real-time UI using SMQ."
+  ],
+  "avoid_when": [
+    "The user needs a single self-contained app with one startup command for the entire directory.",
+    "The user needs generic WebSocket examples unrelated to SMQ."
+  ],
+  "read_next": [
+    "AGENTS.md",
+    "README.md",
+    "one2one/README.md",
+    "RPC/README.md",
+    "IoT/README.md",
+    "BlobArena/README.md"
+  ],
+  "protocols": [
+    "SMQ",
+    "WebSocket",
+    "JSON"
+  ],
+  "variants": {
+    "BlobArena": "AI-generated multiplayer browser game variants using SMQ.",
+    "one2one": "Basic direct browser-to-server SMQ messaging.",
+    "RPC": "Promise-style browser RPC over SMQ with Lua server dispatch.",
+    "LightSwitch-And-LightBulb-App": "Browser switch and bulb pages communicating through SMQ.",
+    "IoT": "Chat and LED-control tutorial examples.",
+    "cluster": "Mako-specific local multi-node cluster simulation."
+  },
+  "topics": [
+    "publish subscribe",
+    "RPC",
+    "IoT UI",
+    "browser messaging",
+    "multiplayer game"
+  ],
+  "notes": [
+    "The cluster subexample is Mako-specific as written and should not be treated as generic Xedge code."
+  ]
+}

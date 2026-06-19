@@ -1,0 +1,53 @@
+{
+  "name": "MinnowSim",
+  "path": "MinnowSim",
+  "summary": "Server-side simulated device backend for the Minnow SPA tutorial. It requires the separate RealTimeLogic/MinnowServer repository for the browser SPA and must be run as a two-app Mako setup.",
+  "compatibility": [
+    "mako",
+    "xedge"
+  ],
+  "run": [
+    "mako -lminnow::MinnowServer/www -l::LSP-Examples/MinnowSim/www",
+    "mako -lminnow::../MinnowServer/www -l::MinnowSim/www"
+  ],
+  "protocols": [
+    "WebSocket",
+    "HTTP"
+  ],
+  "topics": [
+    "single page application",
+    "device simulator",
+    "WebSocket",
+    "JSONS",
+    "GPIO simulation",
+    "firmware upload",
+    "authentication"
+  ],
+  "use_when": [
+    "The user wants the backend/device side of the Minnow SPA tutorial.",
+    "The user wants a WebSocket JSON application with simulated embedded state.",
+    "The user has or is willing to clone the companion MinnowServer repository."
+  ],
+  "avoid_when": [
+    "The user expects this directory alone to serve the SPA UI.",
+    "The companion MinnowServer repository is unavailable and cannot be cloned or otherwise provided.",
+    "The user wants real ESP32 GPIO without adapting the simulator branch.",
+    "The user wants an SMQ example rather than raw WebSocket JSON messaging."
+  ],
+  "read_next": [
+    "AGENTS.md",
+    "README.md",
+    "www/.preload",
+    "www/index.lsp"
+  ],
+  "prerequisites": [
+    "The companion repository https://github.com/RealTimeLogic/MinnowServer must be available as a sibling checkout or at a known path.",
+    "If MinnowServer is missing, clone it with: git clone https://github.com/RealTimeLogic/MinnowServer",
+    "Run Mako with MinnowServer/www mounted as /minnow/ and MinnowSim/www mounted as the root app."
+  ],
+  "setup": [
+    "Recommended layout: place MinnowServer and LSP-Examples in the same parent directory.",
+    "From the common parent directory: mako -lminnow::MinnowServer/www -l::LSP-Examples/MinnowSim/www",
+    "From inside LSP-Examples with MinnowServer as a sibling: mako -lminnow::../MinnowServer/www -l::MinnowSim/www"
+  ]
+}

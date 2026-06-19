@@ -5,7 +5,7 @@ local sso=app.sso
 ------------------------------------------------------------
 local function emitLogin()
 ?>
-  <p>Login using your Microsoft Azure AD account.</p>
+  <p>Log in using your Microsoft Entra ID account.</p>
   <p class="lead">
     <a class="btn btn-primary btn-lg" href="?login=" role="button">Login</a>
   </p>
@@ -24,13 +24,13 @@ local function emitOK(payload)
    end
 ?>
 <div class="alert alert-primary" role="alert">
-  <p>Hello <?lsp=payload.preferred_username?>
+  <p>Hello <?lsp=payload.preferred_username?></p>
   <p>Navigate to the <a target="_blank" href="https://realtimelogic.com/ba/doc/en/lua/lua.html#ba_create_wfs">Web File Server</a> by clicking the button below:</p>
   <p class="lead">
     <a class="btn btn-primary btn-lg" href="fs/" role="button">File Server</a>
   </p>
   <div class="alert alert-light" role="alert">
-  Authenticated Session URL: <?lsp=request:url().."fs/"..s:id(true).."/"?>
+    Authenticated session URL: <?lsp=request:url().."fs/"..s:id(true).."/"?>
   </div>
 </div>
 <?lsp
@@ -40,7 +40,7 @@ end
 local function doIdErr(secretErr)
 ?>
 <div class="alert alert-danger" role="alert">
-   <p><p>Login failed: <?lsp=secretErr?></p>
+   <p>Login failed: <?lsp=secretErr?></p>
 </div>
 <div class="container mt-5">
   <form method="post">
@@ -112,29 +112,22 @@ end
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>SSO Example</title>
-    <!-- Bootstrap core CSS -->
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Microsoft Entra ID SSO Example</title>
     <link href="assets/style.css" rel="stylesheet">
-    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
   </head>
   <body>
-    <!-- Page Content -->
     <div class="container">
       <div class="row">
         <div class="col-lg-12">
 <div class="jumbotron" >
-  <h1 class="display-4">SSO Example</h1>
+  <h1 class="display-4">Microsoft Entra ID SSO Example</h1>
    <?lsp action() ?>
 </div>      
 
         </div>
       </div>
     </div>
-    <!-- Bootstrap core JavaScript -->
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
-    <script src="assets/service.js"></script>
   </body>
 </html>
 

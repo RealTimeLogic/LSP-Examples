@@ -1,11 +1,16 @@
 <html>
+<head>
+<title>WebSocket Echo Client</title>
+<link rel="stylesheet" href="style.css">
+</head>
 <body>
-<h1>Send WSS message to wss://ws.postman-echo.com/raw</h1>
+<main>
+<h1>WebSocket Echo Client</h1>
+<p>This page sends one message to <code>wss://ws.postman-echo.com/raw</code> and prints the echoed response.</p>
 <form>
-  <p>Echo message:
-     <input type="text" name="msg">
-     <input type="submit" value="Submit">
-  </p>
+  <p>Echo message:</p>
+  <input type="text" name="msg">
+  <input type="submit" value="Submit">
 </form>
 <?lsp
 local msg=request:data"msg"
@@ -28,6 +33,7 @@ if msg then
    end
 end
 ?>
+</main>
 </body>
 </html>
 

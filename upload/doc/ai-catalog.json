@@ -1,0 +1,22 @@
+{
+  "name": "upload",
+  "path": "upload",
+  "summary": "Two BAS file-upload examples: a simpler blocking upload flow and an asynchronous upload flow for higher concurrency, both with form and drag-and-drop browser UI.",
+  "compatibility": ["mako", "xedge"],
+  "run": ["cd upload/blocking", "mako -l::www", "cd upload/asynchronous", "mako -l::www"],
+  "use_when": [
+    "The user wants to add file or firmware upload support to a BAS web application.",
+    "The user wants to compare simple blocking upload handling with ba.create.upload-based asynchronous handling."
+  ],
+  "avoid_when": [
+    "The target does not provide writable storage for uploaded files.",
+    "The user needs a complete file manager rather than focused upload examples."
+  ],
+  "read_next": ["AGENTS.md", "README.md", "blocking/README.md", "asynchronous/README.md"],
+  "variants": {
+    "blocking": "Simpler request-driven upload example and recommended starting point.",
+    "asynchronous": "Advanced ba.create.upload-based example for higher upload concurrency."
+  },
+  "topics": ["file upload", "firmware upload UI", "LSP", "IO objects", "deferred response"],
+  "notes": ["Xedge use requires adapting writable storage paths and IO selection to the target."]
+}

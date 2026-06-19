@@ -40,8 +40,9 @@ This workspace contains a compact Lua MQTT broker for Barracuda App Server runti
 
 Run the full test suite against the TLS listener:
 
-```powershell
-python test_mqtt_broker.py --tls --port 8883 --all
+```bash
+cd MQTT-Broker
+python design/test_mqtt_broker.py --tls --port 8883 --all
 ```
 
 The full test covers:

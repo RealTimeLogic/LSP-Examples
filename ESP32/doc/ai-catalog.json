@@ -1,0 +1,55 @@
+{
+  "name": "ESP32 Xedge32 Examples",
+  "path": "ESP32",
+  "summary": "Collection of independent Xedge32 examples for ESP32-class hardware. The examples demonstrate LSP and XLua for GPIO, I2C sensors, camera capture and streaming, Wi-Fi diagnostics, ADC audio streaming, PWM servo control, MQTT, SMQ, and Mako Server simulation support.",
+  "compatibility": [
+    "Xedge32"
+  ],
+  "variants": {
+    "misc": "Independent Xedge32 scripts and pages; upload only the files needed for the selected hardware example.",
+    "simulator": "Support files for running selected Xedge32 examples in Mako Server simulation mode.",
+    "grafana": "Grafana dashboard JSON for the ESP32/MySQL weather-station tutorial."
+  },
+  "protocols": [
+    "SMQ",
+    "MQTT",
+    "WebSocket",
+    "HTTP"
+  ],
+  "targets": [
+    "ESP32",
+    "Xedge32",
+    "embedded hardware",
+    "Mako Server simulation mode"
+  ],
+  "topics": [
+    "Lua Server Pages",
+    "XLua startup scripts",
+    "GPIO",
+    "I2C",
+    "BME280",
+    "ESP32 camera",
+    "Wi-Fi diagnostics",
+    "ADC audio",
+    "PWM servo control",
+    "Grafana",
+    "hardware configuration"
+  ],
+  "use_when": [
+    "The user wants small Xedge32 examples for ESP32 hardware features.",
+    "The user wants to adapt GPIO, I2C, ADC, PWM, camera, Wi-Fi, MQTT, or SMQ code for an ESP32 board.",
+    "The user wants independent LSP or XLua files that can be uploaded selectively to an Xedge32 app.",
+    "The user wants to run selected Xedge32 examples in Mako Server simulation mode before hardware deployment.",
+    "The user wants the ESP32/MySQL weather-station Grafana dashboard asset."
+  ],
+  "avoid_when": [
+    "The user wants a normal Mako Server example that runs directly with one local app command.",
+    "The user wants a single cohesive web application where every file in the directory is deployed together.",
+    "The user wants generic browser-only examples without ESP32 or Xedge32 APIs.",
+    "The user wants production-ready board support without confirming GPIO pins, I2C pins, ADC channels, PWM settings, camera pin maps, power wiring, and MQTT settings."
+  ],
+  "read_next": [
+    "AGENTS.md",
+    "README.md"
+  ]
+}

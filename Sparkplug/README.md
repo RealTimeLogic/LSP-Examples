@@ -29,6 +29,8 @@ mako -l::SparkplugExplorer
 
 For more detail on starting the Mako Server, see the [command line video tutorial](https://youtu.be/vwQ52ZC5RRg) and the [command line options documentation](https://realtimelogic.com/ba/doc/?url=Mako.html#loadapp).
 
+Expected result: the console prints Sparkplug messages received from the configured MQTT broker. If no messages appear, confirm the broker settings at the top of `SparkplugExplorer/.preload`.
+
 ## How it works
 
 ### What is MQTT Sparkplug

@@ -1,5 +1,35 @@
 <html>
+<head>
+<title>Automatic Cluster Configuration</title>
+<style>
+body {
+  margin: 0;
+  padding: 32px;
+  background: #1e1f22;
+  color: #d7dbd8;
+  font: 16px/1.5 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+main {
+  max-width: 820px;
+  margin: 0 auto;
+  border: 1px solid #454856;
+  border-radius: 8px;
+  padding: 20px;
+  background: #2d2f34;
+}
+h1 {
+  color: #f2f4f3;
+}
+a {
+  color: #ffd12b;
+}
+li {
+  margin: 6px 0;
+}
+</style>
+</head>
 <body>
+<main>
 <h1>Automatic cluster configuration</h1>
 <ul>
 <?lsp
@@ -119,5 +149,6 @@ fp:close()
 <?lsp for _,ipaddr in pairs(list) do response:write(ipaddr,', ') end ?>
 </p>
 <?lsp end ?>
+</main>
 </body>
 </html>

@@ -56,17 +56,20 @@ end
 <head>
 <title>DB test</title>
 <script src="/rtl/jquery.js" type="text/javascript"></script>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
+<main>
 
 <h1>Add Data:</h1>
 
 <form method="POST">
-  <input style="width:100%" type="text" name="element" value=""><br>
+  <input type="text" name="element" value=""><br>
   <input type="submit" value="Submit">
 </form>
 
 <h1>DB Content:</h1>
+<div class="panel">
 <ul>
 <?lsp
 
@@ -94,6 +97,7 @@ end
 conn:close() -- Remember to close the 'read' DB connection object
 ?>
 </ul>
+</div>
 
 <?lsp if request:data"auto" then ?>
 <script>
@@ -106,5 +110,6 @@ $(function() {
 </script>
 <?lsp end ?>
 
+</main>
 </body>
 </html>

@@ -1,0 +1,43 @@
+{
+  "name": "JSON File Server",
+  "path": "JSON-File-Server",
+  "summary": "Authentication and authorization example using a BAS JSON user database, ACL authorizer constraints, Digest authentication, request:login, and a protected Web File Server/WebDAV endpoint.",
+  "compatibility": [
+    "mako",
+    "xedge"
+  ],
+  "run": [
+    "cd JSON-File-Server",
+    "mako -l::www"
+  ],
+  "protocols": [
+    "HTTP",
+    "WebDAV"
+  ],
+  "topics": [
+    "authentication",
+    "authorization",
+    "JSON user database",
+    "ACL",
+    "Digest authentication",
+    "request:login",
+    "Web File Server"
+  ],
+  "use_when": [
+    "The user wants JSON-backed BAS authentication and authorization.",
+    "The user wants file-server access control by user, role, path, and method.",
+    "The user wants to test request:login with an authorizer."
+  ],
+  "avoid_when": [
+    "The user wants OAuth, SSO, WebAuthn, or external identity providers.",
+    "The user wants encrypted file storage; use CryptoIO.",
+    "The user wants a production credential store without replacing demo users."
+  ],
+  "read_next": [
+    "AGENTS.md",
+    "README.md",
+    "www/.preload",
+    "www/index.lsp",
+    "mako.conf"
+  ]
+}

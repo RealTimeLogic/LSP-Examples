@@ -1,3 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Redis Driver Test</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main>
+<h1>Redis Driver Test</h1>
+<p>This page runs the Redis driver test against the local Redis server configured in the example.</p>
 <pre>
 <?lsp
 
@@ -80,4 +91,7 @@ ba.socket.event(redisTest)
 
 ?>
 </pre>
+</main>
+</body>
+</html>
 

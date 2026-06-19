@@ -1,0 +1,38 @@
+{
+  "name": "CGI",
+  "path": "CGI",
+  "summary": "Lua CGI adapter for Mako Server-style deployments using the forkpty plugin and external CGI scripts. It mounts a CGI directory into the BAS virtual file system and translates requests into CGI process execution.",
+  "compatibility": [
+    "mako"
+  ],
+  "run": [
+    "mkdir -p /tmp/cgi-test/",
+    "cp scripts/* /tmp/cgi-test/",
+    "chmod +x /tmp/cgi-test/*",
+    "cd CGI",
+    "mako -l::www"
+  ],
+  "topics": [
+    "CGI",
+    "forkpty",
+    "virtual file system",
+    "external processes",
+    "Lua Server Pages"
+  ],
+  "use_when": [
+    "The user wants to study or modify a CGI compatibility layer for BAS/Mako.",
+    "The user needs to run external shell or Python CGI scripts behind a BAS directory.",
+    "The user is working on Linux, macOS, or QNX-like environments with forkpty support."
+  ],
+  "avoid_when": [
+    "The user wants generic Xedge deployment.",
+    "The user wants an embedded target without external process execution.",
+    "The user wants a pure LSP/Lua server-side implementation without CGI scripts."
+  ],
+  "read_next": [
+    "AGENTS.md",
+    "README.md",
+    "www/.preload",
+    "www/.lua/cgi.lua"
+  ]
+}

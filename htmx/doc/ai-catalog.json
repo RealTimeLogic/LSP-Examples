@@ -1,0 +1,41 @@
+{
+  "name": "htmx Examples",
+  "path": "htmx",
+  "summary": "Introductory htmx plus LSP example where the browser requests a server-rendered HTML fragment and swaps it into the page.",
+  "compatibility": [
+    "mako",
+    "xedge"
+  ],
+  "variants": {
+    "introduction": "Basic htmx example using hx-get to load an LSP-generated user list fragment."
+  },
+  "run": [
+    "cd htmx",
+    "mako -l::introduction"
+  ],
+  "protocols": [
+    "HTTP"
+  ],
+  "topics": [
+    "htmx",
+    "Lua Server Pages",
+    "server-rendered HTML",
+    "HTML fragments"
+  ],
+  "use_when": [
+    "The user wants a small htmx and LSP example.",
+    "The user wants server-rendered HTML fragments instead of JSON.",
+    "The user wants a lightweight alternative to SPA frameworks."
+  ],
+  "avoid_when": [
+    "The user wants a complete dashboard; use Light-Dashboard.",
+    "The user wants WebSocket or SMQ updates.",
+    "The user wants a JSON REST API example."
+  ],
+  "read_next": [
+    "AGENTS.md",
+    "README.md",
+    "introduction/index.html",
+    "introduction/users.lsp"
+  ]
+}

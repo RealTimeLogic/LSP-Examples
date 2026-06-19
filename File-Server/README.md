@@ -28,9 +28,7 @@ For more detail on startup options, see the [Mako command line video](https://yo
 
 Then open:
 
-- `http://localhost:portno/fs/`
-
-where `portno` is the HTTP port printed by the server.
+- the HTTP URL printed by the Mako console with `/fs/` appended
 
 Login credentials:
 

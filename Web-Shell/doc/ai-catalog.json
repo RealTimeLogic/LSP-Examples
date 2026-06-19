@@ -1,0 +1,21 @@
+{
+  "name": "Web-Shell",
+  "path": "Web-Shell",
+  "summary": "Linux-oriented browser shell that uses ba.forkpty for a server-side pseudo-terminal and SMQ plus xterm.js for the browser terminal UI.",
+  "compatibility": ["mako"],
+  "run": ["cd Web-Shell", "mako -l::www"],
+  "use_when": [
+    "The user wants to study ba.forkpty, PTY lifecycle handling, and browser terminal integration.",
+    "The user wants a Linux web shell example that bridges terminal input and output over SMQ."
+  ],
+  "avoid_when": [
+    "The target does not include ba.forkpty or a Linux-style shell.",
+    "The user needs a safe production remote shell without a full authentication and authorization design.",
+    "The user needs a generic Xedge-compatible example."
+  ],
+  "read_next": ["AGENTS.md", "README.md", "www/.preload", "www/index.lsp"],
+  "protocols": ["SMQ", "WebSocket"],
+  "targets": ["Linux"],
+  "topics": ["web shell", "ba.forkpty", "PTY", "xterm.js", "SMQ", "authentication"],
+  "notes": ["This example is intentionally Linux/Mako-oriented and should not be exposed without strong access control."]
+}

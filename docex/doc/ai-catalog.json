@@ -1,0 +1,35 @@
+{
+  "name": "Documentation Examples",
+  "path": "docex",
+  "summary": "Index directory for runnable examples referenced from Real Time Logic documentation. The current child example is a shopping-cart route demonstrating BAS virtual file system directory logic.",
+  "compatibility": [
+    "mako",
+    "xedge"
+  ],
+  "variants": {
+    "cart": "Shopping-cart route example using a BAS directory function and response forwarding."
+  },
+  "topics": [
+    "documentation examples",
+    "virtual file system",
+    "directory function",
+    "response:forward",
+    "Lua Server Pages"
+  ],
+  "use_when": [
+    "The user wants examples referenced from BAS documentation.",
+    "The user wants the shopping-cart VFS directory example.",
+    "The user is adding or organizing documentation companion examples."
+  ],
+  "avoid_when": [
+    "The user wants one runnable app at the docex root.",
+    "The user wants a full e-commerce cart implementation.",
+    "The user wants examples not tied to BAS documentation."
+  ],
+  "read_next": [
+    "AGENTS.md",
+    "README.md",
+    "cart/README.md",
+    "cart/www/.preload"
+  ]
+}

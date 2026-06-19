@@ -1,0 +1,38 @@
+{
+  "name": "Dynamic Navigation Menu",
+  "path": "Dynamic-Nav-Menu",
+  "summary": "Multi-page LSP application with shared dynamic navigation, custom 404 handling, and form authentication using a JSON user database with HA1 password hashes.",
+  "compatibility": [
+    "mako",
+    "xedge"
+  ],
+  "run": [
+    "cd Dynamic-Nav-Menu",
+    "mako -l::www"
+  ],
+  "topics": [
+    "navigation menu",
+    "authentication",
+    "JSON user database",
+    "HA1 hashes",
+    "custom 404",
+    "Lua Server Pages"
+  ],
+  "use_when": [
+    "The user wants a protected multi-page LSP app with shared navigation.",
+    "The user wants form authentication with hashed credentials.",
+    "The user wants custom 404 forwarding and public login assets."
+  ],
+  "avoid_when": [
+    "The user wants a client-side SPA framework.",
+    "The user wants OAuth, SSO, or WebAuthn authentication.",
+    "The user wants a database-backed user management system."
+  ],
+  "read_next": [
+    "AGENTS.md",
+    "README.md",
+    "www/.preload",
+    "www/.header.lsp",
+    "www/.login-form.lsp"
+  ]
+}

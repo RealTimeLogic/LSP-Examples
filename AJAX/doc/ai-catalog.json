@@ -1,0 +1,39 @@
+{
+  "name": "AJAX",
+  "path": "AJAX",
+  "summary": "Minimal Lua Server Pages AJAX example where one LSP page serves HTML, accepts browser POST requests from fetch, and returns JSON without a full page reload.",
+  "compatibility": [
+    "mako",
+    "xedge"
+  ],
+  "run": [
+    "cd AJAX",
+    "mako -l::www"
+  ],
+  "protocols": [
+    "HTTP"
+  ],
+  "topics": [
+    "AJAX",
+    "Lua Server Pages",
+    "fetch",
+    "JSON",
+    "request response",
+    "beginner"
+  ],
+  "use_when": [
+    "The user wants a minimal AJAX example using LSP and browser fetch.",
+    "The user wants one page that handles both HTML rendering and POST-based JSON responses.",
+    "The user wants to understand request:data and response:json in a small example."
+  ],
+  "avoid_when": [
+    "The user wants persistent WebSocket communication.",
+    "The user wants SMQ publish/subscribe or RPC over SMQ.",
+    "The user wants a larger app structure with separate routes and assets."
+  ],
+  "read_next": [
+    "AGENTS.md",
+    "README.md",
+    "www/index.lsp"
+  ]
+}

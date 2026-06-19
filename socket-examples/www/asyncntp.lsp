@@ -1,3 +1,13 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Asynchronous NTP Test</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main>
+<h1>Asynchronous NTP Test</h1>
+<p>This page uses an asynchronous socket read to query the TCP time service at <code>time.nist.gov</code>.</p>
 <pre>
 <?lsp
 local s,err = ba.socket.connect("time.nist.gov",37)
@@ -28,3 +38,6 @@ else
 end
 ?>
 </pre>
+</main>
+</body>
+</html>

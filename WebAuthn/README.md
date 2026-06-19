@@ -76,7 +76,7 @@ WebAuthn can be deployed on both **public servers** on the Internet and **privat
 3. Start the Mako Server with the following commands:
 
 ```sh
-   cd LSP-Examples/WebAuthn
+   cd WebAuthn
    mako
 ```
 
@@ -93,7 +93,7 @@ For detailed instructions on starting the Mako Server, refer to:
 ### **Accessing the Example**
 Once the Mako Server is running:
 
-- Open a browser and navigate to **`http://localhost`** or **`http://localhost:portno`**, where `portno` is the listening port printed in the console.
+- Open a browser and navigate to the HTTP URL printed in the Mako console.
 - We **recommend allowing the server to open default ports 80 and 443**, as some instructions below assume the Mako Server is listening on these port numbers.
 - Proceed by replicating the commands seen below:
   ![WebAuthn Example 1](images/example1.gif)
@@ -155,7 +155,7 @@ While **BAS WebAuthn** does **not require email-based registration**, using **em
 5. **Restart the Mako Server**
    - Hit Ctrl-C and start the server again
 6. **Register**
-   - Open a browser and navigate to **`http://localhost`**.
+   - Open a browser and navigate to the HTTP URL printed in the Mako console.
    - Register using your **email address**.
    - **Check your email** for a confirmation link.
       - If email is not configured, **copy the registration URL** printed in the console.

@@ -19,14 +19,14 @@ This example accompanies the tutorial [Using Lua to Access a PostgreSQL Database
 4. Start the example from the `PostgreSQL` directory with:
 
 ```bash
-cd LSP-Examples/PostgreSQL
+cd PostgreSQL
 mako
 ```
 
 Because the app includes a local `mako.conf`, starting Mako in this directory loads the configured PostgreSQL example automatically.
 
 5. Confirm that the console prints `DB connected: yes`.
-6. Open `http://localhost:portno`, where `portno` is the server's listening port.
+6. Open the HTTP URL printed in the Mako console.
 7. Enter data in the HTML form and click `Save Message`.
 
 ## How it works

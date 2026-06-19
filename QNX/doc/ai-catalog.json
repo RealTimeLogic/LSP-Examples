@@ -1,0 +1,38 @@
+{
+  "name": "QNX",
+  "path": "QNX",
+  "summary": "Contains QNX-specific BAS integration code, currently a PPS-to-SMQ bridge that exposes QNX Persistent Publish Subscribe messages to browser and device clients through SMQ.",
+  "compatibility": [
+    "mako",
+    "QNX"
+  ],
+  "use_when": [
+    "The user needs to bridge QNX PPS data into an SMQ-based web or device UI.",
+    "The user is working on BAS code running in a QNX environment."
+  ],
+  "avoid_when": [
+    "The user needs a standalone local Mako demo without QNX PPS.",
+    "The user needs generic Xedge compatibility."
+  ],
+  "read_next": [
+    "AGENTS.md",
+    "PPS/README.md",
+    "PPS/www/.lua/pps.lua"
+  ],
+  "variants": {
+    "PPS": "QNX Persistent Publish Subscribe bridge module that maps PPS messages to SMQ topics."
+  },
+  "protocols": [
+    "SMQ",
+    "QNX PPS"
+  ],
+  "topics": [
+    "QNX",
+    "PPS",
+    "SMQ bridge",
+    "pipe API"
+  ],
+  "notes": [
+    "This directory is platform-specific and does not contain a complete standalone web app."
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "name": "require-test",
+  "path": "require-test",
+  "summary": "Shows how a Mako Server app uses mako.createloader(io) so Lua require and dofile can load modules from the app IO tree.",
+  "compatibility": ["mako"],
+  "run": ["cd require-test", "mako -l::www"],
+  "use_when": [
+    "The user wants to understand app-local Lua module loading in Mako Server.",
+    "The user needs examples of require paths under www/.lua and nested module directories."
+  ],
+  "avoid_when": [
+    "The user needs generic Xedge module loading guidance.",
+    "The user wants an application feature example rather than loader behavior."
+  ],
+  "read_next": ["AGENTS.md", "README.md", "www/.preload", "www/index.lsp", "www/.lua/helloworld2.lua"],
+  "topics": ["Lua require", "mako.createloader", "application IO", "LSP environment"],
+  "notes": ["This example intentionally targets Mako Server loader behavior."]
+}

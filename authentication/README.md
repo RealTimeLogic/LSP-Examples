@@ -26,6 +26,7 @@ The examples are typically loaded as root applications in Mako Server, which is 
 Run the examples from the `authentication/` directory with the Mako Server:
 
 ```bash
+cd authentication
 mako -l::root
 mako -l::root digest|form
 
@@ -34,6 +35,8 @@ mako -l::subdir digest|form
 
 mako -l::semiautomatic
 ```
+
+Run one command at a time. After the server starts, open the HTTP URL printed in the Mako console and exercise the protected pages.
 
 Login credentials for all examples:
 

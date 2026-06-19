@@ -1,0 +1,18 @@
+{
+  "name": "PostgreSQL",
+  "path": "PostgreSQL",
+  "summary": "Demonstrates a persistent PostgreSQL connection helper for a Mako Server application, with database work run on a BAS thread and rendered from an LSP page.",
+  "compatibility": ["mako"],
+  "run": ["cd PostgreSQL", "mako"],
+  "use_when": [
+    "The user wants to reuse one PostgreSQL connection from a Mako Server app.",
+    "The user wants to study deferred responses and database work on BAS threads."
+  ],
+  "avoid_when": [
+    "The user needs a generic Xedge example without a native PostgreSQL binding.",
+    "The user wants a production-ready database abstraction or connection pool."
+  ],
+  "read_next": ["AGENTS.md", "README.md", "mako.conf", "www/.preload", "www/.lua/pg.lua", "www/index.lsp"],
+  "topics": ["PostgreSQL", "LSP", "deferred response", "BAS thread", "native Lua binding"],
+  "notes": ["Requires a host-compiled pgsql.so and valid database credentials in mako.conf."]
+}

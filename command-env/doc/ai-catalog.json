@@ -1,0 +1,41 @@
+{
+  "name": "Command Environment",
+  "path": "command-env",
+  "summary": "Container with two small LSP examples demonstrating the BAS request/response command environment through response:include and response:forward behavior.",
+  "compatibility": [
+    "mako",
+    "xedge"
+  ],
+  "variants": {
+    "include": "Shared header/footer rendering using response:include.",
+    "forward": "Page control transfer and command environment behavior using response:forward."
+  },
+  "run": [
+    "cd command-env",
+    "mako -l::include",
+    "mako -l::forward"
+  ],
+  "topics": [
+    "command environment",
+    "response:include",
+    "response:forward",
+    "session",
+    "Lua Server Pages"
+  ],
+  "use_when": [
+    "The user wants to understand BAS request/response command environment lifetime.",
+    "The user wants examples of response:include or response:forward.",
+    "The user needs to compare per-request variables with session state."
+  ],
+  "avoid_when": [
+    "The user wants a single cohesive application.",
+    "The user wants authentication, database, or real-time messaging examples.",
+    "The user wants browser-only JavaScript examples."
+  ],
+  "read_next": [
+    "AGENTS.md",
+    "README.md",
+    "include/.header.lsp",
+    "forward/first.lsp"
+  ]
+}

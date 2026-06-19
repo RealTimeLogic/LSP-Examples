@@ -19,7 +19,7 @@ mako -l::www
 
 For more detail on starting the Mako Server, see the [command line video tutorial](https://youtu.be/vwQ52ZC5RRg) and the [command line options documentation](https://realtimelogic.com/ba/doc/?url=Mako.html#loadapp).
 
-After the server starts, open `http://localhost/`. Type into the input field and watch the data appear in the browser while the server prints the processed values to its console.
+After the server starts, open the HTTP URL printed in the Mako console. Type into the input field and watch the data appear in the browser while the server prints the processed values to its console.
 
 ## How it works
 

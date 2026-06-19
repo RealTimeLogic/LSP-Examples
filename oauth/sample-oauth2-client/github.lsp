@@ -41,6 +41,50 @@ end
 -- No equivalent echo so let's create one
 local function echo(msg) response:write(msg) end
 
+local function pageStart(title)
+   response:write([[
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>]], title, [[</title>
+<style>
+body {
+  margin: 0;
+  padding: 32px;
+  background: #1e1f22;
+  color: #d7dbd8;
+  font: 16px/1.5 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+main {
+  max-width: 760px;
+  margin: 0 auto;
+  border: 1px solid #454856;
+  border-radius: 8px;
+  padding: 20px;
+  background: #2d2f34;
+}
+h1, h3 {
+  color: #f2f4f3;
+}
+a {
+  color: #ffd12b;
+}
+</style>
+</head>
+<body>
+<main>
+]])
+end
+
+local function pageEnd()
+   response:write[[
+</main>
+</body>
+</html>
+]]
+end
+
 -- This helper function will make API requests to GitHub, setting
 -- the appropriate headers GitHub expects, and decoding the JSON response
 local function apiRequest(url, query)
@@ -117,16 +161,23 @@ if get.action == 'repos' then
     direction = 'desc'
   })
 
+  pageStart"GitHub Repositories"
+  echo '<h1>GitHub Repositories</h1>'
   echo '<ul>'
   for _,repo in ipairs(repos) do
      response:write('<li><a href="',repo.html_url, '">',repo.name,'</a></li>')
   end
   echo '</ul>'
+  echo '<p><a href="?action=logout">Log Out</a></p>'
+  pageEnd()
+  response:abort()
 end
 
 -- If there is an access token in the session
 -- the user is already logged in
 if not get.action then
+  pageStart"GitHub OAuth Example"
+  echo '<h1>GitHub OAuth Example</h1>'
   if session.access_token then
     echo '<h3>Logged In</h3>'
     echo '<p><a href="?action=repos">View Repos</a></p>'
@@ -135,6 +186,7 @@ if not get.action then
     echo '<h3>Not logged in</h3>'
     echo '<p><a href="?action=login">Log In</a></p>'
   end
+  pageEnd()
   response:abort()
 end
 
