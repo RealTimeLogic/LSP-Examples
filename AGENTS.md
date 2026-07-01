@@ -60,15 +60,19 @@ Use these consolidated files as the primary references:
 > 4. `opcuaapi.md` for OPC UA-specific APIs and integration patterns
 > 5. If guidance conflicts with API details, trust `basapi.md`
 
+## Optional AI skill references
+
+Use these public skills only when the task touches the matching area. Do not load every skill by default.
+
+- BAS VFS and routing design: https://realtimelogic.com/downloads/ai-skills/VFS-skill.md
+- Authentication, authorization, sessions, and user databases: https://realtimelogic.com/downloads/ai-skills/Authentication-Authorization-Skill.md
+- General OWASP-style security review for BAS applications: https://realtimelogic.com/downloads/ai-skills/OWASP-General-Security-Skill.md
+- SMQ architecture, topics, browser/device flows, and broker authorization: https://realtimelogic.com/downloads/ai-skills/SMQ-Skill.md
+- SQLite write serialization and dedicated-writer patterns: https://realtimelogic.com/downloads/ai-skills/SQLite-Skill.md
+
 ## SMQ (Simple Message Queue)
 
 SMQ is the built-in publish/subscribe messaging system used by the Barracuda App Server.
-
-### Detailed SMQ skill
-
-For non-trivial SMQ work, read the centralized SMQ AI skill before modifying broker setup, browser clients, topic naming, publish/subscribe flow, direct messaging, reconnect behavior, or cleanup logic:
-
-- https://realtimelogic.com/downloads/ai-skills/SMQ-Skill.md
 
 ### Official SMQ documentation
 
