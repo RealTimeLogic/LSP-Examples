@@ -13,6 +13,26 @@ This example implements a Linux-oriented browser terminal. Server-side Lua start
 
 ## Official Documentation (Source Of Truth)
 
+This `AGENTS.md` may be copied standalone into other work directories. Treat the
+local paths below as relative to the directory containing this file.
+
+Before using any public BAS, Mako, Xedge, Xedge32, OPC UA, or AI-skill URL:
+
+1. Look for a local cached copy under `./.agents/reference/rtl/`.
+2. If the file is missing and network access is available, download it from the
+   listed source URL and save it there before using it.
+3. Record the source URL and download date in `./.agents/reference/rtl/manifest.md`
+   or in a short header at the top of the cached file.
+4. Use the local cached copy for normal work.
+5. Re-fetch the public URL only when the user asks for current/latest guidance,
+   the cached file is missing, or the cached file conflicts with observed runtime
+   behavior.
+
+For fully offline use, copy this `AGENTS.md` together with the
+`./.agents/reference/rtl/` directory. If only `AGENTS.md` is copied into an
+offline directory, the cache cannot be populated until network access is
+available.
+
 Use the official Markdown documentation bundles for BAS Lua, auxiliary APIs, `ba.forkpty`, SMQ, sockets, authentication, Mako Server, and LSP. Do not invent BAS, Lua, SMQ, PTY, or authenticator APIs.
 
 - BAS API bundle: https://realtimelogic.com/downloads/basapi.md
@@ -47,6 +67,7 @@ apps={{name="", path="www"}}
 ## Key Files
 
 - `www/.preload`: checks `ba.forkpty`, discovers the user's shell, creates the SMQ broker, starts one PTY per SMQ client, forwards PTY output to the browser, writes browser input to the PTY, handles resize events, and configures authentication when available.
+
 - `www/index.lsp`: serves the terminal UI, accepts SMQ requests, connects the browser SMQ client, subscribes to PTY output, publishes input and resize messages, and initializes xterm.js.
 - `www/xterm.js` and `www/xterm.css`: local terminal rendering assets.
 

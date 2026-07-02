@@ -26,11 +26,33 @@ own `AGENTS.md`, that file is more specific and must be read before editing.
 Do not invent BAS, Lua, LSP, SMQ, Mako, Xedge, or Xedge32 APIs. Use the official
 documentation for exact names, signatures, and behavior:
 
-- BAS API bundle: https://realtimelogic.com/downloads/basapi.md
-- BAS tutorials bundle: https://realtimelogic.com/downloads/tutorials.md
-- Mako Server tutorials: https://makoserver.net/download/tutorials.md
-- Xedge32 and ESP32 API reference: https://realtimelogic.com/downloads/esp32api.md
-- OPC UA API reference: https://realtimelogic.com/downloads/opcuaapi.md
+This `AGENTS.md` may be copied standalone into other work directories. Treat the
+local paths below as relative to the directory containing this file.
+
+Before using any public BAS, Mako, Xedge, Xedge32, OPC UA, or AI-skill URL:
+
+1. Look for a local cached copy under `./.agents/reference/rtl/`.
+2. If the file is missing and network access is available, download it from the
+   listed source URL and save it there before using it.
+3. Record the source URL and download date in `./.agents/reference/rtl/manifest.md`
+   or in a short header at the top of the cached file.
+4. Use the local cached copy for normal work.
+5. Re-fetch the public URL only when the user asks for current/latest guidance,
+   the cached file is missing, or the cached file conflicts with observed runtime
+   behavior.
+
+For fully offline use, copy this `AGENTS.md` together with the
+`./.agents/reference/rtl/` directory. If only `AGENTS.md` is copied into an
+offline directory, the cache cannot be populated until network access is
+available.
+
+| Reference | Local copy | Source URL |
+| --- | --- | --- |
+| BAS API bundle | `./.agents/reference/rtl/basapi.md` | `https://realtimelogic.com/downloads/basapi.md` |
+| BAS tutorials bundle | `./.agents/reference/rtl/tutorials.md` | `https://realtimelogic.com/downloads/tutorials.md` |
+| Mako Server tutorials | `./.agents/reference/rtl/mako-tutorials.md` | `https://makoserver.net/download/tutorials.md` |
+| Xedge32 and ESP32 API reference | `./.agents/reference/rtl/esp32api.md` | `https://realtimelogic.com/downloads/esp32api.md` |
+| OPC UA API reference | `./.agents/reference/rtl/opcuaapi.md` | `https://realtimelogic.com/downloads/opcuaapi.md` |
 
 Reference priority:
 
@@ -47,17 +69,14 @@ API reference and fix the local guidance.
 
 Load only the smallest skill that matches the task:
 
-- VFS and routing: https://realtimelogic.com/downloads/ai-skills/VFS-skill.md
-- Authentication and authorization:
-  https://realtimelogic.com/downloads/ai-skills/Authentication-Authorization-Skill.md
-- General web/application security:
-  https://realtimelogic.com/downloads/ai-skills/OWASP-General-Security-Skill.md
-- SMQ real-time messaging:
-  https://realtimelogic.com/downloads/ai-skills/SMQ-Skill.md
-- SQLite write serialization:
-  https://realtimelogic.com/downloads/ai-skills/SQLite-Skill.md
-- Lua/C/C++ bindings:
-  https://realtimelogic.com/downloads/ai-skills/Lua-Binding-Skill.md
+| Skill | Local copy | Source URL |
+| --- | --- | --- |
+| VFS and routing | `./.agents/reference/rtl/VFS-skill.md` | `https://realtimelogic.com/downloads/ai-skills/VFS-skill.md` |
+| Authentication and authorization | `./.agents/reference/rtl/Authentication-Authorization-Skill.md` | `https://realtimelogic.com/downloads/ai-skills/Authentication-Authorization-Skill.md` |
+| General web/application security | `./.agents/reference/rtl/OWASP-General-Security-Skill.md` | `https://realtimelogic.com/downloads/ai-skills/OWASP-General-Security-Skill.md` |
+| SMQ real-time messaging | `./.agents/reference/rtl/SMQ-Skill.md` | `https://realtimelogic.com/downloads/ai-skills/SMQ-Skill.md` |
+| SQLite write serialization | `./.agents/reference/rtl/SQLite-Skill.md` | `https://realtimelogic.com/downloads/ai-skills/SQLite-Skill.md` |
+| Lua/C/C++ bindings | `./.agents/reference/rtl/Lua-Binding-Skill.md` | `https://realtimelogic.com/downloads/ai-skills/Lua-Binding-Skill.md` |
 
 Selection rule: routing first for URL/resource-tree work, authentication for
 identity or protected paths, security for exposure or review, SQLite for database
