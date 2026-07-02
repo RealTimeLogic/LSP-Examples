@@ -1,153 +1,88 @@
-# AGENTS.md – Barracuda App Server (Generic)
+# AGENTS.md - LSP Examples
 
 ## Purpose
-This document provides **generic guidance for working with the Barracuda App Server (BAS)** and its derivatives, such as Mako Server and Xedge, using AI-assisted development. It is **not tied to any specific application, UI template, or example project**.
 
-The goal is to help an AI (or developer) understand how to:
-- Navigate the Barracuda App Server architecture
-- Use the official Lua, LSP, JavaScript, and C/C++ APIs correctly
-- Generate correct server-side and client-side code
-- Rely on the official documentation as the source of truth
+This repository contains independent Barracuda App Server (BAS) examples. BAS is
+the embedded web/application server C code library used by Mako Server, Xedge, and Xedge32. LSP
+means Lua Server Pages.
 
----
+Use this file as the repository-level baseline. If the selected example has its
+own `AGENTS.md`, that file is more specific and must be read before editing.
 
-## AI usage guidelines
+## First Steps
 
-- This project has been validated with **Codex**, but other AI engines should also work.
-- Always point the AI to **this file (AGENTS.md)** when asking it to generate or modify code.
-- Explicitly state whether the task concerns:
-  - Server-side Lua
-  - Lua Server Pages (LSP)
-  - Client-side JavaScript
-  - SMQ messaging
-  - C or C++ integration
+- Identify the exact example or subexample before changing files.
+- Read that example's `README.md` first; it is the run and verification contract.
+- Read any local `AGENTS.md`, design note, or skill file named by the README or
+  local AGENTS file.
+- Modify only the selected example unless the user explicitly asks for
+  cross-example parity.
+- Keep the common example shape when adding or moving app files: root
+  `README.md`, runnable app files under `www/` or the variant directory named by
+  the local README.
 
-The AI **must not invent APIs**. If something is unclear, the AI should consult the consolidated BAS documentation and tutorials listed below.
+## Source Of Truth
 
----
+Do not invent BAS, Lua, LSP, SMQ, Mako, Xedge, or Xedge32 APIs. Use the official
+documentation for exact names, signatures, and behavior:
 
-## Official documentation (source of truth)
+- BAS API bundle: https://realtimelogic.com/downloads/basapi.md
+- BAS tutorials bundle: https://realtimelogic.com/downloads/tutorials.md
+- Mako Server tutorials: https://makoserver.net/download/tutorials.md
+- Xedge32 and ESP32 API reference: https://realtimelogic.com/downloads/esp32api.md
+- OPC UA API reference: https://realtimelogic.com/downloads/opcuaapi.md
 
-Use these consolidated files as the primary references:
+Reference priority:
 
-- **BAS documentation bundle (`basapi.md`)**  
-  https://realtimelogic.com/downloads/basapi.md
+1. `basapi.md` for BAS API syntax, signatures, and behavior.
+2. `tutorials.md` for BAS architecture, patterns, examples, and security guidance.
+3. Mako tutorials for Mako-specific packaging, deployment, or server behavior.
+4. `esp32api.md` for Xedge32 and ESP32-specific APIs.
+5. `opcuaapi.md` for OPC UA APIs.
 
-- **BAS tutorials bundle (`tutorials.md`)**  
-  https://realtimelogic.com/downloads/tutorials.md
+If a tutorial, example, or AI skill conflicts with the API reference, trust the
+API reference and fix the local guidance.
 
-- **Mako Server tutorials bundle (`tutorials.md`)**  
-  https://makoserver.net/download/tutorials.md
+## Optional Public Skills
 
-- **ESP32 API reference (`esp32api.md`)**  
-  https://realtimelogic.com/downloads/esp32api.md
+Load only the smallest skill that matches the task:
 
-- **OPC UA API reference (`opcuaapi.md`)**  
-  https://realtimelogic.com/downloads/opcuaapi.md
+- VFS and routing: https://realtimelogic.com/downloads/ai-skills/VFS-skill.md
+- Authentication and authorization:
+  https://realtimelogic.com/downloads/ai-skills/Authentication-Authorization-Skill.md
+- General web/application security:
+  https://realtimelogic.com/downloads/ai-skills/OWASP-General-Security-Skill.md
+- SMQ real-time messaging:
+  https://realtimelogic.com/downloads/ai-skills/SMQ-Skill.md
+- SQLite write serialization:
+  https://realtimelogic.com/downloads/ai-skills/SQLite-Skill.md
+- Lua/C/C++ bindings:
+  https://realtimelogic.com/downloads/ai-skills/Lua-Binding-Skill.md
 
-### Protocols
+Selection rule: routing first for URL/resource-tree work, authentication for
+identity or protected paths, security for exposure or review, SQLite for database
+writes, SMQ for publish/subscribe or browser/device messaging, and Lua bindings
+only for native C/C++ integration.
 
-- SMQ JS client API: https://realtimelogic.com/downloads/basapi.md
-- SMQ broker API: https://realtimelogic.com/downloads/basapi.md
-- MQTT API: https://realtimelogic.com/downloads/basapi.md
-- Modbus API: https://realtimelogic.com/downloads/basapi.md
-- OPC UA API (index): https://realtimelogic.com/downloads/opcuaapi.md
+## BAS Coding Rules
 
-> Reference priority:
-> 1. `basapi.md` for API syntax, signatures, and behavior (source of truth)
-> 2. `tutorials.md` for architecture, patterns, examples, and security guidance
-> 3. `esp32api.md` for ESP32-specific APIs and integration patterns
-> 4. `opcuaapi.md` for OPC UA-specific APIs and integration patterns
-> 5. If guidance conflicts with API details, trust `basapi.md`
+- Keep server-side Lua/LSP responsible for data sources, device/runtime logic,
+  authorization, validation, and HTTP/SMQ endpoints.
+- Keep browser JavaScript responsible for rendering and user interaction. Do not
+  embed server secrets in client code.
+- Prefer BAS-native APIs and the existing example pattern over third-party
+  frameworks.
 
-## Optional AI skill references
+## Verification
 
-Use these public skills only when the task touches the matching area. Do not load every skill by default.
+There is no single command for the whole repository. Run and test the selected
+example exactly as documented in its README, commonly:
 
-- BAS VFS and routing design: https://realtimelogic.com/downloads/ai-skills/VFS-skill.md
-- Authentication, authorization, sessions, and user databases: https://realtimelogic.com/downloads/ai-skills/Authentication-Authorization-Skill.md
-- General OWASP-style security review for BAS applications: https://realtimelogic.com/downloads/ai-skills/OWASP-General-Security-Skill.md
-- SMQ architecture, topics, browser/device flows, and broker authorization: https://realtimelogic.com/downloads/ai-skills/SMQ-Skill.md
-- SQLite write serialization and dedicated-writer patterns: https://realtimelogic.com/downloads/ai-skills/SQLite-Skill.md
+```bash
+cd path/to/example
+mako -l::www
+```
 
-## SMQ (Simple Message Queue)
-
-SMQ is the built-in publish/subscribe messaging system used by the Barracuda App Server.
-
-### Official SMQ documentation
-
-- **SMQ JavaScript API (client-side)**  
-  https://realtimelogic.com/downloads/basapi.md
-
-- **SMQ Lua API (server-side broker and publishers)**  
-  https://realtimelogic.com/downloads/basapi.md
-
-### SMQ publish signatures (Lua)
-
-- **Broadcast publish**
-  ```lua
-  smq:publish(data, "topic")
-  ```
-
-- **Direct publish (point-to-point)**
-  ```lua
-  smq:publish(data, ptid, "topic")
-  ```
-
-The AI should always follow these exact signatures.
-
----
-
-## Client–server responsibilities
-
-When generating code, the AI must clearly separate responsibilities:
-
-### Server-side (Lua / C / C++)
-- Owns data sources (sensors, state, hardware, logic)
-- Publishes data via SMQ or exposes REST/HTTP endpoints
-- Enforces authentication, authorization, and security headers
-
-### Client-side (JavaScript)
-- Subscribes to SMQ topics
-- Renders UI updates
-- Never embeds server secrets or credentials
-
----
-
-## Security considerations
-
-- Follow the **principle of least privilege** when exposing endpoints
-- Update Content Security Policy (CSP) headers when adding external scripts or styles
-- Treat authentication, TLS, and trust management as first-class design concerns
-
-The Barracuda App Server provides built-in primitives for these tasks; external frameworks are typically unnecessary.
-
----
-
-## Guidance for AI-generated code
-
-When asking an AI to generate code:
-
-- Always reference `https://realtimelogic.com/downloads/basapi.md`
-- For architecture/security/best-practice questions, also reference `https://realtimelogic.com/downloads/tutorials.md`
-- Specify whether the code targets:
-  - Embedded RTOS environments
-  - Embedded Linux
-  - Desktop or server-class systems
-- Prefer **Barracuda App Server native APIs** over third-party libraries
-- Avoid assumptions based on generic Lua, OpenResty, or browser frameworks; If uncertain or if the required API cannot be found, ask for clarification before generating any code
-
----
-
-## Final note
-
-This AGENTS.md file is intentionally **generic and reusable**.
-
-It applies to:
-- Embedded web servers
-- Edge devices
-- Industrial products
-- Secure IoT gateways
-
-Any application-specific structure, UI framework, or project layout must be documented **separately**, and the AI must ask for this documentation, if needed.
-
+For UI or SMQ examples, verify the browser workflow described by the README. For
+SMQ broker endpoints such as `smq.lsp`, a plain HTTP request may fail because the
+endpoint expects an SMQ/WebSocket handshake; test the intended client flow.
