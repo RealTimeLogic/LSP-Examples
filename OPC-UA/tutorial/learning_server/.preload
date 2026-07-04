@@ -1,0 +1,87 @@
+local ua = require("opcua.api")
+
+local endpointUrl = "opc.tcp://localhost:4850"
+local temperatureId = "ns=1;i=6001"
+local setpointId = "ns=1;i=7001"
+local controllerId = "ns=1;i=8001"
+local methodId = "ns=1;i=8002"
+
+local config = {
+  applicationName = "Mako learning server",
+  applicationUri = "urn:opcua-lua:mako-learning-server",
+  productUri = "urn:opcua-lua:mako-learning-server",
+  bufSize = 65536,
+
+  endpoints = {
+    {
+      listenPort = 4850,
+      listenAddress = "localhost",
+      endpointUrl = endpointUrl
+    }
+  },
+
+  securePolicies = {
+    {
+      securityPolicyUri = ua.SecurityPolicy.None
+    }
+  },
+
+  userIdentityTokens = {
+    {
+      policyId = "anonymous",
+      tokenType = 0
+    }
+  }
+}
+
+local server = ua.newServer(config)
+server:initialize()
+
+local editor = server.model:edit()
+local tutorial = editor:objectsFolder():addFolder("Tutorial")
+
+tutorial:addVariable("Temperature", {
+  Type = ua.VariantType.Double,
+  Value = 21.5
+}, nil, temperatureId)
+
+tutorial:addVariable("Setpoint", {
+  Type = ua.VariantType.Double,
+  Value = 24.0
+}, nil, setpointId)
+
+local controller = tutorial:addObject("Controller", nil, controllerId)
+local function scaleValue(objectId, calledMethodId, inputArguments)
+  local value = inputArguments[1].Value
+  local factor = inputArguments[2].Value
+
+  return {
+    {
+      Type = ua.VariantType.Double,
+      Value = value * factor
+    }
+  }
+end
+
+controller:addMethod(
+  "ScaleValue",
+  scaleValue,
+  {
+    {Name = "Value", DataType = ua.DataTypeId.Double},
+    {Name = "Factor", DataType = ua.DataTypeId.Double}
+  },
+  {
+    {Name = "Scaled", DataType = ua.DataTypeId.Double}
+  },
+  methodId
+)
+
+editor:save()
+
+trace("Learning server ready at " .. endpointUrl)
+server:run()
+
+function onunload()
+  trace("Stopping learning server.")
+  server:shutdown()
+end
