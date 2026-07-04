@@ -1,73 +1,83 @@
 local ua = require("opcua.api")
 
--- create server
+local io = ba.openio("home")
+mako.createloader(io)
+local common = require("pubsub_common")
+
+local broker = common.createBroker(18881)
+local dataTopic = "rtl/json/data/tutorial/server-node"
+local transportProfileUri = ua.TranportProfileUri.MqttJson
+
+local config = {
+  bufSize = 8192
+}
+
 local uaServer = ua.newServer()
 uaServer:initialize()
 
-local ObjectsFolder = "i=85"
-local int32DataValue = {
-  Type = ua.VariantType.UInt32,
-  Value = 10
-}
+local objectsFolder = "i=85"
 local request = {
-  NodesToAdd = {ua.newVariableParams(ObjectsFolder, "writeHook", int32DataValue)}
-}
-
--- Add a node
-local resp = uaServer:addNodes(request)
-local results = resp.Results
-assert(results[1].StatusCode, ua.StatusCode.Good)
-local nodeId =  results[1].AddedNodeId
-
--- Create MQTT client
-local config = {
-  bufSize = 128 -- max size of MQTT message
-}
-
-local uaMmqtt = ua.newMqttClient(config, uaServer)
-
--- Array with fields parameters.
-local fields = {
-  -- #1
-  {
-    nodeId = nodeId,   -- ID of the node whose changes will be monitored
-    name = "MqttNode", -- Field name used in JSON payloads
+  NodesToAdd = {
+    ua.newVariableParams(objectsFolder, "MqttNode", {
+      Type = ua.VariantType.UInt32,
+      Value = 10
+    })
   }
 }
 
--- create dataset with fields
-local classId = "5fa38ebb-44d2-a3ec-d251-1030c777f10a"
-uaMmqtt:createDataset(fields, classId)
+local resp = uaServer:addNodes(request)
+local nodeId = resp.Results[1].AddedNodeId
+assert(resp.Results[1].StatusCode == ua.StatusCode.Good)
 
--- Connect to MQTT broker
-local transportProfileUri = ua.TranportProfileUri.MqttJson
-local endpointUrl = "opc.mqtt://test.mosquitto.org:1883"
-uaMmqtt:connect(endpointUrl, transportProfileUri)
+local subscriber = ua.newMqttClient(config)
+local received
+common.connectLocal(subscriber, broker, transportProfileUri)
 
--- Start periodic publishing
-local dataTopic = "rtl/json/data/urn:arykovanov-note:opcua:server/group/dataset"
-uaMmqtt:startPublishing(dataTopic, "test_cyclic_publisher", 2000)
+subscriber:subscribe(dataTopic, function(message, err)
+  if err then
+    common.fail("Failed to decode MQTT JSON PubSub message: " .. tostring(err))
+  end
+  received = message
+end)
 
--- Run server.
+local publisher = ua.newMqttClient(config, uaServer)
+publisher:createDataset({
+  {
+    nodeId = nodeId,
+    name = "MqttNode"
+  }
+}, "5fa38ebb-44d2-a3ec-d251-1030c777f10a")
+
+common.connectLocal(publisher, broker, transportProfileUri)
+
 uaServer:run()
 
--- Function which will periodically write data to address space
--- Those changes will be hooked by MQTT client for publishing data.
-local writeRequest = {
+uaServer:write({
   NodesToWrite = {
     {
       NodeId = nodeId,
       AttributeId = ua.AttributeId.Value,
       Value = {
         Type = ua.VariantType.UInt32,
-        Value=123
+        Value = 123
       }
     }
   }
-}
+})
 
+publisher:publish(dataTopic, "server-node-publisher")
 
-uaServer:write(writeRequest)
+common.waitFor("server node PubSub message", function()
+  return received ~= nil
+end)
 
-uaMmqtt:stopPublishing()
+local value = received.Messages[1].Payload.MqttNode
+assert(value.Type == ua.VariantType.UInt32)
+assert(value.Value == 123)
+
+publisher:close()
+subscriber:close()
 uaServer:shutdown()
+broker:shutdown()
+
+trace("Published OPC UA server node value through local MQTT broker.")

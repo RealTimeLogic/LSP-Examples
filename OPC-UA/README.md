@@ -42,3 +42,50 @@ mako tutorial/08_method_call.lua
 ```
 
 Stop the learning server with `Ctrl+C` when done.
+
+## PubSub API Examples
+
+The examples in `pubsub/` use a local
+[MQTT broker](https://github.com/RealTimeLogic/LSP-Examples/tree/master/MQTT-Broker)
+instead of a public external broker. The easiest setup is the
+[Mako Server mako.zip Developer Edition](https://makoserver.net/documentation/developer-package/),
+which includes the broker module used by these examples.
+
+Run the examples from the `pubsub` directory:
+
+```bash
+cd pubsub
+mako mqtt_publish_node_subscribe.lua
+mako mqtt_publish_serverless.lua
+mako mqtt_subscribe.lua
+```
+
+The examples stop immediately with a clear error message if the `mqttbroker`
+module cannot be loaded. In that case, install the Developer Edition `mako.zip`
+or copy the broker from the MQTT-Broker example.
+
+## PubSub Learning Examples
+
+The PubSub tutorial examples use the Lua MQTT broker module included with the
+[Mako Server mako.zip Developer Edition](https://makoserver.net/documentation/developer-package/).
+This is the easiest way to test the examples locally because no external MQTT
+broker is required.
+
+From `LSP-Examples/OPC-UA`, run the PubSub learning examples with:
+
+```bash
+cd tutorial
+mako run_pubsub.lua
+```
+
+The examples load shared tutorial code from `tutorial/.lua/pubsub_common.lua`
+using `mako.createloader(io)` and `require()`. They stop immediately with a
+clear error message if the `mqttbroker` module cannot be loaded. In that case,
+install the Developer Edition `mako.zip` or copy the broker from
+[MQTT-Broker](https://github.com/RealTimeLogic/LSP-Examples/tree/master/MQTT-Broker).
+
+> **Warning:** The PubSub examples require an
+> [MQTT broker](https://github.com/RealTimeLogic/LSP-Examples/tree/master/MQTT-Broker).
+> The easiest test setup is the
+> [Mako Server mako.zip Developer Edition](https://makoserver.net/documentation/developer-package/),
+> which includes the broker module used by these examples.
