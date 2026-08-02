@@ -63,8 +63,7 @@ for more information.
 
 1: "uploadform" is for the standard HTTP file upload form.
 
-2: "dropbox" shows a drop image in the browser, when enabled by JS. The
-   image can be found in the wfs embedded zip file.
+2: "dropbox" shows a CSS-styled drop target when enabled by JS.
 
 3: "upload" shows the upload progress bar, when enabled by JS.
 --]]
@@ -93,7 +92,7 @@ for more information.
 
 
     <div id="dropbox">
-      <div><img src="http://realtimelogic.com/rtl/wfm/dropbox.png"/></div>
+      <div class="dropicon" aria-hidden="true">&#8679;</div>
       <p>Drag and drop to upload firmware.</p>
       <p><input id="showform" type="checkbox" /> Switch to upload form.</p>
     </div>
@@ -107,7 +106,9 @@ for more information.
         <tr>
           <td>
             <div class="progressbar">
-              <div id="progressbar" class="progressbar-completed" style="width:0;">
+              <div id="progressbar" class="progressbar-completed" style="width:0;"
+                   role="progressbar" aria-label="Upload progress"
+                   aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
                 <div>&nbsp;</div>
               </div>
             </div>

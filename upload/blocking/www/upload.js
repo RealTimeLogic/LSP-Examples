@@ -11,7 +11,10 @@ function refresh() {
 }
 
 function progressbar(percent) {
-    document.getElementById("progressbar").style.width=Math.round(percent)+"%";
+    var value=Math.round(percent);
+    var bar=document.getElementById("progressbar");
+    bar.style.width=value+"%";
+    bar.setAttribute("aria-valuenow",value);
 }
 
 function canDoDragDropUpload() {

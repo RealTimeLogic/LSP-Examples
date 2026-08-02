@@ -59,12 +59,17 @@ input[type="submit"],
   display: none;
   max-width: 360px;
   margin: 10vh auto 0;
+  padding: 28px 24px;
   text-align: center;
+  background: #2d2f34;
+  border: 2px dashed #69c575;
+  border-radius: 8px;
 }
 
-#dropbox div {
-  width: 160px;
-  margin: auto;
+.dropicon {
+  color: #69c575;
+  font-size: 72px;
+  line-height: 1;
 }
 
 #upload {
