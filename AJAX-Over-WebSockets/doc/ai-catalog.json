@@ -1,7 +1,7 @@
 {
   "name": "AJAX Over WebSockets",
   "path": "AJAX-Over-WebSockets",
-  "summary": "AJAX/RPC-style browser-to-Lua calls over a persistent WebSocket connection. The example includes a server-side LSP WebSocket endpoint and both modern Promise-based and older jQuery browser clients.",
+  "summary": "AJAX/RPC-style browser-to-Lua calls over a persistent WebSocket connection. The example includes a server-side LSP WebSocket endpoint and native callback- and Promise-based browser clients.",
   "compatibility": [
     "mako",
     "xedge"
@@ -21,12 +21,12 @@
     "Lua Server Pages",
     "JSON",
     "Promises",
-    "jQuery"
+    "native DOM APIs"
   ],
   "use_when": [
     "The user wants request-response browser calls over a persistent WebSocket transport.",
     "The user wants a small custom RPC dispatcher implemented in LSP and Lua.",
-    "The user wants to compare modern Promise-based browser code with an older jQuery implementation."
+    "The user wants to compare callback- and Promise-based native JavaScript implementations."
   ],
   "avoid_when": [
     "The user wants plain HTTP AJAX without WebSockets.",

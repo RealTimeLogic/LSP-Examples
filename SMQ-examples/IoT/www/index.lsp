@@ -22,9 +22,21 @@ published at makoserver.net.
 </p>
 
 <ul>
-  <li><a href="chat/BasicChat.html">Basic chat client</a></li>
-  <li><a href="chat/">Improved chat client</a></li>
-  <li><a href="led-control/">Device LED control</a></li>
+  <li>
+    <a href="chat/BasicChat.html">Basic chat client</a>
+    &mdash;
+    <a href="https://makoserver.net/articles/Designing-a-browser-based-Chat-Client-using-SimpleMQ">Tutorial</a>
+  </li>
+  <li>
+    <a href="chat/">Improved chat client</a>
+    &mdash;
+    <a href="https://makoserver.net/articles/Improving-the-browser-based-Chat-Client">Tutorial</a>
+  </li>
+  <li>
+    <a href="led-control/">Device LED control</a>
+    &mdash;
+    <a href="https://makoserver.net/articles/Browser-to-Device-LED-Control-using-SimpleMQ">Tutorial</a>
+  </li>
 </ul>
 
 <p>

@@ -23,7 +23,6 @@ html,body,#terminal{
     background:black;
 }
     </style>
-    <script type="text/javascript" src="/rtl/jquery.js"></script>
     <script type="text/javascript" src="/rtl/smq.js"></script> 
     <script src="xterm.js"></script>
   </head>
@@ -38,8 +37,8 @@ term.open(document.getElementById('terminal'));
 fitAddon.fit();
 
 function r() {fitAddon.fit();}
-$(function() {
-    $(window).resize(r);
+addEventListener("DOMContentLoaded", function() {
+    addEventListener("resize", r);
 
     var serverTid; // Server's ephemeral tid
 

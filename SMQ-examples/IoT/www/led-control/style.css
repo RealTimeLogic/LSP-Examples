@@ -1,200 +1,499 @@
-html,body{
-  min-height: 100%; /* real browsers */
-height: auto !important; /* real browsers */
+:root {
+  color-scheme: dark;
+  --bg: #252526;
+  --bg-deep: #1e1e1e;
+  --panel: #333;
+  --panel-soft: #2b2c2f;
+  --border: #454856;
+  --border-strong: #6a6d70;
+  --text: #d4d4d4;
+  --text-strong: #fff;
+  --text-muted: #aeb4bb;
+  --green: #69c575;
+  --yellow: #ffd12b;
+  --shadow: 0 18px 45px rgb(0 0 0 / 32%);
+  --radius: 8px;
 }
 
-body{
-  color:white;
-   font-weight:bold;
-background: rgb(0,0,0); /* Old browsers */
-background: -moz-linear-gradient(top,  rgba(0,0,0,1) 0%, rgba(69,72,77,1) 100%); /* FF3.6+ */
-background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(0,0,0,1)), color-stop(100%,rgba(69,72,77,1))); /* Chrome,Safari4+ */
-background: -webkit-linear-gradient(top,  rgba(0,0,0,1) 0%,rgba(69,72,77,1) 100%); /* Chrome10+,Safari5.1+ */
-background: -o-linear-gradient(top,  rgba(0,0,0,1) 0%,rgba(69,72,77,1) 100%); /* Opera 11.10+ */
-background: -ms-linear-gradient(top,  rgba(0,0,0,1) 0%,rgba(69,72,77,1) 100%); /* IE10+ */
-background: linear-gradient(to bottom,  rgba(0,0,0,1) 0%,rgba(69,72,77,1) 100%); /* W3C */
-filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#000000', endColorstr='#45484d',GradientType=0 ); /* IE6-9 */
+* {
+  box-sizing: border-box;
 }
 
-table div span a {
-  color:white;
- font-size:120%;
+html,
+body {
+  min-height: 100%;
 }
 
-#nav { position: relative; margin:0 30px 0 0;padding: 0px;}
+body {
+  margin: 0;
+  color: var(--text);
+  background:
+    radial-gradient(circle at 10% -10%, rgb(105 197 117 / 18%), transparent 32rem),
+    radial-gradient(circle at 110% 20%, rgb(255 209 43 / 7%), transparent 28rem),
+    var(--bg);
+  font: 600 16px/1.5 "Segoe UI", Tahoma, Arial, sans-serif;
+}
 
-#nav li {list-style-type: none;margin-bottom:5px}
+a {
+  color: var(--yellow);
+  text-decoration: none;
+}
+
+a:hover,
+a:focus {
+  text-decoration: underline;
+}
+
+.led-app {
+  width: min(1180px, calc(100vw - 32px));
+  min-height: calc(100vh - 32px);
+  margin: 16px auto;
+}
+
+.led-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 360px);
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.led-title,
+.connection-card,
+.device-pane,
+#devices > div {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.led-title {
+  padding: 24px 26px;
+}
+
+.eyebrow,
+.pane-label {
+  color: var(--green);
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+h1 {
+  margin: 8px 0 0;
+  color: var(--text-strong);
+  font-size: 34px;
+  line-height: 1.05;
+}
+
+.led-title p {
+  max-width: 620px;
+  margin: 12px 0 0;
+  color: var(--text-muted);
+}
+
+.connection-card {
+  display: flex;
+  min-height: 128px;
+  flex-direction: column;
+  justify-content: center;
+  padding: 20px;
+}
+
+.connection-card h2,
+.connection-card p {
+  margin: 0;
+}
+
+.connection-card h2 {
+  color: var(--green);
+  font-size: 22px;
+}
+
+.connection-card p {
+  margin-top: 8px;
+  color: var(--text-muted);
+}
+
+.led-layout {
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.device-pane {
+  position: sticky;
+  top: 16px;
+  padding: 16px;
+}
+
+.pane-label {
+  margin-bottom: 12px;
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+#nav {
+  margin: 0;
+  padding: 0;
+}
+
+#nav li {
+  margin-bottom: 8px;
+  list-style: none;
+}
 
 #nav a {
-
-width:100px;
-border:1px solid #5b2500;
-border-radius: 14px;font-size:14px;font-weight:bold;font-family:arial, helvetica, sans-serif; padding: 10px; text-decoration:none; display:inline-block;text-shadow: -1px -1px 0 rgba(0,0,0,0.3);font-weight:bold; color: #FFFFFF;
-
- background-color: #45484d; background-image: -webkit-gradient(linear, left top, left bottom, from(#45484d), to(#000000));
- background-image: -webkit-linear-gradient(top, #45484d, #000000);
- background-image: -moz-linear-gradient(top, #45484d, #000000);
- background-image: -ms-linear-gradient(top, #45484d, #000000);
- background-image: -o-linear-gradient(top, #45484d, #000000);
- background-image: linear-gradient(to bottom, #45484d, #000000);filter:progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#45484d, endColorstr=#000000);
-
+  position: relative;
+  display: block;
+  padding: 11px 12px;
+  color: var(--text);
+  background: var(--panel-soft);
+  border: 1px solid var(--border);
+  border-radius: 6px;
 }
 
-#nav a:hover {
-background-image: -webkit-linear-gradient(top, #2d2f32, #1a1a1a);
- background-image: -moz-linear-gradient(top, #2d2f32, #1a1a1a);
- background-image: -ms-linear-gradient(top, #2d2f32, #1a1a1a);
- background-image: -o-linear-gradient(top, #2d2f32, #1a1a1a);
- background-image: linear-gradient(to bottom, #2d2f32, #1a1a1a);filter:progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#2d2f32, endColorstr=#1a1a1a);
+#nav a:hover,
+#nav a:focus {
+  color: var(--text-strong);
+  background: #454856;
+  border-color: var(--border-strong);
+  text-decoration: none;
 }
 
 #nav a.selected {
- background-color: #933C00; background-image: -webkit-gradient(linear, left top, left bottom, from(#933C00), to(#6d0019));
- background-image: -webkit-linear-gradient(top, #933C00, #6d0019);
- background-image: -moz-linear-gradient(top, #933C00, #6d0019);
- background-image: -ms-linear-gradient(top, #933C00, #6d0019);
- background-image: -o-linear-gradient(top, #933C00, #6d0019);
- background-image: linear-gradient(to bottom, #933C00, #6d0019);filter:progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#933C00, endColorstr=#6d0019);
+  color: #102315;
+  background: var(--green);
+  border-color: var(--green);
 }
-
 
 #nav a span {
-    background: #FFFFcc; 
-    border-radius: 10px;
-    box-shadow: 5px 5px 5px #444;  
-    display:block;
-    position:absolute;
-    z-index: 999;
-    top:5px;
-    width:200px;
-    border:1px solid #ccc;
-    padding: 5px;
-    color:gray;
-    text-align:left;
-    left:150px;
-    top:20px;
-    display: none;
+  position: absolute;
+  z-index: 20;
+  top: 0;
+  left: calc(100% + 12px);
+  display: none;
+  width: 260px;
+  padding: 10px 12px;
+  color: var(--text);
+  text-align: left;
+  background: var(--panel);
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  box-shadow: var(--shadow);
 }
 
-#nav a:hover span{
-    display: block;
+#nav a:hover span {
+  display: block;
 }
 
-#nav a:focus span {
-    display: none;
+#devices {
+  min-width: 0;
 }
 
-#devices > div{display: none;}
-
-
-#nodev {
-width:300px;
-height:120px;
-margin:auto;
-position: absolute;
-  top: 0; left: 0; bottom: 0; right: 0;
-background-color: #933C00; background-image: -webkit-gradient(linear, left top, left bottom, from(#933C00), to(#6d0019));
-padding:20px;
-border-radius: 35px;
+#devices > div {
+  display: none;
+  padding: 24px;
 }
 
-#nodev h2,#nodev p { text-align:center }
-#nodev a { color:white; }
+#devices > #dev-0 {
+  display: block;
+}
 
-/* LED : http://cssdeck.com/labs/css-leds */
+#devices h2,
+#devices h3 {
+  margin: 0 0 14px;
+  color: var(--green);
+}
 
-.led-red, .led-yellow, .led-green, .led-blue, .led-off {
-margin:20px;
-    width: 25px;
-    height: 25px;
-    border-radius: 50%;
+#devices h2 {
+  margin-top: 24px;
+  font-size: 21px;
+}
+
+#devices h3 {
+  font-size: 23px;
+}
+
+#devices p {
+  margin: 0 0 14px;
+  line-height: 1.6;
+}
+
+#devices b {
+  color: var(--text-strong);
+}
+
+.simulator-card {
+  display: flex;
+  gap: 24px;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 24px;
+  padding: 18px;
+  background: var(--panel-soft);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+#devices .simulator-card h2 {
+  margin: 0 0 6px;
+}
+
+#devices .simulator-card p {
+  margin: 0;
+  color: var(--text-muted);
+}
+
+.simulator-control {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 10px;
+  align-items: center;
+}
+
+#simulator-status {
+  min-width: 90px;
+  color: var(--text-strong);
+}
+
+#devices > div > span {
+  display: block;
+  color: var(--text-strong);
+  font-size: 24px;
+  font-weight: 800;
+}
+
+.temperature {
+  margin: 8px 0 16px;
+  color: var(--text-muted);
+}
+
+.temperature span {
+  font-size: 78%;
+}
+
+#devices table {
+  width: 100%;
+  margin-top: 18px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-spacing: 0;
+  border-radius: var(--radius);
+}
+
+#devices tr {
+  background: var(--bg-deep);
+}
+
+#devices tr:nth-child(even) {
+  background: #242527;
+}
+
+#devices td {
+  padding: 13px 14px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+
+#devices tr:last-child td {
+  border-bottom: 0;
+}
+
+#devices td:first-child {
+  width: 60%;
+  color: var(--text-strong);
+}
+
+.led-red,
+.led-yellow,
+.led-green,
+.led-blue,
+.led-off {
+  width: 28px;
+  height: 28px;
+  margin: 0 auto;
+  border-radius: 50%;
 }
 
 .led-red {
-    background-color: #940;
-    box-shadow: #000 0 -1px 7px 1px, inset #600 0 -1px 9px, #F00 0 2px 12px;
+  background: #d94a4a;
+  box-shadow: 0 0 0 2px #4a1616 inset, 0 0 18px #ff5353;
 }
 
 .led-yellow {
-    background-color: #A90;
-    box-shadow: #000 0 -1px 7px 1px, inset #660 0 -1px 9px, #DD0 0 2px 12px;
+  background: #dfc238;
+  box-shadow: 0 0 0 2px #5f510e inset, 0 0 18px #ffe15a;
 }
 
 .led-green {
-    background-color: #690;
-    box-shadow: #000 0 -1px 7px 1px, inset #460 0 -1px 9px, #7D0 0 2px 12px;
+  background: var(--green);
+  box-shadow: 0 0 0 2px #214c27 inset, 0 0 18px #86e891;
 }
 
 .led-blue {
-    background-color: #4AB;
-    box-shadow: #000 0 -1px 7px 1px, inset #006 0 -1px 9px, #06F 0 2px 14px;
+  background: #69a7ff;
+  box-shadow: 0 0 0 2px #153a70 inset, 0 0 18px #69a7ff;
 }
 
 .led-off {
-    background-color: gray;
-    box-shadow: #000 0 -1px 7px 1px, inset #4B4B4B 0 -1px 9px, #878787 0 2px 14px;
+  background: #6a6d70;
+  box-shadow: 0 0 0 2px #3a3c3e inset;
 }
-
-/* End LED */
-
-/* ON OFF Switch: http://proto.io/freebies/onoff/ */
 
 .onoffswitch {
-    position: relative; width: 72px;
-    -webkit-user-select:none; -moz-user-select:none; -ms-user-select: none;
+  position: relative;
+  width: 78px;
+  user-select: none;
 }
+
 .onoffswitch-checkbox {
-    display: none;
+  position: absolute;
+  opacity: 0;
 }
+
 .onoffswitch-label {
-    display: block; overflow: hidden; cursor: pointer;
-    border: 2px solid #999999; border-radius: 23px;
+  display: block;
+  overflow: hidden;
+  cursor: pointer;
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
 }
+
 .onoffswitch-inner {
-    display: block; width: 200%; margin-left: -100%;
-    -moz-transition: margin 0.3s ease-in 0s; -webkit-transition: margin 0.3s ease-in 0s;
-    -o-transition: margin 0.3s ease-in 0s; transition: margin 0.3s ease-in 0s;
+  display: block;
+  width: 200%;
+  margin-left: -100%;
+  transition: margin .22s ease;
 }
-.onoffswitch-inner:before, .onoffswitch-inner:after {
-    display: block; float: left; width: 50%; height: 23px; padding: 0; line-height: 23px;
-    font-size: 14px; color: white; font-family: Trebuchet, Arial, sans-serif; font-weight: bold;
-    -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
-    border-radius: 23px;
-    box-shadow: 0px 11.5px 0px rgba(0,0,0,0.08) inset;
+
+.onoffswitch-inner::before,
+.onoffswitch-inner::after {
+  display: block;
+  float: left;
+  width: 50%;
+  height: 30px;
+  line-height: 30px;
+  font-size: 12px;
+  font-weight: 800;
 }
-.onoffswitch-inner:before {
-    content: "ON";
-    padding-left: 10px;
-    background-color: #933C00; color: #FFFFFF;
-    border-radius: 23px 0 0 23px;
+
+.onoffswitch-inner::before {
+  box-sizing: border-box;
+  content: "ON";
+  padding-left: 10px;
+  color: #102315;
+  background: var(--green);
 }
-.onoffswitch-inner:after {
-    content: "OFF";
-    padding-right: 10px;
-    background-color: #000000; color: #FFFFFF;
-    text-align: right;
-    border-radius: 0 23px 23px 0;
+
+.onoffswitch-inner::after {
+  box-sizing: border-box;
+  content: "OFF";
+  padding-right: 10px;
+  text-align: right;
+  background: var(--bg-deep);
 }
+
 .onoffswitch-switch {
-    display: block; width: 23px; margin: 0px;
-    background: #FFFFFF;
-    border: 2px solid #999999; border-radius: 23px;
-    position: absolute; top: 0; bottom: 0; right: 45px;
-    -moz-transition: all 0.3s ease-in 0s; -webkit-transition: all 0.3s ease-in 0s;
-    -o-transition: all 0.3s ease-in 0s; transition: all 0.3s ease-in 0s; 
-    background-image: -moz-linear-gradient(center top, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0) 80%); 
-    background-image: -webkit-linear-gradient(center top, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0) 80%); 
-    background-image: -o-linear-gradient(center top, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0) 80%); 
-    background-image: linear-gradient(center top, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0) 80%);
-    box-shadow: 0 1px 1px white inset;
+  position: absolute;
+  top: 3px;
+  right: 49px;
+  bottom: 3px;
+  width: 24px;
+  background: var(--text-strong);
+  border-radius: 999px;
+  transition: right .22s ease;
 }
+
+.onoffswitch-checkbox:focus + .onoffswitch-label {
+  outline: 2px solid var(--yellow);
+  outline-offset: 2px;
+}
+
 .onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-inner {
-    margin-left: 0;
+  margin-left: 0;
 }
+
 .onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-switch {
-    right: 0px; 
+  right: 3px;
 }
 
-#dev-0 a { color:yellow }
+@media (max-width: 820px) {
+  .led-app {
+    width: min(100vw - 20px, 640px);
+    margin: 10px auto;
+  }
 
-.temperature span { font-size:70%;}
+  .led-hero,
+  .led-layout {
+    grid-template-columns: 1fr;
+  }
+
+  h1 {
+    font-size: 28px;
+  }
+
+  .device-pane {
+    position: static;
+  }
+
+  #nav {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+  }
+
+  #nav li {
+    margin: 0;
+  }
+
+  #nav a {
+    min-width: 155px;
+  }
+
+  #nav a span {
+    display: none !important;
+  }
+}
+
+@media (max-width: 520px) {
+  .led-title,
+  .connection-card,
+  .device-pane,
+  #devices > div {
+    padding: 16px;
+  }
+
+  #devices table,
+  #devices tbody,
+  #devices tr,
+  #devices td {
+    display: block;
+    width: 100%;
+  }
+
+  .simulator-card {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  #devices tr {
+    padding: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  #devices td {
+    padding: 6px 0;
+    border: 0;
+  }
+
+  .led-red,
+  .led-yellow,
+  .led-green,
+  .led-blue,
+  .led-off {
+    margin: 4px 0;
+  }
+}

@@ -1,151 +1,117 @@
-
-/* Note: This JavaScript code uses JQuery, which is embedded in the
-   wfs server, and loaded into index.lsp.
-   See: http://api.jquery.com/
-   P.S. $() is a valid function name in JavaScript.
-   */
-
-
-// Returns true if the file name extension is .zip
+// Returns true if the file name extension is .zip.
 function checkIfZip(name) {
-    var ok=false;
-    try {
-        var regexp=/^.*\.([^\.]*)$/m;
-        var x=name.match(regexp);
-        var ext=x[1].toLowerCase();
-        ok = ext=="zip";
-    }
-    catch(e){}
+    var ok=/\.zip$/i.test(name);
     if(!ok)
         alert("Now is a good time to read the documentation and to find out what files can be uploaded!");
     return ok;
-};
-
+}
 
 function refresh() {
-    window.location.reload(true);
-};
+    window.location.reload();
+}
 
-
-//Sets the progress bar width by using CSS manipulation.
 function progressbar(percent) {
-    $("#progressbar").css('width', Math.round(percent)+"%");
-};
+    document.getElementById("progressbar").style.width=Math.round(percent)+"%";
+}
 
-// Returns true if the browser supports drag and drop upload.
 function canDoDragDropUpload() {
     try {
-        var xhr = new XMLHttpRequest();
-        xhr.upload.addEventListener("progress", function(){},false);
+        var xhr=new XMLHttpRequest();
+        xhr.upload.addEventListener("progress",function(){},false);
         return true;
     }
     catch(e) {}
     return false;
 }
 
+addEventListener("DOMContentLoaded",function() {
+    var body=document.body;
+    var formbox=document.getElementById("uploadform");
+    var form=formbox.querySelector("form");
+    var fileinput=formbox.querySelector("input[type=file]");
+    var dropbox=document.getElementById("dropbox");
+    var upload=document.getElementById("upload");
+    var accepting=true;
+    var dragover=false;
+    var xhr;
 
-
-$(function() {
-
-    /* Allow only zip files.
-      Ref:
-         http://api.jquery.com/submit/
-         http://api.jquery.com/file-selector/
-    */
-    $("#uploadform form").submit(function() {
-        return checkIfZip($("#uploadform input:file").val());
+    form.addEventListener("submit",function(e) {
+        if(!checkIfZip(fileinput.value)) e.preventDefault();
     });
 
     if(!canDoDragDropUpload()) {
-        $("body").append("<p>P.S. Your browser stinks!</p>");
+        body.insertAdjacentHTML("beforeend","<p>P.S. Your browser stinks!</p>");
         return;
     }
 
-    //Switch from a boring old fashioned upload form to a modern drag and drop upload manager.
-    $("#uploadform").hide();
-    $('#dropbox').show();
+    formbox.style.display="none";
+    dropbox.style.display="block";
 
-     // The drop event callback i.e. drag and drop
     function drop(e) {
         e.preventDefault();
-        // Ignore new drop events
-        $('body').unbind('drop').bind('drop', function() {});
-        // We accept one file. Additional files are ignored.
-        var file=e.originalEvent.dataTransfer.files[0];
-
-        if( ! checkIfZip(file.name) ) {
+        if(!accepting) return;
+        accepting=false;
+        var file=e.dataTransfer.files[0];
+        if(!file || !checkIfZip(file.name)) {
             refresh();
             return;
         }
 
-        //Create the upload object
-        xhr = new XMLHttpRequest();
-
-        // Attach 4 upload event listeners.
-        xhr.onreadystatechange=function(){
-            if (xhr.readyState == 4) { // The request and response is complete.
-                // We simply dump the HTML response into the DOM, replacing the current page.
-                // An alternative is to have the server send JSON respone data.
-                $("html").html(xhr.responseText);
-                xhr=null; /* (ref-done) */
+        xhr=new XMLHttpRequest();
+        xhr.onreadystatechange=function() {
+            if(xhr && xhr.readyState == 4) {
+                var html=xhr.responseText;
+                xhr=null;
+                document.open();
+                document.write(html);
+                document.close();
             }
         };
-        xhr.upload.addEventListener("progress", function(e) {
-            if(e.loaded == file.size) { // Note, Firefox fails at sending the event when 100% completed.
+        xhr.upload.addEventListener("progress",function(e) {
+            if(e.loaded == file.size) {
                 progressbar(100);
-                // Give the user time to see the "upload complete" progress bar
                 setTimeout(function() {
-                    if(!xhr) return; /* wow, server zip processing is fast (ref-done) */
-                    $('#upload').hide();
-                    /* Lets reuse the original upload form.
-                       The data below is displayed when upload is
-                       complete and while the server unpacks the ZIP file.
-                    */
-                    $("#uploadform .rtltmb").html("Installing.....")
-                    $("#uploadform .marg").html(
-                        "<p>Please wait for the server to complete the firmware installation.</p>");
-                    $("#uploadform").show();
-                }, 500);
+                    if(!xhr) return;
+                    upload.style.display="none";
+                    formbox.querySelector(".rtltmb").textContent="Installing.....";
+                    formbox.querySelector(".marg").innerHTML=
+                        "<p>Please wait for the server to complete the firmware installation.</p>";
+                    formbox.style.display="block";
+                },500);
             }
-            else
-                if(e.lengthComputable) progressbar(e.loaded * 100 / file.size);
-        }, false);
-        xhr.upload.addEventListener("error", function(e) {
+            else if(e.lengthComputable) progressbar(e.loaded*100/file.size);
+        },false);
+        xhr.upload.addEventListener("error",function() {
             setTimeout(function() {
                 alert("Uploading "+file.name+" failed!");
                 refresh();
-            }, 100);
-        }, false);  
-        xhr.upload.addEventListener("abort", refresh, false);
+            },100);
+        },false);
+        xhr.upload.addEventListener("abort",refresh,false);
+        xhr.open("PUT",window.location.href);
+        xhr.setRequestHeader("x-requested-with","upload");
+        xhr.send(file);
 
-        //Open connection to origin i.e. LSP page
-        xhr.open("PUT", window.location.href);
-        //We use the following on the server side to identify this as a drop event.
-        xhr.setRequestHeader("x-requested-with","upload")
-        xhr.send(file); // Start the upload
+        document.getElementById("uploading").textContent=file.name;
+        dropbox.style.display="none";
+        upload.style.display="block";
+    }
 
-        //Hide the dropbox image and show the progress bar.
-        $('#dropbox').clearQueue().hide();
-        $('#upload').show();
-    };
-
-    // Install dragover and the drop callbacks.
-    // "dragover" fires constantly while hovering thus creating a nice dim effect with the logic below.
-    var dragover=false
-    $('body').bind('dragover',function(e) {
+    body.addEventListener("dragover",function(e) {
         e.preventDefault();
-        if(dragover) return;
+        if(!accepting || dragover) return;
         dragover=true;
-        $('#dropbox').show().fadeTo(300,.5,function(){
-            $('#dropbox').fadeTo(300,1, function() {dragover=false;});});
-    }).bind('drop',drop);
-
-    // If user wants to switch back to old fashioned upload form.
-    $("#showform").click(function() {
-        $('#dropbox').clearQueue().hide();
-        // Ignore new drop events
-        $('body').unbind('drop').bind('drop', function() {});
-        $("#uploadform").show();
+        dropbox.style.opacity=.5;
+        setTimeout(function() {
+            dropbox.style.opacity=1;
+            dragover=false;
+        },300);
     });
+    body.addEventListener("drop",drop);
 
+    document.getElementById("showform").addEventListener("click",function() {
+        accepting=false;
+        dropbox.style.display="none";
+        formbox.style.display="block";
+    });
 });

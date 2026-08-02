@@ -75,7 +75,6 @@ for more information.
 <html>
   <head>
     <link type="text/css" href="style.css" rel="Stylesheet" />
-    <script type="text/javascript" src="http://realtimelogic.com/rtl/jquery.js"></script>
     <script type="text/javascript" src="upload.js"></script>
   </head>
   <body>

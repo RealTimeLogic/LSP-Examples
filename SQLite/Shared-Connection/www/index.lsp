@@ -55,7 +55,6 @@ end
 <html>
 <head>
 <title>DB test</title>
-<script src="/rtl/jquery.js" type="text/javascript"></script>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -101,11 +100,11 @@ conn:close() -- Remember to close the 'read' DB connection object
 
 <?lsp if request:data"auto" then ?>
 <script>
-// We use JQuery for the auto HTML form submit/post
-$(function() {
+addEventListener("DOMContentLoaded", function() {
     var d=new Date();
-    $("form > input[type=text]").val(d.toUTCString()+" : "+d.getMilliseconds());
-    $("form").submit();
+    document.querySelector("form > input[type=text]").value=
+        d.toUTCString()+" : "+d.getMilliseconds();
+    document.querySelector("form").requestSubmit();
 });
 </script>
 <?lsp end ?>

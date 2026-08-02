@@ -1,11 +1,11 @@
 <html>
   <head>
     <link rel="stylesheet" href="../style.css">
-    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"></script>
     <script>
-$(function() {
+addEventListener("DOMContentLoaded", function() {
+    const out=document.getElementById("console");
     function print(txt) {
-        $("#console").append(txt+"\n");
+        out.append(txt+"\n");
     };
     let l=window.location
     let protocol = l.protocol === 'https:' ? "wss://" : "ws://" 

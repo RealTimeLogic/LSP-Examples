@@ -90,10 +90,18 @@ h1 {
 }
 
 .alert {
-  display: none;
+  visibility: hidden;
+  opacity: 0;
   float: left;
   color: #ffd12b;
   font-size: 12px;
+  transition: opacity 1.5s, visibility 0s 1.5s;
+}
+
+.alert.visible {
+  visibility: visible;
+  opacity: 1;
+  transition: opacity 0.5s;
 }
 
 @keyframes wrong-log {

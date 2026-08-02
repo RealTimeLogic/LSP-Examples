@@ -3,7 +3,6 @@
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"/>
-  <script src="/rtl/jquery.js"></script>
   <script>
 
 
@@ -78,12 +77,13 @@ function createAjax(service,onopen,onclose) {
 }; // End 'createAjax': 22 lines of code :-)
 
 
-// We use JQuery for interacting with the HTML
-$(function() {
+addEventListener("DOMContentLoaded", function() {
 
     // Disable/enable all HTML input elements
     function disableInputs(disable) {
-        $("input").prop('disabled', disable);
+        document.querySelectorAll("input").forEach(function(e) {
+            e.disabled=disable;
+        });
     };
     disableInputs(true); //Initially disabled, then enabled when WebSocket is up
 
@@ -98,28 +98,34 @@ $(function() {
        HTML input elements and call the AJAX service.
     */
     function math(serviceFunc,button) {
-        $("#err").html(""); // Erase errors, if any
+        var err=document.getElementById("err");
+        err.textContent=""; // Erase errors, if any
         // Extract the two values from the two input elems.
-        var list=$(button).parent().parent().children();
-        var a = list.eq(0).find('input').val(); //First input
-        var b = list.eq(2).find('input').val(); // Second input
+        var row=button.closest(".row");
+        var input=row.querySelectorAll("input");
+        var a=input[0].value;
+        var b=input[1].value;
         // Call server function "math/[add|subtract]"
         ajax(function(rsp,err) { // Ajax callback
             console.log(rsp);console.log(err); //debug
             if(rsp != null)
-                list.find("h2").html(rsp+""); // Show response (number)
+                row.querySelector("h2").textContent=rsp+""; // Show response
             else
-                $("#err").html(err);
+                document.getElementById("err").textContent=err;
           },
           "math/"+serviceFunc, // REST URI: "math/[add|subtract]"
           a, b); // AJAX arguments
     };
 
-    $("#addBut").click(function() { math("add",this); });
+    document.getElementById("addBut").addEventListener("click",function() {
+        math("add",this);
+    });
 
-    $("#subBut").click(function() { math("subtract",this); });
+    document.getElementById("subBut").addEventListener("click",function() {
+        math("subtract",this);
+    });
 
-    $("#timeBut").click(function() {
+    document.getElementById("timeBut").addEventListener("click",function() {
         /* Call the Lua function os.date with arg "*t".
            Function os.date returns an object with time values.
            This example shows how a complex data object may be sent.
@@ -131,9 +137,9 @@ $(function() {
                 for (var key in rsp) {
                     html += key + " : " + rsp[key] + "\n";
                 }
-                $("#time").html(html);
+                document.getElementById("time").textContent=html;
             }
-            else $("#err").html(err);
+            else document.getElementById("err").textContent=err;
         }, "os/date", "*t");
         
     });

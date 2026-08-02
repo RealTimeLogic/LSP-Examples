@@ -1,7 +1,7 @@
 //Clear the console
 function conClear()
 {
-    $("#console").empty();
+    document.getElementById("console").replaceChildren();
 };
 
 
@@ -10,9 +10,14 @@ function conClear()
  */
 function conPrint(msg, type)
 {
-    if(type)
-        msg="<span class='"+type+"'>"+msg+"</span>";
-    $("#console").append(msg);
+    var out=document.getElementById("console");
+    if(type) {
+        var span=document.createElement("span");
+        span.className=type;
+        span.textContent=msg;
+        out.append(span);
+    }
+    else out.append(msg);
     window.scrollTo(0, document.body.scrollHeight);
 };
 
@@ -31,9 +36,11 @@ function wsConnect()
         ws=new WebSocket(url+"server.lsp");
         ws.onopen = function(evt) {
             conPrint("WebSocket connection established!\n\n","info");
-            $("body").focus().keypress(function(ev) {
+            document.body.focus();
+            document.body.addEventListener("keydown",function(ev) {
+                var c=ev.key == "Enter" ? '\n' : ev.key.length == 1 ? ev.key : null;
+                if(!c) return;
                 ev.preventDefault();
-                var c = ev.which == 13 ? '\n' : String.fromCharCode(ev.which);
                 conPrint(c,"cli");
                 ws.send(c);
             });
@@ -48,8 +55,10 @@ function wsConnect()
     }
 };
 
-$(function() {
-    $('body').empty().html("<pre id='console'></pre>");
+addEventListener("DOMContentLoaded",function() {
+    var out=document.createElement("pre");
+    out.id="console";
+    document.body.replaceChildren(out);
     conPrint("WebSocket Server Demo.\nConnecting to ELIZA the psychotherapist...\n", "info");
     wsConnect();
 });

@@ -11,7 +11,7 @@ Use this example when the user wants lightweight browser-to-Lua RPC over WebSock
 1. `README.md` - overview, run command, and tutorial link.
 2. `www/service.lsp` - WebSocket upgrade and server-side RPC dispatch.
 3. `www/promise.html` - modern native JavaScript Promise/async client.
-4. `www/index.html` - older jQuery client kept for comparison.
+4. `www/index.html` - callback-based native JavaScript client.
 5. `www/.preload` - app startup message.
 
 Do not invent BAS, socket, WebSocket, LSP, JSON, or browser APIs. If API details are unclear, use the official Markdown documentation bundles below.
@@ -57,7 +57,7 @@ Reference priority:
 
 - `www/service.lsp` - WebSocket endpoint. Rejects non-WebSocket requests with `404`, decodes JSON calls, resolves service paths such as `math/add`, executes Lua functions with `pcall(...)`, and writes JSON responses.
 - `www/promise.html` - native browser client using `WebSocket`, Promises, and `async` / `await`.
-- `www/index.html` - original jQuery-based browser client.
+- `www/index.html` - callback-based browser client using native DOM APIs.
 - `www/.preload` - simple startup print.
 
 ## Change Guidance

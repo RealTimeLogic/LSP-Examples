@@ -4,27 +4,22 @@
 <meta charset="UTF-8" />
 
 <title>SimpleMQ Chat Demo</title>
-<script src="/rtl/jquery.js"></script>
 <script src="/rtl/smq.js"></script>
 <link rel="stylesheet" type="text/css" href="style.css">
 
 <script>
 
-function escapeHtml(unsafe) {
-    return unsafe
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-};
-
-$(function() {
+addEventListener("DOMContentLoaded",function() {
 
     var nickname;
     var users={}; //List of all users: key=ftid, val = name
     var timers={}; // List of users actively typing: key=ftid, val = timer handle
     var smq = SMQ.Client(SMQ.wsURL("/smq.lsp"),{info:"I am the improved chat client"});
+    var userlist=document.querySelector("#users ul");
+    var messages=document.querySelector("#messages ul");
+    var messagepane=document.querySelector("#messages div");
+    var msginput=document.getElementById("msg");
+    var dialog=document.getElementById("dialog");
     
     /*
       Build list of users shown in the left pane. This function is
@@ -32,25 +27,34 @@ $(function() {
       disconnects.
      */
     function buildUserList() {
-       var html="";
+       userlist.replaceChildren();
        for (var ftid in users) {
-          html+="<li id='"+ftid+"'>"+users[ftid]+"</li>";
+          var item=document.createElement("li");
+          item.id=ftid;
+          item.textContent=users[ftid];
+          userlist.append(item);
        }
-       $("#users ul").html(html);
     };
 
     /*
       Scroll the text window and keep last text entered visible.
      */
     function scrollMsg() {
-        $('#messages div').animate({scrollTop: $('#messages ul').height()}, 1000);
+        messagepane.scrollTo({top:messages.scrollHeight,behavior:"smooth"});
     };
 
     /*
       Print message to console. The console is an ul element where we add li elements.
     */
-    function userInfo(info, classname) {
-        $('#messages ul').append('<li class="'+classname+'">'+info);
+    function userInfo(first, second, classname, markFirst) {
+        var item=document.createElement("li");
+        item.className=classname;
+        var mark=document.createElement("span");
+        mark.style.color="#fff";
+        mark.textContent=markFirst ? first : second;
+        if(markFirst) item.append(mark,second);
+        else item.append(first,mark);
+        messages.append(item);
     };
 
 
@@ -64,7 +68,7 @@ $(function() {
             var name = users[ftid];
             delete users[ftid];
             buildUserList();
-            userInfo(name+" <span style='color:#fff'>signing off</span>","leave top-mk");
+            userInfo(name+" ","signing off","leave top-mk");
             scrollMsg();
         });
     };
@@ -74,10 +78,9 @@ $(function() {
       Called when a user publishes "Hello".
     */
     function onHello(name,ftid) {
-        name=escapeHtml(name);
         users[ftid] = name;
         if(smq.gettid() == ftid) { /* Our own hello message */
-            userInfo("<span style='color:#fff'>Welcome</span> "+name,"enter top-mk");
+            userInfo("Welcome"," "+name,"enter top-mk",true);
         }
         else /* Another user publishes "Hello" */
         {
@@ -86,10 +89,10 @@ $(function() {
                 smq.publish(nickname,ftid,"Hello");
             }
             superviseUser(ftid);
-            userInfo(name+"<span style='color:#fff'> signing on</span>","enter top-mk");
+            userInfo(name," signing on","enter top-mk");
             buildUserList();
             scrollMsg();
-            $("#joined")[0].play();
+            document.getElementById("joined").play();
         }
     };
 
@@ -97,7 +100,7 @@ $(function() {
       Called when another user sends a message to our ephemeral ID.
     */
     function selfOnHello(name,ftid) {
-        users[ftid] = escapeHtml(name);
+        users[ftid] = name;
         superviseUser(ftid);
         buildUserList();
     };
@@ -107,17 +110,22 @@ $(function() {
       Called when we or another user publishes a "ChatMsg"
     */
     function onChatMsg(msg,ftid) {
-        var mk = "<li class='message-board'><span class='green'>"+users[ftid]+"</span>"+escapeHtml(msg)+"</li>";
-        $('#messages ul').append(mk);
+        var item=document.createElement("li");
+        item.className="message-board";
+        var name=document.createElement("span");
+        name.className="green";
+        name.textContent=users[ftid];
+        item.append(name,msg);
+        messages.append(item);
         scrollMsg();
         var thndl = timers[ftid];
         if(thndl) {
             clearTimeout(thndl);
             delete timers[ftid];
-            $("#"+ftid).removeClass("writing");
+            document.getElementById(ftid)?.classList.remove("writing");
         }
         if(smq.gettid() != ftid)
-            $("#notify")[0].play();
+            document.getElementById("notify").play();
     };
 
     /*
@@ -136,12 +144,12 @@ $(function() {
             }
             else {
                 /* Set pane green */
-                $("#"+ftid).addClass("writing");
+                document.getElementById(ftid)?.classList.add("writing");
             }
             timers[ftid] = setTimeout(function() {
                 /* Timeout: set color back to red */
                 delete timers[ftid];
-                $("#"+ftid).removeClass("writing");
+                document.getElementById(ftid)?.classList.remove("writing");
             }, 2500);
         }
     };
@@ -150,11 +158,11 @@ $(function() {
       Called when we send a complete message (ENTER pressed).
       Fetch the message from the input field and publish the message.
     */
-    function sendChatMsg() {
-        smq.publish($('#msg').val(), "ChatMsg");
-        $('#msg').val(''); /* Clear input field */
-        $('#msg').focus(); /* Keep field focused */
-        return false;
+    function sendChatMsg(e) {
+        e.preventDefault();
+        smq.publish(msginput.value,"ChatMsg");
+        msginput.value="";
+        msginput.focus();
     };
 
     /*
@@ -172,32 +180,38 @@ $(function() {
         /* "typing text" events */
         smq.subscribe("TypeEvent", {onmsg:onTypeEvent});
         /* Send a complete message when ENTER is pressed */
-        $('form').submit(sendChatMsg);
+        document.querySelector("form").addEventListener("submit",sendChatMsg);
         var nextTime = 0;
         /* Send "typing text" events when user types text into the
          * text field.
          */
-        $('#msg').keydown(function(ev){
+        msginput.addEventListener("keydown",function(ev) {
             var time = (new Date()).getTime();
-            if(ev.which === 13) {
+            if(ev.key === "Enter") {
                 nextTime=0;
+                sendChatMsg(ev);
             }
             else if(nextTime < time) { /* Limit the number of events. */
                 smq.publish('', "TypeEvent");
                 nextTime = time + 1000;
             }
         });
-        $("#dialog p").html('<b> Enter your nickname</b> <input id="nickname"/>');
-        $('#nickname').focus();
+        var prompt=dialog.querySelector("p");
+        prompt.replaceChildren();
+        var label=document.createElement("b");
+        label.textContent=" Enter your nickname";
+        var nicknameInput=document.createElement("input");
+        nicknameInput.id="nickname";
+        prompt.append(label,nicknameInput);
+        nicknameInput.focus();
         /* Events for our "nickname" dialog */
-        $('#nickname').keydown(function(ev){
-            var time = (new Date()).getTime();
-            if(ev.which === 13) { /* When we have the nickname */
-                nickname = $(this).val();
+        nicknameInput.addEventListener("keydown",function(ev) {
+            if(ev.key === "Enter") { /* When we have the nickname */
+                nickname=nicknameInput.value;
                 /* Publish "Hello" to all other connected users */
                 smq.publish(nickname,"Hello");
-                $("#dialog").hide();
-                $('#msg').focus();
+                dialog.style.display="none";
+                msginput.focus();
                 
             }
         });
@@ -209,9 +223,13 @@ $(function() {
     */
     smq.onclose=function(message,canreconnect) {
         if(nickname) {
-            $("#dialog p").html("<b>Disconnected!</b>" + (message ? "<br>"+escapeHtml(message) : ""));
-            $("#dialog").show();  
-            $("#users ul").empty();
+            var prompt=dialog.querySelector("p");
+            var label=document.createElement("b");
+            label.textContent="Disconnected!";
+            prompt.replaceChildren(label);
+            if(message) prompt.append(document.createElement("br"),message);
+            dialog.style.display="block";
+            userlist.replaceChildren();
             if(canreconnect) return 3000; // Attempt to reconnect after 3 sec.
         }
     };
@@ -226,10 +244,10 @@ $(function() {
     smq.onreconnect=function() {
         if(nickname) {
             users={};
-            $("#dialog").hide();
+            dialog.style.display="none";
             /* Publish "Hello" to all other connected users */
             smq.publish(nickname,"Hello");
-            $('#msg').focus();
+            msginput.focus();
         };
     };
 

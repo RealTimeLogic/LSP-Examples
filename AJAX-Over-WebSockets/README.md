@@ -9,7 +9,7 @@ WebSockets are used here as the transport layer, which makes the connection pers
 ## Files
 
 - `www/.preload` - Startup logic for the example app.
-- `www/index.html` - Original browser example based on jQuery and the AJAX WebSocket client library.
+- `www/index.html` - Callback-based browser example using native DOM APIs and the AJAX WebSocket client library.
 - `www/promise.html` - Modernized browser example using native DOM APIs, Promises, and `async` / `await`.
 - `www/service.lsp` - Server-side LSP page that upgrades the request to a WebSocket and exposes the example RPC-style service.
 
@@ -71,6 +71,6 @@ Upload the generated ZIP with the Xedge App Upload tool.
 ## Notes / Troubleshooting
 
 - If you access `service.lsp` without a WebSocket handshake, the page returns `404` because it is meant to act as a socket endpoint, not as a regular HTML page.
-- `promise.html` is the easier version to study if you want the modern browser-side flow first.
+- `promise.html` is the easier version to study if you want the Promise-based browser-side flow first.
 - Full tutorial: https://makoserver.net/articles/AJAX-over-WebSockets
 - Related example: [REST / AJAX / RPC over SMQ](../SMQ-examples/RPC/README.md)
