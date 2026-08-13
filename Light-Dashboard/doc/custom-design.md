@@ -3,7 +3,13 @@
 This document explains how the `custom/` dashboard variant works. The custom
 variant is the most complete example in this directory: it combines a small
 database-free CMS, HTMX fragment navigation, a two-level menu, native
-JavaScript UI code, and CMS-level SMQ support.
+JavaScript UI code, and CMS-level SMQ support. It is suitable for real-time
+device interfaces ranging from RTOS targets to Embedded Linux systems.
+
+Applications that need database-backed content, browser-based administration,
+themes, or plugins should also consider
+[FuguHub](https://github.com/RealTimeLogic/FuguHub), which retains HTMX and SMQ
+support while providing a more advanced CMS on Mako Server.
 
 The design goal is to behave like a lightweight single-page application when
 JavaScript is available, while still behaving like a normal server-rendered CMS
@@ -336,7 +342,7 @@ mistaken fetches from entering the SMQ upgrade path.
 It creates exactly one browser SMQ client for that shell:
 
 ```js
-const smq = SMQ.Client("/SMQ/", { cleanstart: true });
+const smq = SMQ.Client(SMQ.wsURL("/SMQ/"), { cleanstart: true });
 ```
 
 `cleanstart: true` means the code explicitly rebuilds subscriptions after a
@@ -349,6 +355,8 @@ The module exposes `window.cmsSmq` with these main members:
   - the raw SMQ client, exposed for low-level cases;
 - `brokerTid`
   - currently `1`, the default broker TID;
+- `rpcTimeoutMs`
+  - currently `10000`; page RPC calls reject after this many milliseconds;
 - `isConnected()`
   - reports whether the shell-level SMQ client is connected;
 - `sendToBroker(messageName, payload)`
@@ -491,7 +499,8 @@ The broker replies directly to the browser on `"$RpcResp"` with the same `id`:
 `cms-smq.js` keeps pending RPC calls in the active page scope. When a matching
 response arrives, the Promise resolves with `rsp` or rejects with `err`. When
 HTMX unloads the fragment or the SMQ connection closes, pending page RPC calls
-are rejected so callers do not wait forever.
+are rejected so callers do not wait forever. Calls that receive no response are
+rejected after `rpcTimeoutMs` as an additional bound.
 
 Use RPC for page-specific request/response operations such as loading a
 filtered table, requesting diagnostics, or invoking a small broker-side method.
@@ -538,6 +547,10 @@ smq.subscribe(route.topic, settings);
 The settings object includes `datatype`, normally `"json"`, and a single
 `onmsg` dispatcher. The dispatcher loops through the route's page-owned
 handlers and calls each handler.
+
+Every route subscription has an acknowledgement callback. A denied
+subscription emits `cms:smq-subscribe-error`; the shell displays this as a
+visible connection warning instead of leaving the page silently stale.
 
 ### Readiness Barrier
 
@@ -603,9 +616,8 @@ smq.onconnect = onConnect;
 smq.onreconnect = onConnect;
 ```
 
-On the first connection, the scaffold marks the shell as connected.
-
-On reconnect, it:
+On the first connection and every reconnect, it installs the active page's
+routes and runs the readiness barrier. On reconnect, it also:
 
 1. increments `connectionGeneration`;
 2. resubscribes active routes for the current page scope;
@@ -614,6 +626,16 @@ On reconnect, it:
 
 The generation counter prevents stale readiness callbacks from an older
 connection from running after a reconnect.
+
+The connection manager emits these document events:
+
+- `cms:smq-connect` after a connection is ready;
+- `cms:smq-close` when the real-time connection closes;
+- `cms:smq-subscribe-error` when the broker denies a route.
+
+`custom/static/ui.js` combines these events with `htmx:sendError`,
+`htmx:timeout`, and `htmx:responseError` to show one retryable warning overlay.
+The warning clears after a successful HTMX request or SMQ reconnect.
 
 ## Page Author Pattern for SMQ
 
@@ -716,7 +738,7 @@ Default security headers are set in `custom/.lua/cms.lua`:
 ```lua
 local securityPolicies = {
    ["Content-Security-Policy"] =
-      "default-src 'self'; script-src 'self' cdn.jsdelivr.net unpkg.com 'unsafe-inline'; style-src 'self' cdn.jsdelivr.net unpkg.com 'unsafe-inline'",
+      "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'",
    ["X-Content-Type-Options"] = "nosniff",
 }
 ```
@@ -724,10 +746,12 @@ local securityPolicies = {
 If a page adds new external scripts, styles, images, APIs, or WebSocket
 endpoints, update the CSP in `cms.lua`.
 
-The example templates intentionally use plain asset paths such as:
+The custom shell bundles HTMX locally. The example templates intentionally use
+plain asset paths such as:
 
 ```html
 <script src="/static/ui.js"></script>
+<script src="/static/htmx.min.js"></script>
 ```
 
 Do not add cache-busting query strings to the reusable examples. If a browser

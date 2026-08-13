@@ -16,6 +16,12 @@ The `custom/` variant is the primary target for new work. It uses:
 - CMS-level SMQ support from `custom/static/cms-smq.js`;
 - native JavaScript only for custom application code.
 
+Light Dashboard is appropriate for real-time device interfaces on platforms
+ranging from RTOS targets to Embedded Linux. When a project instead requires
+SQLite-backed content, browser-based administration, themes, or plugins,
+consider [FuguHub](https://github.com/RealTimeLogic/FuguHub) as the more advanced
+Mako Server CMS alternative.
+
 Do not use this skill for the `www/` or `htmx/` variants unless the user
 explicitly asks for parity across variants.
 
@@ -55,6 +61,9 @@ The shell keeps persistent app-level behavior:
 - `/rtl/smq.js`;
 - `custom/static/cms-smq.js`;
 - `custom/static/ui.js`.
+
+HTMX is bundled locally as `custom/static/htmx.min.js`. Do not replace it with
+a CDN dependency.
 
 Page fragments live in `custom/.lua/www/*.html` and are injected into
 `#main`.
@@ -241,6 +250,9 @@ HTMX swaps only `#main`, so the shell-level SMQ connection remains open across
 fragment navigation. Full page reloads create a new shell and a new SMQ
 connection.
 
+The shared client uses `SMQ.wsURL("/SMQ/")` and `cleanstart: true`. It
+explicitly rebuilds the active page's subscriptions after reconnect.
+
 Server-side broker code is in `custom/.preload`. The browser endpoint is
 `custom/SMQ/index.lsp`.
 
@@ -296,6 +308,7 @@ The scope API maps to native SMQ like this:
 - `scope.callRpc(methodName, ...args)`
   - Native shape: `smq.pubjson({id, name:methodName, args}, 1, "$RpcReq")` plus a direct `"$RpcResp"` response.
   - Use for page-specific request/response flows where Promise-style code or concurrent requests are useful.
+  - Calls reject after 10 seconds, on SMQ disconnect, or when the page unloads.
 
 - `scope.rpc.methodName(...args)`
   - Proxy for `scope.callRpc("methodName", ...args)`.
@@ -339,6 +352,11 @@ On SMQ reconnect:
 Pending page RPC calls are rejected when the fragment unloads or when SMQ
 disconnects. Do not leave page code waiting for old RPC responses after HTMX
 navigation or reconnect.
+
+The shell emits `cms:smq-connect`, `cms:smq-close`, and
+`cms:smq-subscribe-error`. `custom/static/ui.js` turns these and HTMX transport
+errors into a visible retry/dismiss warning. Do not remove that feedback when
+changing shell behavior. A successful request or reconnect clears it.
 
 ## Page-Scoped RPC Pattern
 
@@ -462,6 +480,9 @@ Check these paths:
 - HTMX navigation from the menu.
 - Browser back/forward.
 - If SMQ is involved, full reload plus HTMX navigation away from and back to the page.
+- Stop Mako with the page open. Verify the connection warning appears, then
+  restart Mako and verify the warning clears, subscriptions resume, and fresh
+  initial state is loaded.
 - If styling changed, desktop and mobile nav widths.
 
 Useful command checks:

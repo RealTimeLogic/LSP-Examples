@@ -3,14 +3,68 @@ $(function() {
     window.roundSliderCleanup();
   }
 
-  //SMQ Doc: https://realtimelogic.com/ba/doc/en/JavaScript/SMQ.html 
-  var smq = SMQ.Client("/SMQ/"); // Connect to /SMQ/index.lsp
+  //SMQ Doc: https://realtimelogic.com/ba/doc/en/JavaScript/SMQ.html
+  var smq = SMQ.Client(SMQ.wsURL("/SMQ/"), {cleanstart:true});
   let running=true;
   let active=true;
+  let hasConnected=false;
+  let connectionGeneration=0;
+
+  function emit(name,detail) {
+    document.dispatchEvent(new CustomEvent(name,{detail:detail || {}}));
+  }
+
+  function subscriptionAck(topic,subtopic) {
+    return function(accepted) {
+      if(!accepted) {
+        emit("cms:smq-subscribe-error",{topic:topic,subtopic:subtopic || null});
+      }
+    };
+  }
+
+  function subscribeAndRequestState() {
+    // Subscribe to one-to-one messages sent directly from the server.
+    smq.subscribe("self","slider",{
+      datatype:"json",
+      onack:subscriptionAck("self","slider"),
+      onmsg:onSmqMsg
+    });
+    // Subscribe to one-to-many slider updates.
+    smq.subscribe("slider",{
+      datatype:"json",
+      onack:subscriptionAck("slider"),
+      onmsg:onSmqMsg
+    });
+    // The final subscription is a barrier: request state only after the
+    // response subscription has been processed by the broker.
+    smq.subscribe("$roundSliderReady",{onack:function(accepted) {
+      if(!accepted) {
+        emit("cms:smq-subscribe-error",{topic:"$roundSliderReady",subtopic:null});
+      } else if(running) {
+        smq.publish("",1,"getSlider");
+      }
+    }});
+  }
+
+  function onConnect() {
+    if(hasConnected) connectionGeneration += 1;
+    else hasConnected=true;
+    subscribeAndRequestState();
+    emit("cms:smq-connect",{
+      generation:connectionGeneration,
+      reconnect:connectionGeneration > 0
+    });
+  }
+
+  smq.onconnect=onConnect;
+  smq.onreconnect=onConnect;
 
   smq.onclose=function(message,canreconnect) {
     if(!running) return;
-    console.log("SMQ disconnected");
+    emit("cms:smq-close",{
+      message:message || "SMQ disconnected",
+      canReconnect:Boolean(canreconnect)
+    });
     if(canreconnect) return 3000;
   };
 
@@ -23,13 +77,6 @@ $(function() {
     }
   }
   
-  // Subscribe to one-to-one message sent from server directly to client
-  smq.subscribe("self","slider",{datatype:"json",onmsg:onSmqMsg});
-  // Request broker to send us the slider angle pos: triggers above.
-  smq.publish("", 1, "getSlider");
-  // Subscribe to one-to-many, the message the server sends to all clients
-  smq.subscribe("slider",{datatype:"json",onmsg:onSmqMsg});
-
   function onChange (e) {
     if(!active)
       smq.pubjson({angle:Math.floor(e.value * 180 / 100)}, "slider");

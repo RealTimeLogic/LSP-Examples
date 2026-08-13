@@ -2,11 +2,11 @@
 
 ## Overview
 
-This directory contains three ready-to-run dashboard UIs for embedded devices such as routers, gateways, and firmware-backed products.
+This directory contains three ready-to-run dashboard UIs for building responsive, real-time web interfaces for devices such as routers, gateways, controllers, and firmware-backed products.
 
-The dashboards are designed for small embedded targets, typically RTOS-based devices, running Xedge or a custom Barracuda App Server build. They avoid a database and keep the CMS layer file/menu driven, which makes them suitable for firmware-style products where the UI is bundled with the device software.
+Light Dashboard is suitable across the embedded spectrum, from small RTOS targets running Xedge or a custom Barracuda App Server build to higher-level operating systems such as Embedded Linux and QNX running Mako Server. It avoids a database and keeps the CMS layer file/menu driven, making it a good fit when the web interface is developed and deployed as part of the device software. HTMX provides efficient partial-page updates, while SMQ supports live data, commands, and other real-time device interactions.
 
-For larger platforms such as Embedded Linux and QNX, consider using the database-driven Mako Server Content Management System (CMS) instead.
+For applications that need a more advanced, database-driven content system, consider [FuguHub](https://github.com/RealTimeLogic/FuguHub). FuguHub runs on Mako Server and adds SQLite-backed content, browser-based administration, themes, plugins, and AI access through MCP while retaining HTMX and SMQ support for real-time web applications.
 
 #### The introductory article for this design:
 
@@ -91,6 +91,8 @@ The article also calls out a few practical details that matter in real products:
 - HTMX requests return fragments, while full requests return the complete layout.
 - Pages are composed dynamically at runtime from `template.lsp` plus the requested fragment.
 - SSR navigation closes real-time connections. The `custom/` shell keeps one SMQ connection alive across HTMX fragment navigation, while full page reloads create a new shell and a new SMQ connection.
+- The smaller `htmx/` RoundSlider page owns its SMQ client, but explicitly
+  rebuilds subscriptions and requests current state after reconnect.
 - Responses are compressed, and authentication can be layered in without changing each individual page.
 
 ### Add, modify, and remove pages
@@ -138,6 +140,9 @@ To modify a page, update the fragment and adjust the matching menu entry if the 
 - `www/` and `htmx/` use **Pure.css** for most of the layout and utility styling.
 - `custom/` uses a custom CSS design with a two-level menu and is the most flexible choice if you want to align the UI with a specific brand.
 - Global styles live in `static/styles.css`, and layout/menu behavior lives in `static/ui.js`.
+- The HTMX variants bundle HTMX locally as `static/htmx.min.js`. The `www/`
+  and `htmx/` RoundSlider examples also bundle jQuery and RoundSlider locally,
+  so the dashboards do not require CDN access at runtime.
 - Keep page markup consistent by using the `.header` and `.content` wrappers already used by the included pages.
 
 
@@ -151,10 +156,17 @@ The server side is set up in `custom/.preload`. It creates the SMQ broker, regis
 
 Pages that need SMQ should not call `SMQ.Client()` directly. Instead, a page script should mount itself with `window.cmsSmq.mountPage(...)`, subscribe to the topics it needs, request initial state after the subscription barrier completes, and register any cleanup it needs when the fragment unloads.
 
+The shell publishes `cms:smq-connect`, `cms:smq-close`, and
+`cms:smq-subscribe-error` DOM events. `static/ui.js` uses these events together
+with HTMX request-error events to show a retryable connection warning. A
+successful HTMX request or SMQ reconnect removes the warning.
+
 For page-specific request/response work, prefer the scoped RPC helper. It uses
 the SMQ RPC pattern from `SMQ-examples/RPC`: requests go to `$RpcReq`, replies
 return on `$RpcResp`, and each response is matched to the original Promise by a
 correlation ID.
+Calls time out after 10 seconds and are also rejected when the page unloads or
+the SMQ connection closes.
 
 #### SMQ Page API
 
@@ -199,6 +211,8 @@ The lifecycle is:
 5. `scope.onReady(...)` runs after the final subscription barrier is acknowledged, so the page can safely request initial state.
 6. When HTMX replaces `#main`, `cms-smq.js` tears down the active page scope, removes page-owned handlers, unsubscribes from page-owned event topics when no handlers remain, and runs `scope.onCleanup(...)`.
 7. The CMS SMQ connection remains open until the full page shell unloads.
+8. After reconnect, active routes are rebuilt and `scope.onReady(...)` runs
+   again so the page can request fresh authoritative state.
 
 Use one-to-many event topics for state many pages or clients may observe. Use
 the scoped RPC helper for page-specific request/response calls when the page may
@@ -246,7 +260,7 @@ Authentication is intentionally optional:
 
 ### Security policies
 
-Default security headers, including the Content Security Policy, are defined in `cms.lua`. If you add CDN assets or any new external scripts or styles, update the CSP to match.
+Default security headers, including the Content Security Policy, are defined in `cms.lua`. The `custom/` shell uses local assets only. If you add external scripts, styles, APIs, or WebSocket endpoints, update the CSP to match.
 
 ### AI-assisted changes
 

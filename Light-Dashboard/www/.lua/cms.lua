@@ -20,7 +20,7 @@ local app,io,dir=app,app.io,app.dir
 
 -- Set on 'dir' and used by function cmsfunc()
 local securityPolicies={
-   ["Content-Security-Policy"]= "default-src 'self'; script-src 'self' cdn.jsdelivr.net 'unsafe-inline'; style-src 'self' cdn.jsdelivr.net 'unsafe-inline'",
+   ["Content-Security-Policy"]= "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'",
    ["X-Content-Type-Options"]="nosniff",
 }
 -- Doc: https://realtimelogic.com/ba/doc/en/lua/lua.html#rsrdr_header

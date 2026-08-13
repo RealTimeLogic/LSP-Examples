@@ -73,7 +73,7 @@ end
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?lsp=activeMenuItem.name?></title>
     <link rel="stylesheet" href="/static/styles.css">
-    <script src="https://unpkg.com/htmx.org@2.0.3"></script>
+    <script src="/static/htmx.min.js"></script>
     <script src="/rtl/smq.js"></script>
     <script src="/static/cms-smq.js"></script>
 </head>

@@ -76,6 +76,65 @@ The content `<div>` is where all your content goes.
     color: #888;
 }
 
+.connection-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 2147483647;
+    display: grid;
+    place-items: center;
+    padding: 1.5rem;
+    background: rgba(0, 0, 0, 0.72);
+}
+
+.connection-panel {
+    width: min(32rem, 100%);
+    padding: 1.5rem;
+    border: 1px solid #d7d7d7;
+    border-radius: 0.5rem;
+    background: #fff;
+    box-shadow: 0 1rem 2.5rem rgba(0, 0, 0, 0.28);
+    color: #222;
+}
+
+.connection-title {
+    margin: 0;
+    font-size: 1.35rem;
+}
+
+.connection-message {
+    margin: 0.65rem 0 1.25rem;
+    color: #555;
+    line-height: 1.55;
+}
+
+.connection-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.65rem;
+}
+
+.connection-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 2.6rem;
+    padding: 0.65rem 1.1rem;
+    border: 1px solid #aaa;
+    border-radius: 0.25rem;
+    background: #eee;
+    color: #222;
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.connection-button-primary {
+    border-color: #1f8dd6;
+    background: #1f8dd6;
+    color: #fff;
+}
+
 
 
 /*

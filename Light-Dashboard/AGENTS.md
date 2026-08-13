@@ -75,6 +75,11 @@ Important distinction for `custom/`:
 - The official SMQ docs define the underlying native API.
 - Custom page scripts must use the CMS page-scope API from `custom/static/cms-smq.js`.
 - Do not create page-local `SMQ.Client(...)` instances in `custom/` pages.
+- The shared client emits `cms:smq-connect`, `cms:smq-close`, and
+  `cms:smq-subscribe-error`; preserve the shell-level connection warning in
+  `custom/static/ui.js`.
+- `scope.onReady(...)` runs again after reconnect. Initial-state requests must
+  be safe to repeat.
 - For page-level SMQ work, read [doc/custom-skill.md](doc/custom-skill.md) and [doc/custom-design.md#page-scopes](doc/custom-design.md#page-scopes).
 
 Server-side Lua SMQ publish signatures are:
@@ -101,6 +106,7 @@ Variant-local files follow the same broad layout:
 Custom-only additions:
 
 - `custom/static/cms-smq.js`: shared browser-side SMQ connection and page-scope lifecycle manager.
+- `custom/static/htmx.min.js`: local HTMX runtime used by the shell.
 - `custom/SMQ/index.lsp`: SMQ connection endpoint.
 - `doc/custom-skill.md`: agent skill for developing the custom variant.
 - `doc/custom-design.md`: detailed custom CMS architecture notes.
@@ -109,10 +115,17 @@ Custom-only additions:
 
 - Always state or infer the target variant before editing.
 - Prefer local assets; update CSP in the relevant `cms.lua` when adding external resources.
+- Do not replace the local HTMX runtime with a CDN dependency.
 - Do not add query-string cache busters such as `?v=custom` to reusable examples/templates.
+- Keep runtime browser dependencies local. The `www/` and `htmx/` RoundSlider
+  pages use the vendored jQuery and RoundSlider files in `static/`; do not
+  replace them with CDN references.
 - Keep page fragments registered in the matching `.lua/menu.json`.
 - Preserve no-JS/full-page behavior unless the user explicitly asks for JS-only behavior.
 - When working on `custom/`, use modern native JavaScript unless the user asks for a specific library.
+- For SMQ changes, stop and restart Mako while a page is open. Verify that the
+  warning appears, subscriptions recover, initial state is requested again,
+  and the warning clears.
 
 ## Verification
 

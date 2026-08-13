@@ -88,13 +88,130 @@
         }
     }
 
+    var connectionWarningDismissed = false;
+
+    function removeConnectionWarning() {
+        var overlay = document.getElementById('connectionWarning');
+        if (overlay) overlay.remove();
+    }
+
+    function connectionRestored() {
+        connectionWarningDismissed = false;
+        removeConnectionWarning();
+    }
+
+    function showConnectionWarning(title, message) {
+        if (connectionWarningDismissed) return;
+
+        var overlay = document.getElementById('connectionWarning');
+        if (!overlay) {
+            overlay = document.createElement('div');
+            overlay.id = 'connectionWarning';
+            overlay.className = 'connection-overlay';
+            overlay.setAttribute('role', 'alertdialog');
+            overlay.setAttribute('aria-modal', 'true');
+            overlay.setAttribute('aria-labelledby', 'connectionWarningTitle');
+
+            var panel = document.createElement('div');
+            panel.className = 'connection-panel';
+            var heading = document.createElement('h2');
+            heading.id = 'connectionWarningTitle';
+            heading.className = 'connection-title';
+            var detail = document.createElement('p');
+            detail.className = 'connection-message';
+            var actions = document.createElement('div');
+            actions.className = 'connection-actions';
+            var retry = document.createElement('a');
+            retry.href = window.location.href;
+            retry.className = 'connection-button connection-button-primary';
+            retry.textContent = 'Retry';
+            var dismiss = document.createElement('button');
+            dismiss.type = 'button';
+            dismiss.className = 'connection-button connection-button-secondary';
+            dismiss.textContent = 'Dismiss';
+            dismiss.addEventListener('click', function () {
+                connectionWarningDismissed = true;
+                removeConnectionWarning();
+            });
+            actions.append(retry, dismiss);
+            panel.append(heading, detail, actions);
+            overlay.appendChild(panel);
+            document.body.appendChild(overlay);
+        }
+
+        overlay.querySelector('.connection-title').textContent = title;
+        overlay.querySelector('.connection-message').textContent = message;
+    }
+
+    function requestFailure(event, fallback) {
+        var xhr = event.detail && event.detail.xhr;
+        var status = xhr && xhr.status;
+        return status
+            ? 'The server returned HTTP ' + status + '. Retry when the service is available.'
+            : fallback;
+    }
+
+    function requestSucceeded(event) {
+        var xhr = event.detail && event.detail.xhr;
+        return Boolean(xhr && xhr.status >= 200 && xhr.status < 400);
+    }
+
     document.body.addEventListener('htmx:afterRequest', function (event) {
+      var successful = requestSucceeded(event);
+      if (successful) {
+        connectionRestored();
+      } else {
+        showConnectionWarning(
+          'Page update failed',
+          requestFailure(event, 'The server could not be reached. Check the connection and try again.')
+        );
+      }
+
       // Add the class to the clicked link
       const targetLink = event.target.closest('.pure-menu-link');
-      if (targetLink) {
+      if (successful && targetLink) {
         setActiveLink(targetLink);
       }
     });
+
+    document.addEventListener('htmx:beforeRequest', function () {
+      connectionWarningDismissed = false;
+    }, true);
+    document.addEventListener('htmx:sendError', function (event) {
+      showConnectionWarning(
+        'Server unavailable',
+        requestFailure(event, 'The server could not be reached. Check the connection and try again.')
+      );
+    }, true);
+    document.addEventListener('htmx:timeout', function () {
+      showConnectionWarning('Request timed out', 'The server did not respond in time. Try again.');
+    }, true);
+    document.addEventListener('htmx:responseError', function (event) {
+      showConnectionWarning(
+        'Page update failed',
+        requestFailure(event, 'The server rejected the page update. Try again.')
+      );
+    }, true);
+
+    document.addEventListener('cms:smq-connect', connectionRestored);
+    document.addEventListener('cms:smq-close', function (event) {
+      var detail = event.detail || {};
+      var message = detail.canReconnect
+        ? 'The real-time connection was lost. Reconnecting automatically.'
+        : 'The real-time connection was closed. Reload the page to reconnect.';
+      showConnectionWarning('Real-time connection lost', message);
+    });
+    document.addEventListener('cms:smq-subscribe-error', function () {
+      showConnectionWarning(
+        'Real-time subscription denied',
+        'The server rejected a real-time page subscription. Reload the page or contact the administrator.'
+      );
+    });
+
+    window.addEventListener('offline', function () {
+      showConnectionWarning('Network unavailable', 'This device is offline. Reconnect to the network and try again.');
+    });
+    window.addEventListener('online', connectionRestored);
 
     document.body.addEventListener('htmx:historyRestore', syncNavigationFromUrl);
     window.addEventListener('popstate', function () {

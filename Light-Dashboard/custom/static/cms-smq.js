@@ -2,7 +2,8 @@
   "use strict";
 
   const brokerTid = 1;
-  const smq = SMQ.Client("/SMQ/", { cleanstart: true });
+  const rpcTimeoutMs = 10000;
+  const smq = SMQ.Client(SMQ.wsURL("/SMQ/"), { cleanstart: true });
   const routes = new Map();
   let connected = false;
   let hasConnected = false;
@@ -31,15 +32,31 @@
   }
 
   function subscribeRoute(route) {
+    if (!connected) {
+      return;
+    }
+
     if (route.subscribedGeneration === connectionGeneration) {
       return;
     }
 
     const settings = {
       datatype: route.datatype,
+      onack(accepted) {
+        if (!accepted) {
+          emit("cms:smq-subscribe-error", {
+            topic: route.topic,
+            subtopic: route.subtopic || null
+          });
+        }
+      },
       onmsg(message, ptid, tid, subtid) {
         route.handlers.forEach((handler) => {
-          handler(message, ptid, tid, subtid);
+          try {
+            handler(message, ptid, tid, subtid);
+          } catch (error) {
+            console.error("SMQ page handler failed", error);
+          }
         });
       }
     };
@@ -79,7 +96,13 @@
 
     failPendingRpc(scope, new Error("Page unloaded before SMQ RPC response"));
     scope.active = false;
-    scope.cleanups.forEach((cleanup) => cleanup());
+    scope.cleanups.forEach((cleanup) => {
+      try {
+        cleanup();
+      } catch (error) {
+        console.error("SMQ page cleanup failed", error);
+      }
+    });
 
     scope.routes.forEach((key) => {
       const route = routes.get(key);
@@ -107,6 +130,7 @@
     }
 
     scope.rpcPending.forEach((pending) => {
+      window.clearTimeout(pending.timer);
       pending.reject(error);
     });
     scope.rpcPending.clear();
@@ -123,6 +147,7 @@
     }
 
     scope.rpcPending.delete(response.id);
+    window.clearTimeout(pending.timer);
     if (response.err) {
       pending.reject(new Error(formatError(response.err)));
     } else {
@@ -134,6 +159,9 @@
     if (!scope.active) {
       return Promise.reject(new Error("Page scope is no longer active"));
     }
+    if (!connected) {
+      return Promise.reject(new Error("SMQ is not connected"));
+    }
 
     const id = `${scope.id}:${++scope.rpcCounter}`;
     const payload = {
@@ -143,28 +171,43 @@
     };
 
     return new Promise((resolve, reject) => {
-      scope.rpcPending.set(id, { resolve, reject });
+      const timer = window.setTimeout(() => {
+        scope.rpcPending.delete(id);
+        reject(new Error(`SMQ RPC timed out: ${methodName}`));
+      }, rpcTimeoutMs);
+      scope.rpcPending.set(id, { resolve, reject, timer });
       try {
         window.cmsSmq.sendToBroker("$RpcReq", payload);
       } catch (error) {
         scope.rpcPending.delete(id);
+        window.clearTimeout(timer);
         reject(error);
       }
     });
   }
 
   function readyScope(scope) {
-    if (!scope || !scope.active || scope.readyCallbacks.length === 0) {
+    if (!connected || !scope || !scope.active || scope.readyCallbacks.length === 0) {
       return;
     }
 
     const readyGeneration = connectionGeneration;
     smq.subscribe("$cmsReady", {
       onack(accepted) {
-        if (!accepted || !scope.active || readyGeneration !== connectionGeneration) {
+        if (!accepted) {
+          emit("cms:smq-subscribe-error", { topic: "$cmsReady", subtopic: null });
           return;
         }
-        scope.readyCallbacks.forEach((callback) => callback(smq));
+        if (!scope.active || readyGeneration !== connectionGeneration) {
+          return;
+        }
+        scope.readyCallbacks.forEach((callback) => {
+          try {
+            callback(smq);
+          } catch (error) {
+            console.error("SMQ page readiness callback failed", error);
+          }
+        });
       }
     });
   }
@@ -183,14 +226,22 @@
     readyScope(scope);
   }
 
+  function emit(name, detail) {
+    document.dispatchEvent(new CustomEvent(name, { detail: detail || {} }));
+  }
+
   function onConnect() {
     connected = true;
     if (hasConnected) {
       connectionGeneration += 1;
-      reconnectScope(currentScope);
     } else {
       hasConnected = true;
     }
+    reconnectScope(currentScope);
+    emit("cms:smq-connect", {
+      generation: connectionGeneration,
+      reconnect: connectionGeneration > 0
+    });
   }
 
   smq.onconnect = onConnect;
@@ -198,6 +249,10 @@
   smq.onclose = function (message, canreconnect) {
     connected = false;
     failPendingRpc(currentScope, new Error(message || "SMQ disconnected"));
+    emit("cms:smq-close", {
+      message: message || "SMQ disconnected",
+      canReconnect: Boolean(canreconnect)
+    });
     if (canreconnect) {
       return 3000;
     }
@@ -206,6 +261,7 @@
 
   window.cmsSmq = {
     brokerTid,
+    rpcTimeoutMs,
     client: smq,
 
     isConnected() {
@@ -213,15 +269,15 @@
     },
 
     sendToBroker(messageName, payload) {
-      smq.pubjson(payload || {}, brokerTid, messageName);
+      smq.pubjson(payload === undefined ? {} : payload, brokerTid, messageName);
     },
 
     sendToPeer(peerTid, messageName, payload) {
-      smq.pubjson(payload || {}, peerTid, messageName);
+      smq.pubjson(payload === undefined ? {} : payload, peerTid, messageName);
     },
 
     publishEvent(eventName, payload) {
-      smq.pubjson(payload || {}, eventName);
+      smq.pubjson(payload === undefined ? {} : payload, eventName);
     },
 
     mountPage(name, init) {

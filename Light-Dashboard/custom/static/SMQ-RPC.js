@@ -86,6 +86,22 @@
   }
 
   function install(scope) {
+    function onConnect() {
+      setConnection("connected");
+    }
+
+    function onClose(event) {
+      const detail = event.detail || {};
+      setConnection(detail.canReconnect ? "reconnecting" : "disconnected");
+    }
+
+    document.addEventListener("cms:smq-connect", onConnect);
+    document.addEventListener("cms:smq-close", onClose);
+    scope.onCleanup(() => {
+      document.removeEventListener("cms:smq-connect", onConnect);
+      document.removeEventListener("cms:smq-close", onClose);
+    });
+
     async function testEcho() {
       const response = await scope.rpc.echo("alpha", { value: 42 }, true);
       assert(Array.isArray(response), "echo response should be an array", response);

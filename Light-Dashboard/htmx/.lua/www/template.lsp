@@ -29,7 +29,7 @@ end
     <title><?lsp=activeMenuItem.name?></title>
     <link rel="stylesheet" href="/static/pure-min.css">
     <link rel="stylesheet" href="/static/styles.css">
-    <script src="https://unpkg.com/htmx.org@2.0.3"></script>
+    <script src="/static/htmx.min.js"></script>
 </head>
 <body>
 

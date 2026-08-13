@@ -11,4 +11,6 @@ if require"smq.hub".isSMQ(request) then
    response:abort() -- stop executing page
 end
 
+response:senderror(400,"Not an SMQ connection request")
+
 ?>
