@@ -8,11 +8,42 @@ If you are new to Lua, start with the [online Lua tutorial](https://tutorial.rea
 
 ## AI-assisted development
 
-This repository is intentionally structured to be AI friendly. The root [AGENTS.md](AGENTS.md) provides generic Barracuda App Server, Mako Server, and Xedge guidance, and each prepared example has its own `AGENTS.md` with example-specific instructions for AI coding agents.
+The root [AGENTS.md](AGENTS.md) teaches an AI agent how to work correctly with
+BAS, Mako Server, Xedge, Xedge32, LSP, routing, authentication, SQLite, SMQ,
+and browser interfaces. Prepared examples also include local `AGENTS.md` files
+with more specific instructions.
 
-[LSP-Claw](https://github.com/RealTimeLogic/LSP-Claw) is an MCP server for AI-assisted Lua, LSP, IoT, and web-app development with BAS-based tools such as Mako Server, Xedge, and Xedge32. It gives an AI agent access to a controlled lab app where it can inspect examples, create files, run the app, and debug server-side Lua/LSP code. It is especially useful for embedded systems because the lab app can be started, stopped, or replaced without restarting the device, RTOS, or host server.
+### Start a new project
 
-Use LSP-Claw when you want an AI agent to select the best example for a requested task, copy only the relevant parts into a lab app, run the result, and inspect trace output before modifying production code.
+Copy [AGENTS.md](AGENTS.md) into the root of the new working directory and keep
+the filename unchanged. Start the AI agent in that directory and use this
+bootstrap prompt:
+
+```text
+Read and follow AGENTS.md. Complete its mandatory reference bootstrap before
+doing any work. If downloading is blocked, request the required permissions; if
+that fails, give me the exact download links and destination paths.
+
+Then inspect this workspace and tell me what you found. Do not change any
+application files until you have confirmed the target runtime, application
+root, and relevant example or architecture with me.
+```
+
+The agent downloads the required API references and skills into
+`.agents/reference/rtl/`, then uses them as the source of truth for the work.
+For an offline project, copy the complete reference directory together with
+`AGENTS.md`.
+
+### Develop on a running system with LSP-Claw
+
+[LSP-Claw](https://github.com/RealTimeLogic/LSP-Claw) is an MCP server that lets
+an AI agent inspect examples, create files, run a controlled lab app, and debug
+Lua/LSP code directly on Mako Server, Xedge, or Xedge32. Use it when the agent
+should select an example, build and test the application, and inspect runtime
+trace output without modifying production code first.
+
+On embedded systems, LSP-Claw can restart or replace only the lab application
+without restarting the device, RTOS, or hosting server.
 
 ## Files
 
