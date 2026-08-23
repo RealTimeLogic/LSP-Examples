@@ -158,8 +158,12 @@ Pages that need SMQ should not call `SMQ.Client()` directly. Instead, a page scr
 
 The shell publishes `cms:smq-connect`, `cms:smq-close`, and
 `cms:smq-subscribe-error` DOM events. `static/ui.js` uses these events together
-with HTMX request-error events to show a retryable connection warning. A
-successful HTMX request or SMQ reconnect removes the warning.
+with HTMX request-error events to show a retryable connection warning. HTMX
+requests time out after 10 seconds. The warning identifies the page that failed,
+and Retry performs a normal full-page request for that page. A successful HTMX
+request clears an HTTP warning, while an SMQ reconnect clears only an SMQ
+warning. A browser `online` event does not clear the warning by itself because
+it does not prove that the server is reachable.
 
 For page-specific request/response work, prefer the scoped RPC helper. It uses
 the SMQ RPC pattern from `SMQ-examples/RPC`: requests go to `$RpcReq`, replies

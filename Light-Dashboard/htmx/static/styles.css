@@ -102,9 +102,17 @@ The content `<div>` is where all your content goes.
 }
 
 .connection-message {
-    margin: 0.65rem 0 1.25rem;
+    margin: 0.65rem 0;
     color: #555;
     line-height: 1.55;
+}
+
+.connection-request {
+    margin: 0 0 1.25rem;
+    overflow-wrap: anywhere;
+    color: #222;
+    font-family: monospace;
+    font-size: 0.9rem;
 }
 
 .connection-actions {

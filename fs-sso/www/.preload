@@ -1,61 +1,71 @@
+local conf=require"loadconf"
+local openid=assert(conf.openid,"The openid table is missing in mako.conf")
+local dio=assert(ba.openio"disk")
 
-local dio=ba.openio("disk")
-mako.createloader(io) -- makes it possible to do: require"ms-sso"
-
--- Loads and configures the SSO module
--- Creates and returns the authenticator object
-local function createSSO(baseURL)
-   sso=require"ms-sso".init(
-                         require"loadconf".openid, -- The parameters must be set in mako.conf
-                         baseURL -- login page is index.lsp and is accessible at base.
-                         )
-   -- The sso object is used by index.lsp
-
-   -- Create an authenticator that simply redirects the user to the base URL if not authenticated
-   -- Doc:
-   --   Authuser: https://realtimelogic.com/ba/doc/en/lua/lua.html#ba_create_authuser
-   --   Authenticator: https://realtimelogic.com/ba/doc/en/lua/lua.html#ba_create_authenticator
-   local function authresp(_ENV, authinfo) response:sendredirect(baseURL) end
-   local function notAuthenticated() end -- No return = not authenticated (always).
-   local auth=ba.create.authenticator(ba.create.authuser(notAuthenticated),{type="auth",response=authresp})
-   return auth
-end
-
-
-
--- The following code sets up a WebDAV/Web-File-Manager and uses the 'auth' object created by createSSO()
-
--- The following should work for both Windows and Linux
-local lockDir = mako.dos2unix(os.getenv"LocalAppData" or os.getenv"TEMP" or os.getenv"TMP" or "/tmp").."/.LOCK"
-if not dio:stat(lockDir) and not dio:mkdir(lockDir) then
-   trace("Error, cannot create:",lockDir)
-else
-   trace("WebDAV .lock directory", lockDir)
-   local type,platform=io:resourcetype()
-   if "windows" == platform then
-      -- On Windows, the Web File Manager creates a virtual top-level
-      -- directory that lists all available drives. However, when
-      -- mapping a WebDAV client on the same computer as the WebDAV
-      -- server, using this virtual directory is not advisable. Doing
-      -- so can create a circular reference that ultimately deadlocks
-      -- the file system and the server.
-      local drive,path=lockDir:match("(.)(.+)")
-      if drive then
-         dio=ba.mkio(dio,drive)
-         assert(dio)
-         trace(string.format("Setting drive to '%s'",drive))
-         lockDir=path
-      end
+-- The reusable SSO module reports what happened. This example decides how to
+-- report it: always to trace and, when Mako SMTP is configured, by email.
+local sendmail=conf.log and conf.log.smtp and require"log".sendmail
+local function notify(event)
+   local msg=string.format("%s%s",event.message,event.expires and
+                           " Expiration: "..event.expires or "")
+   trace("Microsoft Entra credential event:",event.kind,msg)
+   if sendmail then
+      ba.thread.run(function()
+         local action=event.kind == "credential-expiring" or
+                      event.kind == "credential-expired" or
+                      event.kind == "credential-invalid"
+         local ok,err=sendmail{
+            to=openid.notify_to,
+            subject="Microsoft Entra credential: "..event.kind,
+            body=msg..(action and
+               "\n\nOpen the server login page to replace an invalid or expired secret." or "")
+         }
+         if not ok then trace("Credential notification email failed:",err) end
+      end)
    end
 end
 
--- Create a file server instance and insert it into this app's directory.
--- VFS intro: https://realtimelogic.com/ba/doc/en/VirtualFileSystem.html
-require"wfs" -- Create 'ba.create.wfs'
-local fs=ba.create.wfs("fs", dio, lockDir)
+-- Mako example storage. A copied embedded application can replace only this
+-- section; ms-sso.lua has no filesystem or Mako dependency.
+local lockDir=mako.dos2unix(os.getenv"LocalAppData" or os.getenv"TEMP" or
+                            os.getenv"TMP" or "/tmp").."/.LOCK"
+assert(dio:stat(lockDir) or dio:mkdir(lockDir),"Cannot create WebDAV lock directory: "..lockDir)
+local _,platform=io:resourcetype()
+if platform == "windows" then
+   local drive,path=lockDir:match"(.)(.+)"
+   if drive then
+      dio=assert(ba.mkio(dio,drive))
+      lockDir=path
+   end
+end
+
+require"wfs"
+local fs=assert(ba.create.wfs("fs",dio,lockDir))
+local base=dir:baseuri()
+app.ssoBase=base
+local msSso=appreq"ms-sso"
+app.sso=msSso.init(openid,{notify=notify})
+
+local function authresp(env)
+   if env.request:header"Sec-Fetch-Dest" == "document" then
+      env.response:sendredirect(base)
+      return
+   end
+   env.response:setstatus(401)
+   env.response:setcontenttype"application/json"
+   env.response:setheader("Cache-Control","no-store")
+   env.response:write'{"err":"sessionexpired","emsg":"Your session has expired. Sign in again to continue."}'
+end
+local function notAuthenticated() end
+local auth=ba.create.authenticator(
+   ba.create.authuser(notAuthenticated),{type="auth",response=authresp})
+
 dir:insert(fs,true)
-local base=dir:baseuri() -- Where it is installed: '/' if mako -l::www, '/myapp/' if mako -lmyapp::www
-trace("Installing Web File Server at:",base)
--- Prevent non authenticated users from using the file server
-fs:setauth(createSSO(base))
+fs:setauth(auth)
 fs:configure{tmo=2*60*60,helpuri=base.."help.lsp",logouturi=base.."logout.lsp"}
+trace("Installing Web File Server at:",base.."fs/")
+
+function onunload()
+   app.sso.close()
+   fs:unlink()
+end

@@ -89,19 +89,64 @@
     }
 
     var connectionWarningDismissed = false;
+    var failedRequestUrl = window.location.href;
+    var connectionWarningKind = '';
 
     function removeConnectionWarning() {
         var overlay = document.getElementById('connectionWarning');
         if (overlay) overlay.remove();
+        connectionWarningKind = '';
     }
 
-    function connectionRestored() {
+    function connectionRestored(kind) {
+        if (connectionWarningKind && connectionWarningKind !== kind
+            && !(kind === 'http' && connectionWarningKind === 'network')) {
+            return;
+        }
         connectionWarningDismissed = false;
         removeConnectionWarning();
     }
 
-    function showConnectionWarning(title, message) {
+    function requestUrl(event) {
+        var detail = event && event.detail;
+        var pathInfo = detail && detail.pathInfo;
+        var requestConfig = detail && detail.requestConfig;
+        var source = (detail && detail.elt) || (event && event.target);
+        var candidate = (pathInfo && (pathInfo.finalRequestPath || pathInfo.requestPath))
+            || (requestConfig && requestConfig.path)
+            || (source && source.getAttribute
+                && (source.getAttribute('hx-get') || source.getAttribute('href')));
+
+        if (!candidate) return failedRequestUrl;
+
+        try {
+            var url = new URL(candidate, window.location.href);
+            return url.origin === window.location.origin ? url.href : failedRequestUrl;
+        } catch (error) {
+            return failedRequestUrl;
+        }
+    }
+
+    function requestLabel(url) {
+        try {
+            var parsed = new URL(url, window.location.href);
+            return parsed.pathname + parsed.search;
+        } catch (error) {
+            return '';
+        }
+    }
+
+    function retryFailedRequest() {
+        window.location.assign(failedRequestUrl || window.location.href);
+    }
+
+    function showConnectionWarning(title, message, event, kind) {
         if (connectionWarningDismissed) return;
+        kind = kind || 'http';
+        if (kind === 'smq' && connectionWarningKind && connectionWarningKind !== 'smq') return;
+
+        failedRequestUrl = requestUrl(event);
+        connectionWarningKind = kind;
 
         var overlay = document.getElementById('connectionWarning');
         if (!overlay) {
@@ -111,6 +156,7 @@
             overlay.setAttribute('role', 'alertdialog');
             overlay.setAttribute('aria-modal', 'true');
             overlay.setAttribute('aria-labelledby', 'connectionWarningTitle');
+            overlay.setAttribute('aria-describedby', 'connectionWarningMessage connectionWarningRequest');
 
             var panel = document.createElement('div');
             panel.className = 'connection-panel';
@@ -118,13 +164,18 @@
             heading.id = 'connectionWarningTitle';
             heading.className = 'connection-title';
             var detail = document.createElement('p');
+            detail.id = 'connectionWarningMessage';
             detail.className = 'connection-message';
+            var request = document.createElement('p');
+            request.id = 'connectionWarningRequest';
+            request.className = 'connection-request';
             var actions = document.createElement('div');
             actions.className = 'connection-actions';
-            var retry = document.createElement('a');
-            retry.href = window.location.href;
+            var retry = document.createElement('button');
+            retry.type = 'button';
             retry.className = 'connection-button connection-button-primary';
             retry.textContent = 'Retry';
+            retry.addEventListener('click', retryFailedRequest);
             var dismiss = document.createElement('button');
             dismiss.type = 'button';
             dismiss.className = 'connection-button connection-button-secondary';
@@ -134,13 +185,18 @@
                 removeConnectionWarning();
             });
             actions.append(retry, dismiss);
-            panel.append(heading, detail, actions);
+            panel.append(heading, detail, request, actions);
             overlay.appendChild(panel);
             document.body.appendChild(overlay);
         }
 
         overlay.querySelector('.connection-title').textContent = title;
         overlay.querySelector('.connection-message').textContent = message;
+        var label = connectionWarningKind === 'smq' ? '' : requestLabel(failedRequestUrl);
+        var requestDetail = overlay.querySelector('.connection-request');
+        requestDetail.textContent = label ? 'Requested page: ' + label : '';
+        requestDetail.hidden = !label;
+        overlay.querySelector('.connection-button-primary').focus();
     }
 
     function requestFailure(event, fallback) {
@@ -152,6 +208,9 @@
     }
 
     function requestSucceeded(event) {
+        if (event.detail && typeof event.detail.successful === 'boolean') {
+            return event.detail.successful;
+        }
         var xhr = event.detail && event.detail.xhr;
         return Boolean(xhr && xhr.status >= 200 && xhr.status < 400);
     }
@@ -159,11 +218,12 @@
     document.body.addEventListener('htmx:afterRequest', function (event) {
       var successful = requestSucceeded(event);
       if (successful) {
-        connectionRestored();
+        connectionRestored('http');
       } else {
         showConnectionWarning(
           'Page update failed',
-          requestFailure(event, 'The server could not be reached. Check the connection and try again.')
+          requestFailure(event, 'The server could not be reached. Check the connection and try again.'),
+          event
         );
       }
 
@@ -180,42 +240,61 @@
     document.addEventListener('htmx:sendError', function (event) {
       showConnectionWarning(
         'Server unavailable',
-        requestFailure(event, 'The server could not be reached. Check the connection and try again.')
+        requestFailure(event, 'The server could not be reached. Check the connection and try again.'),
+        event
       );
     }, true);
-    document.addEventListener('htmx:timeout', function () {
-      showConnectionWarning('Request timed out', 'The server did not respond in time. Try again.');
+    document.addEventListener('htmx:timeout', function (event) {
+      showConnectionWarning('Request timed out', 'The server did not respond within 10 seconds. Try again.', event);
     }, true);
     document.addEventListener('htmx:responseError', function (event) {
       showConnectionWarning(
         'Page update failed',
-        requestFailure(event, 'The server rejected the page update. Try again.')
+        requestFailure(event, 'The server rejected the page update. Try again.'),
+        event
       );
     }, true);
 
-    document.addEventListener('cms:smq-connect', connectionRestored);
+    document.addEventListener('cms:smq-connect', function () {
+      connectionRestored('smq');
+    });
     document.addEventListener('cms:smq-close', function (event) {
       var detail = event.detail || {};
       var message = detail.canReconnect
         ? 'The real-time connection was lost. Reconnecting automatically.'
         : 'The real-time connection was closed. Reload the page to reconnect.';
-      showConnectionWarning('Real-time connection lost', message);
+      showConnectionWarning('Real-time connection lost', message, undefined, 'smq');
     });
     document.addEventListener('cms:smq-subscribe-error', function () {
       showConnectionWarning(
         'Real-time subscription denied',
-        'The server rejected a real-time page subscription. Reload the page or contact the administrator.'
+        'The server rejected a real-time page subscription. Reload the page or contact the administrator.',
+        undefined,
+        'smq'
       );
     });
 
     window.addEventListener('offline', function () {
-      showConnectionWarning('Network unavailable', 'This device is offline. Reconnect to the network and try again.');
+      showConnectionWarning(
+        'Network unavailable',
+        'This device is offline. Reconnect to the network and try again.',
+        undefined,
+        'network'
+      );
     });
-    window.addEventListener('online', connectionRestored);
+    window.addEventListener('online', function () {
+      var overlay = document.getElementById('connectionWarning');
+      if (overlay && connectionWarningKind === 'network') {
+        overlay.querySelector('.connection-title').textContent = 'Network connection restored';
+        overlay.querySelector('.connection-message').textContent = 'Retry the requested page to confirm that the server is available.';
+      }
+    });
 
-    document.body.addEventListener('htmx:historyRestore', syncNavigationFromUrl);
-    window.addEventListener('popstate', function () {
-      window.setTimeout(syncNavigationFromUrl, 0);
-    });
+    function scheduleNavigationSync() {
+      window.setTimeout(syncNavigationFromUrl, 50);
+    }
+
+    document.body.addEventListener('htmx:historyRestore', scheduleNavigationSync);
+    window.addEventListener('popstate', scheduleNavigationSync);
 
 }(this, this.document));

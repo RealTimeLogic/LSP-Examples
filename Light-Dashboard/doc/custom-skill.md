@@ -480,9 +480,10 @@ Check these paths:
 - HTMX navigation from the menu.
 - Browser back/forward.
 - If SMQ is involved, full reload plus HTMX navigation away from and back to the page.
-- Stop Mako with the page open. Verify the connection warning appears, then
-  restart Mako and verify the warning clears, subscriptions resume, and fresh
-  initial state is loaded.
+- Stop Mako with the page open and select a different menu page. Verify the
+  connection warning names the requested path. Restart Mako, select Retry, and
+  verify that the requested page loads as a full page. For SMQ pages, also
+  verify that subscriptions resume and fresh initial state is loaded.
 - If styling changed, desktop and mobile nav widths.
 
 Useful command checks:

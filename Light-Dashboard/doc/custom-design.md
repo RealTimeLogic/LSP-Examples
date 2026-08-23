@@ -635,7 +635,17 @@ The connection manager emits these document events:
 
 `custom/static/ui.js` combines these events with `htmx:sendError`,
 `htmx:timeout`, and `htmx:responseError` to show one retryable warning overlay.
-The warning clears after a successful HTMX request or SMQ reconnect.
+The page shell configures a 10-second HTMX timeout. The warning retains the
+failed request URL, and Retry uses a normal full-page request so recovery does
+not depend on HTMX state. HTTP and SMQ recovery are tracked separately: an SMQ
+reconnect does not hide a failed-navigation warning, and a browser `online`
+event does not claim that the server is reachable. If HTTP and SMQ fail at the
+same time, the failed-navigation warning takes priority because it identifies
+the page Retry must load.
+
+Browser back/forward restoration schedules menu and title synchronization after
+HTMX finishes restoring its history snapshot. This prevents a restored fragment
+from retaining the active menu item and title of the previous history entry.
 
 ## Page Author Pattern for SMQ
 

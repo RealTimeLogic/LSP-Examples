@@ -514,9 +514,17 @@ legend {
 }
 
 .connection-message {
-    margin: 0.65rem 0 1.25rem;
+    margin: 0.65rem 0;
     color: var(--muted);
     line-height: 1.55;
+}
+
+.connection-request {
+    margin: 0 0 1.25rem;
+    overflow-wrap: anywhere;
+    color: var(--text);
+    font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+    font-size: 0.9rem;
 }
 
 .connection-actions {

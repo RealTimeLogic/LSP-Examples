@@ -1,278 +1,307 @@
-# Single Sign-On (SSO) with OpenID Connect for Microsoft Entra ID
+# Microsoft Entra ID SSO for a BAS File Server
 
-## Overview
+This example uses OpenID Connect to authenticate users with Microsoft Entra ID
+(formerly Azure AD), then protects a BAS Web File Server and WebDAV endpoint.
+It includes a small **reusable** Lua module that can be copied into any Barracuda App
+Server (BAS) powered product, including Mako Server and Xedge.
 
-This example shows how to implement Single Sign-On (SSO) using
-[OpenID Connect](https://openid.net/connect/). The example is designed
-specifically for [Microsoft Azure](https://portal.azure.com/) Entra ID.
+SSO lets a product rely on centrally managed organizational identities instead
+of shipping product-local passwords. User access, account disabling, and login
+policy remain under the organization's control rather than being duplicated on
+every device or server.
 
-Shipping products with pre-installed passwords creates a major
-security vulnerability - essentially setting up a "backdoor" into your
-system.  Implementing SSO can mitigate this risk by allowing users to
-access multiple applications or services with a single set of
-credentials that are not stored on the device. By centralizing the
-authentication process, SSO not only makes it more challenging for
-unauthorized individuals to gain access but also simplifies account
-management and monitoring for system administrators.  This approach
-significantly enhances overall system security and integrity.
+## Microsoft's forced client secret rotation
 
->For an introduction to SSO, check out:
->
->1.  [Single Sign On for Embedded
->    Devices](https://www.linkedin.com/pulse/benefits-active-directory-single-sign-on-embedded)
->2.  [Xedge](https://realtimelogic.com/ba/doc/en/Xedge.html#auth) --
->    which includes an easy-to-use web interface that enables Microsoft
->    Entra ID Single Sign-On as an option.
+This web application still needs a credential of its own.
+Microsoft limits the lifetime of an app registration's client secret to [24
+months or less](https://learn.microsoft.com/en-us/entra/identity-platform/how-to-add-credentials)
+and recommends a lifetime shorter than 12 months. When that secret expires,
+new logins cannot complete.
 
-## Files
+An enterprise application may have a dedicated security team to rotate its
+credentials. A BAS-powered product, embedded device, or customer-managed VPS
+often does not: the operator may have no command line or know how to edit the
+server configuration. Rotation therefore needs an application-level workflow.
 
-### Files Overview
+The reusable module reports upcoming expiration and credential failures through
+callbacks. The Mako example in `www/.preload` turns those events into trace
+messages and, when SMTP is configured, email notifications.
 
-This section details the key files in the `LSP-Examples/fs-sso/www` directory and explains their roles in the Single Sign-On (SSO) example application.
+If Entra rejects an expired or invalid secret during a state-bound login, the
+demo page in `www/index.lsp` presents a recovery form. The module activates a
+replacement only after using it to complete a new authorization-code flow and
+validating the resulting identity token. The detailed safeguards and
+persistence boundary are described in [Browser-based secret
+rotation](#browser-based-secret-rotation).
 
-- **.preload**:
-  This application startup file is responsible for loading the `ms-sso.lua` module. It also creates the authenticator and initializes the Web File Manager (WFS), setting up the core SSO functionality for the application.
+> For additional background, see [Single Sign On for Embedded
+> Devices](https://www.linkedin.com/pulse/benefits-active-directory-single-sign-on-embedded)
+> and the [Xedge authentication
+> documentation](https://realtimelogic.com/ba/doc/en/Xedge.html#auth), which
+> includes Microsoft Entra ID as a built-in SSO option.
 
-- **index.lsp**:
-  This LSP file manages the login user interface. It serves as the primary entry point where users are prompted to log in, enabling them to access protected resources.
+## How the example is organized
 
-- **help.lsp**:
-  Invoked by the Web File Manager (WFS), this file is linked to the Help button in the UI.
+- `www/.lua/ms-sso.lua` is the reusable OpenID Connect module. It has no Mako,
+  filesystem, email, or persistence policy.
+- `www/.preload` is the Mako integration example. It loads `mako.conf`, installs
+  notification callbacks, and protects the Web File Server.
+- `www/index.lsp` is the demo login page and provides the browser-based
+  credential-recovery workflow.
 
-- **logout.lsp**:
-  Also part of the Web File Manager (WFS), this file handles the logout button functionality.
+Create the `mako.conf` described below and run Mako with `www` as the application
+root. Other BAS products can reuse `ms-sso.lua` while replacing the Mako-specific
+integration callbacks.
 
-### The SSO Module
+## Session URLs and WebDAV
 
-- **ms-sso.lua** (located in the `.lua` subdirectory):
-  This generic SSO module encapsulates the Single Sign-On logic used across the application. Designed for reusability, it simplifies the integration of SSO by handling core authentication tasks, making it easy to incorporate into your own projects.
+After login, the demo page lets the user open Web File Manager or explicitly
+generate a session URL for the WebDAV root. Web File Manager can also generate
+a URL that starts at any displayed directory: select the directory, open its
+context menu, and choose **Copy Session URL**.
 
-## How to run
+A client that cannot perform browser SSO can use this URL as its credential.
+For a quick test, paste it into a separate browser session that is not already
+authenticated. You can also supply it directly to a WebDAV client.
 
-### Azure Instructions
+### Mounting WebDAV
 
-Follow these steps to configure your application in the Azure portal:
+Use the session URL as the server URL when mounting or mapping the WebDAV
+service. The [WebDAV mount tutorial](https://youtu.be/i5ubScGwUOc) demonstrates
+the client-side procedure.
 
-1.  Open the [Azure portal](https://portal.azure.com/) and click on the
-    **Azure Active Directory** icon.
-2.  In the left pane, click the hamburger-menu and then select
-    **Microsoft Entra ID**.
-3.  At the top of the page, click **Add -\> App Registration**.
-4.  Enter a suitable name for your application.
-5.  Set the account type to **Single tenant** (in most cases).
-6.  Click on **Select a platform** and choose **Web**.
-7.  For the redirect URI, include all relevant sites (e.g., test sites).
-    For testing purposes, you can use `http://localhost`. For deployment, see [Redirect URI Requirements](#redirect-uri-requirements).
-8.  Click **Register** at the bottom of the page.
-9.  On the following page, copy and save both the **Application (client)
-    ID** and the **Directory (tenant) ID**.
-10. In the left pane, click **Certificates & secrets** and then click
-    **New client secret**.
-11. Provide a name for your client secret.
-12. Choose an appropriate expiration date for the secret.
-13. Click **Add** at the bottom of the page.
-14. Immediately copy the **client secret Value** - you won't be able to
-    see this value again.
-15. Insert the **Directory (tenant) ID**, **Application (client) ID**,
-    and **client secret Value** into your `mako.conf` file (details below).
+### Session URL security
 
-### Granting Users Access
+A session URL is a bearer credential with the same file permissions as the BAS
+session that created it. In this example it expires after two hours. Use HTTPS
+outside localhost, keep the URL private, and never place it in logs, email,
+analytics, or other systems that may retain it. Without HTTPS, anyone able to
+intercept the URL can use it until it expires.
 
-Once your application is set up, grant access to individual users within
-your organization by following these steps:
+## Entra setup
 
-1.  In the Azure portal, click **View** below the **Manage Microsoft
-    Entra ID** icon.
-2.  Search for and select the application you just registered.
-3.  Click on **Assign users and groups**.
-4.  Click **+ Add user/group** and then click the link below **Users**.
-5.  Check the users you want to grant permission to and click **Select**
-    at the bottom of the page.
+The production registration described here belongs in the end customer's Entra
+tenant. The product engineer normally creates a registration only in a
+development tenant for testing. In a deployed product, responsibilities should
+be divided as follows:
 
-Users granted access will now be able to sign in and use the application
-based on the permissions and roles assigned to them.
+| Role | Responsibility |
+| --- | --- |
+| Product engineer | Integrate `ms-sso.lua`; provide secure initial provisioning, credential persistence, notification, and browser-based rotation in the BAS-powered product. |
+| Customer Entra administrator or app-registration owner | Create and maintain the registration in the customer's tenant, create replacement secrets, and control redirect URIs and other registration settings. |
+| Customer product administrator or operations team | Enter the customer-supplied settings into the product and monitor the credential notifications. In a smaller organization, this may be one of the app-registration owners. |
 
-For additional details, refer to the Microsoft tutorial: [Register an
-application with the Microsoft identity
-platform](https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-configure-app-expose-web-apis).
-When you\'re ready, proceed to the [next
-tutorial](https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-configure-app-access-web-apis),
-which includes the section on [adding permissions to access Microsoft
-Graph](https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-configure-app-access-web-apis#add-permissions-to-access-microsoft-graph).
+An **app-registration owner** is an individual account in the customer's Entra
+tenant with administrative control over that registration. Owners are not the
+ordinary users assigned permission to sign in. An owner can update the
+registration's credentials and add or remove other owners, but that ownership
+is scoped to the applications the person owns. See Microsoft's [application
+registration owner
+permissions](https://learn.microsoft.com/en-us/entra/fundamentals/users-default-permissions#application-registration-owner-permissions).
 
-### Start the Example
+Choose the smallest practical set of active customer personnel, normally at
+least two so credential rotation does not depend on one available person. Good
+candidates are a member of the customer's identity/security team and the IT or
+service owner responsible for the deployed product. Review the owner list when
+responsibilities change or someone leaves the organization. A product-vendor
+engineer should not be the customer's only owner or normal credential-rotation
+path; document any exceptional vendor-managed arrangement explicitly.
 
-1.  Open your preferred editor and create the file
-    `LSP-Examples/fs-sso/mako.conf`.
+The notification recipient is separate from Entra ownership. A product should
+route the module's notification callback to a customer-managed, monitored
+mailbox or ticketing address. In this Mako example, set `notify_to` to that
+address. Make sure the recipients know which Entra owners can create a
+replacement secret; assigning an owner in Entra does not configure the
+notification callback.
 
-2.  Copy and paste the following into `mako.conf`:
+For the single-tenant deployment used by this example, the customer's Entra
+administrator or designated app-registration owner performs these steps in the
+[Microsoft Entra admin center](https://entra.microsoft.com/):
 
-```
+1. Open **Entra ID > App registrations > New registration** and create a
+   single-tenant application.
+2. Under **Authentication**, add a **Web** redirect URI. It must exactly match
+   `openid.redirect_uri` below. Use HTTPS except for localhost testing.
+3. Under **Certificates & secrets**, create a client secret and immediately
+   copy its **Value** and expiration date.
+4. Under the app registration's **Owners**, assign the customer personnel who
+   will be responsible for its credentials and configuration.
+5. In the Enterprise Application, assign the intended users and enable
+   **Assignment required** if access should be limited to assigned users.
+6. Enter the tenant ID, client ID, client secret **Value**, and expiration date
+   into the product's secure provisioning workflow. If another customer
+   administrator performs this step, transfer the secret using the customer's
+   approved secret-sharing method, not ordinary email or support tickets.
+
+Microsoft documents the [authorization-code flow and
+PKCE](https://learn.microsoft.com/en-us/entra/identity-platform/v2-oauth2-auth-code-flow)
+and [adding an application
+credential](https://learn.microsoft.com/en-us/entra/identity-platform/how-to-add-credentials).
+
+## Testing the example with Mako
+
+The `mako.conf` workflow below is for a product engineer testing this example.
+It is not the recommended end-customer interface. A shipped BAS-powered product
+should provide its own authenticated provisioning UI or installation workflow
+and securely persist the customer-supplied values; the customer should not need
+repository access or an SSH session.
+
+In the following example, all settings except `notify_to` are used by `www/.lua/ms-sso.lua`. The `.preload` example program uses `notify_to` when SMTP is configured.
+
+Create `fs-sso/mako.conf`:
+
+```lua
 openid={
-   tenant="your tenant id",
-   client_id="your client id",
-   client_secret="your client secret",
-   redirect_uri="http://localhost/"
+   tenant="Directory (tenant) ID",
+   client_id="Application (client) ID",
+   client_secret="client secret Value",
+   client_secret_expires="2028-08-19",
+   redirect_uri="http://localhost/",
+
+   -- Optional. If omitted, Mako's configured SMTP recipient is used.
+   notify_to="server-operators@example.com"
 }
 ```
 
-3.  Replace the placeholder values with your actual Microsoft Entra ID
-    settings. For testing on localhost, keep the `redirect_uri` as shown
-    above.
+`client_secret_expires` is optional to the protocol because Entra does not
+encode the expiration date in the secret Value. When set, it must be a valid
+date; `YYYY-MM-DD` is recommended. When omitted, the module sets it to the
+current UTC date so the operator receives an immediate expired-credential
+notification. The module checks it at startup and daily and reports the first
+configured threshold reached. The defaults are 60, 30, 14, 7, and 1 day.
+Override them with `alert_days={90,30,7,1}` in the `openid` table.
 
-    The Microsoft Entra ID values specified in `openid` remain unchanged, with the exception of the `client_secret`. The client secret expires after a maximum of two years. This application is designed to dynamically handle this condition. When the client secret nears expiration, the login page will prompt the user to enter a new value.
+If the standard Mako `log.smtp` configuration is present, `.preload` emails
+credential events through `require"log".sendmail`. Without SMTP it still writes
+the events to trace output.
 
-    >In this example, the new client secret is stored only in memory. In a production environment, you would need to persistently save this updated value. For instance, [Xedge](https://realtimelogic.com/ba/doc/en/Xedge.html) securely stores the updated client secret after the user provides it.
+Run:
 
-4.  Save `mako.conf` and run the example using the Mako Server:
-
-    ``` bash
-    cd fs-sso
-    mako -l::www
-    ```
-
-For detailed instructions on starting the Mako Server, check out our
-[command line video tutorial](https://youtu.be/vwQ52ZC5RRg) and review
-the server\'s [command line
-options](https://realtimelogic.com/ba/doc/en/Mako.html#loadapp) in our
-documentation.
-
-> **Warning:** If the Mako Server cannot find `mako.conf` or if the
-> `openid` settings in the file are incorrect, you will receive an
-> error message.
-
-
-Once the Mako Server is running, open the HTTP URL printed in the Mako console and
-click the **Login** button. You should be prompted to log in using
-Microsoft Entra ID and will gain access if your Microsoft Entra App is
-configured correctly.
-
-After loging in you will be able to access the Web File Manager by clicking the `File Server` button.
-
-
-## How it works
-
-### Session URL
-
-Client applications, such as [WebDAV](https://realtimelogic.com/products/webdav/), that cannot use Single Sign-On can still be granted access by creating a session URL. The code in the `.preload` file sets this up. After logging in, you should see a session URL. You can then copy this URL and test it in another browser that isn't authenticated; you should be able to access all the resources without having to authenticate.
-
-#### WebDAV
-
-Use the session URL to access the WebDAV server with your preferred WebDAV client. For guidance on mounting or mapping a WebDAV server, check out the [WebDAV mount tutorial video](https://youtu.be/i5ubScGwUOc). When mounting or mapping, simply use the session URL provided during your login session.
-
-#### Session URL Security
-
-A session URL is essentially a secret key that grants access to authenticated resources. Because it functions as a token, its security is paramount. However, this secret is not inherently protected by any encryption unless you ensure that it's transmitted over a secure HTTPS connection.
-
-Without HTTPS, the session URL could be intercepted or exposed, potentially giving unauthorized users access to your system.
-
-
-### The SSO Module's API
-
-Before diving into the API details, let's review the complete messaging sequence, which illustrates how the browser, the Mako Server, and Microsoft Entra (MS Entra) interact during the login process.
-
-```mermaid
-sequenceDiagram
-    title Microsoft SSO Flow with Mako Server
-
-    participant Browser
-    participant MakoServer as Mako Server
-    participant MSEntra as MS Entra
-
-    Browser->>MakoServer: 2: GET Login request
-    Note over MakoServer: index.lsp -> sso.sendredirect(request)
-    MakoServer-->>Browser: 3: 302 redirect 
-    Browser->>MSEntra: 4: GET Authorize(openId data)
-    MSEntra-->>Browser: 5: Response(token)
-    Browser->>MakoServer: 6: POST(token)
-    Note over MakoServer: index.lsp -> sso.login(request)
-    MakoServer->>MSEntra: 7: POST(openId data + token)
-    MSEntra-->>MakoServer: 8: Response(JWT)
-    Note over MakoServer: request:login()
-    MakoServer-->>Browser: 9: response(logged in page)
+```text
+cd fs-sso
+mako -l::www
 ```
 
-**Diagram Explanation:**
+For more about loading applications with Mako, see the [command-line video
+tutorial](https://youtu.be/vwQ52ZC5RRg) and the [Mako application-loading
+options](https://realtimelogic.com/ba/doc/en/Mako.html#loadapp).
 
-1. **Login Request:** The browser sends a GET request for the login page to the Mako Server (Step 2).
-2. **Redirect:** The Mako Server's index.lsp file calls `sso.sendredirect(request)` , which then returns a 302 redirect (Step 3) to the MS Entra authorization endpoint.
-3. **Authorization:** The browser follows the redirect and sends a GET request to MS Entra with the OpenID data (Step 4).
-4. **Token Response:** MS Entra responds with an authentication token (Step 5).
-5. **Token Submission:** The browser submits this token back to the Mako Server via a POST request (Step 6).
-6. **Validation:** In response, index.lsp calls `sso.login(request)` . The Mako Server then forwards the token and OpenID data to MS Entra (Step 7).
-7. **JWT Receipt:** MS Entra returns a JWT to the Mako Server (Step 8), which decodes it and completes the login process (Step 9).
+Open the configured redirect URI, sign in, and then open `/fs/`. Test the
+WebDAV session URL in a separate browser or WebDAV client.
 
-For more details, refer to the [MS Entra API documentation](https://docs.microsoft.com/en-us/azure/active-directory/develop/) for information on token generation and validation.
+## Browser-based secret rotation
 
-### SSO Module Initialization
+The web recovery path is intentional: a VPS operator may have no shell access,
+and an embedded RTOS may have no command line or writable configuration file.
 
-The SSO module is loaded using:
+1. A normal, state-bound Entra sign-in reaches the token endpoint.
+2. Only if Entra returns error `7000215` (invalid secret) or `7000222`
+   (expired secret), the same BAS session receives a short-lived recovery form.
+3. The operator enters the new client secret **Value** and its expiration date.
+4. The module starts a second authorization-code flow and uses the candidate
+   secret at the token endpoint.
+5. Only a complete, validated OpenID Connect login activates the candidate.
+
+The demo shows an activity indicator and suppresses repeated activation while
+each navigation or form submission is pending. Its Content Security Policy
+allows form navigation to `https://login.microsoftonline.com`; this is required
+because the local recovery POST redirects the browser to Entra.
+
+The recovery form is therefore not a general public configuration endpoint. It
+requires a one-time recovery token created after a valid `state` callback, and
+the candidate is not tested with an unrelated Microsoft Graph request.
+
+## Reusable module API
+
+Load the app-private module from `.preload`:
 
 ```lua
-ssoModule = require "ms-sso"
+local msSso=appreq"ms-sso"
+local sso=msSso.init(openid,{
+   notify=function(event)
+      -- event contains kind/message/expiry information, never the secret
+   end,
+   savecredential=function(secret,metadata)
+      -- Persist by using the target application's storage model.
+      -- Return true on success.
+      return true
+   end,
+   log=function(message) trace(message) end,
+   alert_days={60,30,14,7,1}
+})
 ```
 
-This returns a table with a single `init` function. You initialize the SSO module by calling:
+`notify(event)` receives one of:
 
-```lua
-sso = ssoModule.init(openid, login [, log])
+- `credential-expiring`
+- `credential-expired`
+- `credential-invalid`
+- `credential-updated`
+- `credential-update-failed`
+
+It never receives the client secret. `savecredential(secret, metadata)` is the
+separate, optional callback that receives an Entra-accepted replacement and
+`metadata.expires`. If persistence fails, the working value remains active in
+memory and `credential-update-failed` is emitted.
+
+The returned object provides:
+
+- `sso.sendredirect(request)` - starts a login using random, session-bound
+  `state`, nonce, and an S256 PKCE verifier.
+- `sso.login(request)` - consumes the callback once, exchanges the code, and
+  validates the RS256 ID token signature, issuer, tenant, audience, nonce, and
+  time range.
+- `sso.rotate(request, secret, expires, recoveryToken)` - stages a candidate
+  from the protected recovery flow and verifies it with a real login.
+- `sso.decode(token)` - verifies the signature of an ID token.
+- `sso.close()` - cancels the refresh/notification timer deterministically
+  during app unload. The timer is not self-referenced, so garbage collection
+  also cancels it if the SSO instance becomes unreachable without `close()`.
+
+The example logs users internally as the immutable `tid:oid` pair. Names and
+`preferred_username` are display text only. It stores only that internal ID and
+display name in the BAS session; it does not retain an access token.
+
+## Security boundary of this example
+
+This is an authentication and technology example, not a preconfigured file
+authorization policy. WFS is intentionally rooted at Mako's disk IO and all
+successfully authenticated users receive the same WFS access. A product must
+select a dedicated file root and add an authorizer or app-role mapping that
+matches its own read/write policy. Those choices cannot be made generically in
+`ms-sso.lua`.
+
+The [session URL security](#session-url-security) rules apply to every URL
+generated by the demo page or Web File Manager. The demo page generates its URL
+only after an explicit click and returns it with `no-store` and `no-referrer`
+headers.
+
+Local logout ends the BAS session; it does not end the user's Microsoft browser
+session. If the session ends while Web File Manager remains open in another
+tab, its next server operation presents a sign-in prompt instead of treating
+the login page as a file-service response.
+
+## Flow
+
+```text
+Browser -> Mako: GET login page
+Mako -> Browser -> Entra: authorize request (state + nonce + PKCE challenge)
+Entra -> Browser -> Mako: authorization code + state
+Mako -> Entra: code + PKCE verifier + client secret
+Entra -> Mako: ID token
+Mako: validate token, call request:login(tid .. ":" .. oid)
+Mako -> Browser: redirect to the clean application URL
 ```
 
-#### Arguments:
+## Files
 
-* **openid**
+- `www/.preload` - example configuration, notification callback, WFS ownership,
+  and unload cleanup.
+- `www/.lua/ms-sso.lua` - reusable Entra/OpenID Connect module.
+- `www/index.lsp` - browser login, callback, and credential-recovery UI.
+- `www/logout.lsp` and `www/help.lsp` - WFS integration pages.
+- `www/assets/style.css` - local, dependency-free RTL dark theme.
 
-    A configuration table containing the same settings as the `openid` table defined in your mako.conf. These settings include the tenant ID, client ID, client secret, and redirect URI required for MS Entra authentication.
-
-* **login**
-
-    The path to the login page. In this example, it is set to `/` , which loads index.lsp.
-
-* **log** (optional)
-
-    A logging function ( `log(message)` ) for sending log output. If this function is not provided, logging defaults to the server trace.
-
-### Function table returned by ssoModule.init()
-
-* ``` sso.validate(client_secret)```
-  Checks if the Microsoft Entra ID's client secret has expired. If it has, you can call this function to set a new secret.
-    
-    **Return Value:**
-    
-    * **true:** if the new client secret is accepted.
-    * **false:** if the client secret is **not** accepted.
-
-* ``` sso.sendredirect(request)```
-  This function is called by the login page (index.lsp) when the user clicks the login button. It initiates the SSO flow by sending the appropriate redirect to the browser. This function does not return a value; it only initiates the redirection.
-
-* ``` sso.login(request)```
-  This function must be called after the browser receives the authentication token from MS Entra. It decodes the JWT token received from MS Entra and cryptographically validates the data.
-
-    **Return Values:**
-
-    * **On Success:**
-      - `header, payload` - The decoded JWT header and payload received from MS Entra.
-    * **On Error:**
-      - `nil, errorMessage, errorCodes`
-         + **errorMessage:** A string detailing the error, which can be presented to the user.
-         + **errorCodes:** An array of [error codes](https://learn.microsoft.com/en-us/entra/identity-platform/reference-error-codes) returned by MS Entra. The index.lsp example page manages the two error codes 7000215 and 7000222 related to invalid client secret.
-
-## Packaging for Xedge
-
-This example can be packaged as an Xedge app by creating a ZIP from the app directory, so the app files are at the ZIP root. See [Xedge App Deployment](../Xedge-App-Deployment/README.md) for the detailed deployment workflow.
-
-```bash
-cd www
-zip -D -q -u -r -9 ../fs-sso.zip .
-```
-
-Upload the generated ZIP with the Xedge App Upload tool.
-
-
-## Notes / Troubleshooting
-
-### Redirect URI Requirements
-
-For testing purposes, using HTTP on `localhost` is acceptable. However, in real-world deployments, MS Entra mandates using HTTPS to redirect URI. This requirement ensures that all communications are securely encrypted and that sensitive authentication tokens remain protected during transmission.
-
-When deploying your product/device in a production environment, you must ensure that your web server is configured to use HTTPS and, more importantly, that the browser trusts the server certificate. One option is to use a technology like [SharkTrust](https://realtimelogic.com/services/SharkTrust/), which provides DNS and trusted certificates specifically designed for Intranet web servers. Alternatively, you can implement a similar solution that offers trusted certificate management for your Intranet deployment environment.
+For Xedge packaging, place the contents of `www` at the ZIP root. Replace the
+Mako-specific mail and storage callback in `.preload` with the target product's
+own APIs; the SSO module itself can remain unchanged.
