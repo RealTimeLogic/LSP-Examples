@@ -87,20 +87,24 @@ local function emitRecovery(message,token)
 <?lsp
 end
 
-emitError=function(message,codes,recovery)
+emitError=function(message,codes,recovery,status)
    local labels={
       [7000215]="The configured client secret is invalid.",
-      [7000222]="The configured client secret has expired."
+      [7000222]="The configured client secret has expired.",
+      [700025]="Microsoft Entra treats this application as a public client, but this server uses a client secret. Ask the app-registration owner to configure a Web redirect URI and check the public-client settings."
    }
-   if recovery then
-      for _,code in ipairs(type(codes) == "table" and codes or {}) do
-         if labels[tonumber(code)] then return emitRecovery(labels[tonumber(code)],recovery) end
+   for _,code in ipairs(type(codes) == "table" and codes or {}) do
+      code=tonumber(code)
+      if labels[code] then
+         if recovery and code ~= 700025 then return emitRecovery(labels[code],recovery) end
+         message=labels[code]
+         break
       end
    end
 ?>
 <section class="panel-copy">
-  <p class="eyebrow error">Sign-in failed</p>
-  <h2>We could not complete the login</h2>
+  <p class="eyebrow <?lsp=status == "starting" and "warning" or "error"?>"><?lsp=status == "starting" and "Please wait" or "Sign-in failed"?></p>
+  <h2><?lsp=status == "starting" and "Microsoft sign-in is initializing" or "We could not complete the login"?></h2>
   <p><?lsp=esc(message or "Please try again.")?></p>
   <a class="button primary" href="<?lsp=esc(base)?>?login=1">Try again</a>
 </section>
@@ -110,11 +114,11 @@ end
 local action
 local session=request:session()
 if request:method() == "POST" then
-   local ok,err,recovery=sso.rotate(request,request:data"secret",request:data"expires",
+   local ok,err,recovery,status=sso.rotate(request,request:data"secret",request:data"expires",
                                     request:data"recovery")
    if ok then action=function() end
    elseif recovery then action=function() emitRecovery(err,recovery) end
-   else action=function() emitError(err) end end
+   else action=function() emitError(err,nil,nil,status) end end
 elseif request:data"code" or request:data"error" then
    local header,payload,codes,recovery=sso.login(request)
    session=session or request:session(true)
@@ -134,8 +138,8 @@ elseif session and session.msSsoResult then
    action=function() emitError(result.message,result.codes,result.recovery) end
 elseif request:user() then action=emitOK
 elseif request:data"login" then
-   local ok,err=sso.sendredirect(request)
-   action=ok and function() end or function() emitError(err) end
+   local ok,err,_,status=sso.sendredirect(request)
+   action=ok and function() end or function() emitError(err,nil,nil,status) end
 else
    action=emitLogin
 end

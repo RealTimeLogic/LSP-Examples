@@ -242,17 +242,32 @@ local sso=msSso.init(openid,{
 It never receives the client secret. `savecredential(secret, metadata)` is the
 separate, optional callback that receives an Entra-accepted replacement and
 `metadata.expires`. If persistence fails, the working value remains active in
-memory and `credential-update-failed` is emitted.
+memory and `credential-update-failed` is emitted. A failed save does not also
+emit `credential-updated`.
+
+For asynchronous storage, the callback can accept a third argument,
+`done`, a function, and return the string `"pending"`. Call
+`done(ok, errorMessage)` once after the write commits or fails: `ok` is a
+boolean and `errorMessage` is an optional string. The module reports the
+persistence result when `done` runs. Login still succeeds with the verified
+identity and the working secret remains active in memory. The callback must
+retain only the supplied values and completion function, never an HTTP
+request or its normal response. Existing synchronous callbacks continue to
+return `true` for success or `nil, errorMessage` for failure.
 
 The returned object provides:
 
 - `sso.sendredirect(request)` - starts a login using random, session-bound
-  `state`, nonce, and an S256 PKCE verifier.
+  `state`, nonce, and an S256 PKCE verifier. Returns boolean `true` after
+  redirecting. Before provider initialization completes, returns
+  `nil, message, nil, "starting"`, where `message` is a string. The demo
+  displays this as a temporary status with a retry link.
 - `sso.login(request)` - consumes the callback once, exchanges the code, and
   validates the RS256 ID token signature, issuer, tenant, audience, nonce, and
   time range.
 - `sso.rotate(request, secret, expires, recoveryToken)` - stages a candidate
-  from the protected recovery flow and verifies it with a real login.
+  from the protected recovery flow and verifies it with a real login. It can
+  return the same `"starting"` status as `sendredirect`.
 - `sso.decode(token)` - verifies the signature of an ID token.
 - `sso.close()` - cancels the refresh/notification timer deterministically
   during app unload. The timer is not self-referenced, so garbage collection

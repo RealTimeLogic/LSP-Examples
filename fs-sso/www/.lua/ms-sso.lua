@@ -167,7 +167,9 @@ local function query(values)
 end
 
 local function beginLogin(self,cmd,candidate)
-   if not self.provider then return nil,"The Microsoft sign-in service is still starting. Please try again." end
+   if not self.provider then
+      return nil,"Microsoft sign-in is initializing. Wait a few seconds, then try again.",nil,"starting"
+   end
    local session=cmd:session(true)
    if not session then return nil,"Cannot create a login session" end
    local verifier=random()
@@ -243,16 +245,28 @@ local function completeLogin(self,cmd)
       self.openidT.client_secret_expires=tx.candidate.expires
       self.alerted={}
       self.notified={}
-      if self.savecredential then
-         local ok,saved,err=pcall(self.savecredential,tx.candidate.secret,{expires=tx.candidate.expires})
-         if not ok or saved == false or saved == nil then
-            self.log("Credential persistence callback failed: %s",tostring(ok and err or saved))
+      local completed=false
+      local function saved(ok,err)
+         if completed then return end
+         completed=true
+         if not ok then
+            self.log("Credential persistence callback failed: %s",tostring(err))
             notify(self,{kind="credential-update-failed",expires=tx.candidate.expires,
                          message="The new client secret works, but the application could not persist it."})
+         else
+            notify(self,{kind="credential-updated",expires=tx.candidate.expires,
+                         message="The Microsoft Entra client secret was updated."})
          end
       end
-      notify(self,{kind="credential-updated",expires=tx.candidate.expires,
-                   message="The Microsoft Entra client secret was updated."})
+      if self.savecredential then
+         local ok,result,err=pcall(self.savecredential,tx.candidate.secret,
+                                  {expires=tx.candidate.expires},saved)
+         -- Asynchronous storage calls saved() after commit; login is already valid.
+         if not ok then saved(false,result)
+         elseif result ~= "pending" then saved(result,err) end
+      else
+         saved(true)
+      end
    end
    session.msSsoRecovery=nil
    return header,payload
