@@ -1,0 +1,12 @@
+local conf=require"loadconf"
+local config=assert(conf.manualDns,"Missing manualDns settings in mako.conf")
+config.challenge={type="dns-01",mode="manual"}
+
+local acme,err=require"acme/runtime".create{config=config}
+assert(acme,err and (err.message or err.code))
+appreq"manual".init(acme)
+acme:start()
+
+function onunload()
+   acme:close()
+end

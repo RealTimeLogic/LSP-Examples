@@ -70,6 +70,7 @@ without restarting the device, RTOS, or hosting server.
   - [MQTT and AWS](AWS-MQTT) - AWS IoT Core connection example.
   - [MQTT Broker](MQTT-Broker) - A ready-to-use **MQTT broker** and example code.
   - [MQTT Sparkplug](Sparkplug) - Sparkplug library notes and example applications.
+  - [SharkTrust ACME Examples](SharkTrust) - Automatic and manual TLS certificate enrollment and renewal examples for Mako Server, Xedge, and custom BAS integrations.
   - [SMQ Examples](SMQ-examples) - Device-management and messaging examples built on [SMQ](https://realtimelogic.com/ba/doc/?url=SMQ.html).
 - [MinnowSim](MinnowSim) - Source code for the tutorial [Your First Embedded Single Page Application](https://realtimelogic.com/articles/Your-First-Embedded-Single-Page-Application).
 - [QNX: PPS to SMQ Bridge](QNX/PPS) - Extension example for QNX Persistent Publish Subscribe.

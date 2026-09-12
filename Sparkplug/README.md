@@ -1,480 +1,68 @@
-# Sparkplug Client Documentation
+# Sparkplug Examples
 
-![Sparkplug Protocol Stack](https://realtimelogic.com/GZ/images/SparkplugStack.svg)
+These applications demonstrate publishing node and device metrics and monitoring Sparkplug traffic with Mako Server or Xedge. They use the optional `SparkplugB` Lua plugin.
 
-## Overview
+The [Sparkplug API reference](https://realtimelogic.com/ba/doc/en/lua/Sparkplug.html) documents the functions, input/output types, errors, events, payload formats and current limitations. Review those limitations before integrating the plugin.
 
-This document details the Lua library for the Sparkplug 3.0 MQTT client.
+The canonical [plugin source](https://github.com/RealTimeLogic/BAS-Resources/blob/main/src/sparkplug/SparkplugB.lua) and [protobuf schema](https://github.com/RealTimeLogic/BAS-Resources/blob/main/src/sparkplug/sparkplug_b.proto) remain in BAS-Resources. This directory contains the example applications.
 
-The Sparkplug client is a Lua library designed to facilitate communication with an MQTT Server as per the [Sparkplug 3.0 Specification](https://sparkplug.eclipse.org/specification/version/3.0/documents/sparkplug-specification-3.0.0.pdf). It primarily functions as an MQTT Edge of Network (EoN) Node.
+## Files and prerequisites
 
-The [Sparkplug client library's source code](https://github.com/RealTimeLogic/BAS-Resources/blob/main/src/sparkplug/SparkplugB.lua) is included in the [Mako Server](https://makoserver.net/) and [Xedge](https://realtimelogic.com/ba/doc/?url=Xedge.html)
+- [EoN/.preload](EoN/.preload): example node that publishes metrics and receives commands.
+- [SparkplugExplorer/.preload](SparkplugExplorer/.preload): console monitor for Sparkplug traffic.
+- [doc/wfm-sparkplug-modules.png](doc/wfm-sparkplug-modules.png): historical resource-directory illustration; use the module names below for the current plugin.
 
-## Files
+The runtime must include the native `pb` module and the Lua modules `protoc`, `SparkplugB`, `EventEmitter` and MQTT clients. The resource file `.lua/sparkplug_b.proto` must be available through `ba.openio"vm"`. The Explorer also needs `serpent`. Availability depends on how Mako or Xedge was built and packaged; loading `SparkplugB` throws if its protobuf dependencies or schema are unavailable.
 
-- `EoN/.preload` - Example Edge of Network node using the Sparkplug client library.
-- `SparkplugExplorer/.preload` - Console-based Sparkplug Explorer that listens for Sparkplug traffic.
-- `doc/wfm-sparkplug-modules.png` - Supporting image asset.
+Use an MQTT broker accessible from the runtime. Configure the broker address and credentials in the selected example's `.preload` before starting it. The supplied public-broker settings are demonstration settings.
 
 ## How to run
 
-### The Sparkplug Explorer
-
-The Sparkplug Explorer is an easy-to-use tool that monitors and displays incoming Sparkplug messages directly in the console. The MQTT settings are at the beginning of [`SparkplugExplorer/.preload`](SparkplugExplorer/.preload); adjust them as needed.
+Run one application from the `Sparkplug` directory:
 
 ```bash
-cd Sparkplug
+# Monitor the configured broker; decoded messages appear in the console.
 mako -l::SparkplugExplorer
 ```
 
-For more detail on starting the Mako Server, see the [command line video tutorial](https://youtu.be/vwQ52ZC5RRg) and the [command line options documentation](https://realtimelogic.com/ba/doc/?url=Mako.html#loadapp).
-
-Expected result: the console prints Sparkplug messages received from the configured MQTT broker. If no messages appear, confirm the broker settings at the top of `SparkplugExplorer/.preload`.
-
-## How it works
-
-### What is MQTT Sparkplug
-
-The Sparkplug specification provides a detailed explanation of what Sparkplug is, but the key points to know are as follows:
-
-The specification provides guidelines for designing a topic namespace, packaging message payloads, and managing application state in MQTT-based systems for the industrial sector. It includes a topic namespace structure, a mechanism for state management using birth and last-will messages, and a payload structure using Google Protocol Buffers. The specification does not change MQTT itself, but rather defines aspects of it that were left open for the end user to decide on. The Sparkplug infrastructure includes an MQTT broker, a management application, and MQTT Edge of Network Nodes (EoN).
-
-The management application, called the Primary Application, is a SCADA/IIoT Host Node that receives data from Sparkplug EoN nodes and sends control information to them. The device topic addressing includes a namespace, group_id, message_type, and edge_node_id. The namespace is now 'spBv1.0', thus a complete namespace looks like the following:
-
-`spBv1.0/group_id/message_type/edge_node_id`
-
-The message_type can be:
-
-- NBIRTH - Birth certificate for EoN nodes. Sent when EoN starts or when requested by Primary Application via NCMD.
-- NDEATH - Death certificate for EoN nodes. Packaged as an MQTT last-will message when sending the MQTT connect message to the MQTT broker.
-- NDATA - Node data message. Metrics published by EoN nodes and received by Primary Application.
-- NCMD - Node command message. Primary Application sending a command to an EoN.
-- DCMD - Device command message. Primary Application sending a command to a device via an EoN.
-- STATE - Critical application state message. Primary Application broadcasting on/off state (off via last-will message).
-
-The Sparkplug specification provides a clear and consistent structure for topic addressing, making it easier for developers and planners to design systems that are interoperable. The use of Google Protocol Buffers for the payload structure ensures efficient encoding and decoding of data, while the state management mechanism using birth and last-will messages allows for the tracking of nodes in the network. Additionally, the use of retained messages and last-will testament messages allows for the broker to maintain the state of the entire Sparkplug infrastructure.
-
-#### MQTT Sparkplug State Management
-
-State management is critical in the Industrial Internet of Things (IIoT) for ensuring seamless interaction among various devices and applications. Though MQTT provides some tools for session awareness, they often fall short in meeting the multifaceted needs of IIoT systems.
-
-MQTT Sparkplug improves upon MQTT's native "Last Will and Testament" feature by introducing a "death certificate," a detailed account of a device's last known state before it disconnects. This richer information enables better decision-making in the event of unexpected disconnections.
-
-Sparkplug also introduces "birth certificates," which are messages that devices send upon connecting to an MQTT network to announce their available metrics and capabilities. These certificates provide immediate context for other network entities, allowing for more efficient interactions and remote configurations.
-
-Sparkplug uses specific types of messages for establishing and maintaining the state of edge nodes, which send "NBIRTH" messages to announce their operational status when they come online. Conversely, "NDEATH" messages indicate that a node is no longer available, often with added contextual information about their unavailability. MQTT Sparkplug includes the concept of a "rebirth" mechanism to handle network fluctuations. If a device or edge node gets disconnected and reconnects, it automatically retransmits a "BIRTH" message, providing the network with updated status and capabilities.
-
-In addition to these life-cycle messages, Sparkplug maintains a continuous flow of operational data through "DATA" messages. These messages keep the network informed and updated, bridging the gap between the initial "BIRTH" and eventual "DEATH" messages.
-
-### Sparkplug Client Features
-
-- **Publish Birth Certificates (NBIRTH):** Allows the node to publish its own birth certificates.
-- **Node Data Messages (NDATA):** Supports publishing of node data messages.
-- **Process Node Command Messages (NCMD):** Can process command messages from Sparkplug Primary Applications.
-- **API for Device Applications:** Enables MQTT device applications to publish device-specific messages such as birth (DBIRTH), data (DDATA), and death certificates (DDEATH), and to receive device command messages (DCMD).
-
-### Usage Instructions
-
-### Creating and Configuring a New Sparkplug Client
-
-```lua
-local SP = require"SparkplugB"
-SP.create(broker, groupId, nodeName, opt)
+```bash
+# Run the example Edge of Network node against its configured broker.
+mako -l::EoN
 ```
 
-- **broker: string:** The broker name .e.g "locahost"
-- **groupId: string:** The Sparkplug group ID.
-- **nodeName: string:** The Sparkplug node's name.
-- **opt: Configuration Table:** While optional, setting MQTT options like username and password is generally necessary. You may set the following MQTT options: alpn,clientidentifier,keepalive,port,timeout,username,password,secure,nocheck
+The Explorer prints incoming topics and decoded payloads, or a decode error. No traffic in the Explorer can simply mean no matching messages were published. See [Mako's application-loading options](https://realtimelogic.com/ba/doc/?url=Mako.html#loadapp) for command-line details.
 
-##### Example: Creating a Sparkplug Client
+## Configuring the examples
 
-```lua
-local broker = 'localhost'
-local groupId = 'Sparkplug Devices'
-local nodeName = 'Test Edge Node'
-local opt = {
-   username = "admin",
-   password = "admin"
-}
-local client = SP.create(broker, groupId, nodeName, opt)
-```
+Edit the selected application's `.preload` before starting it. Use the same broker for both applications so the Explorer can see the node's messages.
 
-### Stopping the Client
+| Application | Settings in `.preload` |
+| --- | --- |
+| EoN | **string addr** is the broker address; **string groupId** and **string nodeName** identify this node; **string deviceId** identifies its one device. **table op** contains connection options, including the example's **string username** and **string password**. Replace the sample metrics and command handlers for your application. |
+| SparkplugExplorer | **string mqttServer** is the broker address. **string mqttVer** selects `mqttc` (MQTT 5) or `mqtt3c` (MQTT 3.1.1). **string username** and **string password** are the example credentials. The Explorer subscribes to `spBv1.0/#`. |
 
-- **Automatic Connection Management:** Once configured, the client automatically connects to the MQTT Server and attempts to reconnect if the connection is lost.
-- **Stopping and Disconnecting:** The client provides functionality to stop its operation and disconnect from the server. To reconnect, a new client instance must be created and configured.
+Connection options and event behavior are described in the [API reference](https://realtimelogic.com/ba/doc/en/lua/Sparkplug.html#function-reference). The node example supplies its birth messages in its `birth` handler. The Explorer displays traffic; it does not create a node or publish birth messages.
 
-##### Example: Stopping the CLient
+The node shares its two sample metric values with its device. Accepted NCMD/DCMD updates publish both node and device data. Commands must match a known metric name and datatype and provide a numeric value; commands for other devices are ignored. Adapt this shared-state example when your node and devices have independent values. Both applications stop their clients from `onunload()`.
 
-```lua
--- Stop the Sparkplug client
-client:stop()
-```
+## Validation
 
-### Publishing Messages
+Tested with native Windows Mako Server and a local Mosquitto 2.0.11 broker, using the current BAS-Resources plugin. Both Explorer modes (`mqttc` and `mqtt3c`) received and decoded node/device messages. Tests covered commands, ignored device/type mismatches, rebirth, STATE text, malformed payload reporting, broker restart recovery and repeated cleanup. Deferred Explorer startup and cleanup also passed normal and Lua32 tests.
 
-The Sparkplug client offers functionalities for publishing various types of messages, including device birth certificates (DBIRTH), device data messages (DDATA), and device death certificates (DDEATH).
-
-#### Message Payloads
-
-While a detailed payload format description is extensive and available in the [Sparkplug specification](https://sparkplug.eclipse.org/specification/version/3.0/documents/sparkplug-specification-3.0.0.pdf), a brief overview is provided below.
-
-#### Edge Node Birth Certificate (NBIRTH)
-
-The NBIRTH message broadcasts all relevant data points, process variables, and metrics for the edge node.
-
-##### Key Payload Components
-
-1. **Metrics Array:**
-   - Each metric object in this array should include:
-     - `name`: The metric's name.
-     - `value`: The metric's value.
-     - `type`: Metric type, supporting various types like int, int8, int16, int32, int64, uint8, uint16, uint32, uint64, float, double, boolean, string, datetime, text, uuid, dataset, bytes, file, or template.
-     - `timestamp` (optional): A UTC timestamp in 64-bit integer format. This is automatically set if not provided.
-
-##### Example: Publishing an NBIRTH Message
-
-```lua
-local payload = {
-   metrics = {
-      {
-         name = "my_int",
-         value = 456,
-         type = "Int32"
-      },
-      {
-         name = "my_float",
-         value = 1.23,
-         type = "Float"
-      }
-   }
-}
-
--- Publish node birth certificate
-client:publishNodeBirth(payload)
-```
-
-#### Device Birth Certificate (DBIRTH)
-
-A Sparkplug device birth certificate (DBIRTH) message will contain all data points, process variables, and metrics for the device. The DBIRTH payload format is the same as the NBIRTH format.
-
-```lua
-local deviceId = "testDevice"
-local payload = {
-   metrics = {
-      {
-         name = "my_int",
-         value = 456,
-         type = "Int32"
-      },
-      {
-         name = "my_float",
-         value = 1.23,
-         type = "Float"
-      }
-   }
-}
--- Publish device birth
-client:publishDeviceBirth(deviceId, payload)
-```
-
-
-#### Node Data Message (NDATA)
-
-An edge node data message (NDATA) will look similar to NBIRTH but is not required to publish all metrics. However, it must publish at least one metric.
-
-##### Example: Publishing an NDATA Message
-
-```lua
-local payload = {
-   timestamp = 1465456711580,
-   metrics = {
-      {
-         name = "my_int",
-         value = 412,
-         type = "Int32"
-      }
-   }
-}
--- Publish node data
-client:publishNodeData(payload)
-```
-
-
-#### Device Data Message (DDATA)
-
-A device data message (DDATA) will look similar to DBIRTH but is not required to publish all metrics. However, it must publish at least one metric.
-
-##### Example: Publishing a DDATA Message
-
-```lua
-local deviceId = "testDevice"
-local payload = {
-   timestamp = 1465456711580,
-   metrics = {
-      {
-         name = "my_int",
-         value = 412,
-         type = "Int32"
-      }
-   }
-}
--- Publish device data
-client:publishDeviceData(deviceId, payload)
-```
-
-
-
-#### Node Death Certificate (NDEATH)
-
-An edge node death certificate (NDEATH) is published to indicate that the edge node has gone offline or has lost a connection. It is automatically registered as an MQTT Last Will and Testament (LWT) message by the Sparkplug client instance and published on the application's behalf.
-
-#### Device Death Certificate (DDEATH)
-
-A device death certificate (DDEATH) can be published to indicated that the device has gone offline or has lost a connection. It should contain only an optional timestamp.
-
-##### Example: Publishing a DDEATH Message
-
-```lua
-local deviceId = "testDevice"
-payload = {
-   timestamp=1465456711580
-}
---Publish device death
-client:publishDeviceDeath(deviceId, payload)
-```
-
-### Receiving events
-
-The client leverages an EventEmitter to dispatch various Sparkplug relevant events. These events include:
-
-- A "birth" event.
-- A "command" event.
-- A suite of five MQTT connection-related events:
-  - "connect" - signifying a successful connection.
-  - "reconnect" - indicating an attempt to re-establish a connection.
-  - "offline" - triggered when the connection goes offline.
-  - "error" - emitted upon encountering any connection errors.
-  - "close" - indicating the closure of a connection.
-
-#### Birth Event
-
-A "birth" event is used to signal the device application that a DBIRTH message is requested.  This event will be be emitted immediately after the client initially connects or re-connects with the MQTT Server.
-
-##### Example: handling a "birth" event
-
-
-```lua
-client:on('birth', function()
-    trace("received 'birth' event")
-    client:publishNodeBirth(getNodeBirthPayload())
-    client:publishDeviceBirth(deviceId, getDeviceBirthPayload())
- end)
-```
-
-#### Command Events
-
-An Edge Node Command (NCMD) message enables sending command messages from a Primary Application to the Edge of Network (EoN).  An 'ncmd' event will include a payload containing a list of metrics (as described above).  Any metrics included in the payload may represent attempts to write a new value to the data points or process variables that they represent or they may represent control messages sent to the edge node such as a "rebirth" request.
-
-##### Example: handling an "ncmd" event
-
-```lua
-client:on('ncmd', function (payload)
-   for _,metric in ipairs(payload.metrics) do
-      trace(ba.json.encode(metric)) -- debug info
-   end
-    --Process metrics and create new payload containing changed metrics
-   client:publishNodeData(newPayload)
-end)
-```
-
-A Device Command (DCMD) enables sending command messages from a Primary Application to a device via an EoN. A 'dcmd' event includes the device ID and a payload containing a list of metrics (as described above). Any metrics included in the payload represent attempts to write a new value to the data points or process variables that they represent. After the device application processes the request, the device application should publish a DDATA message containing any metrics that have changed.
-
-
-##### Example: handling an "dcmd" event
-
-```lua
-client:on('dcmd', function (deviceId,payload)
-   for _,metric in ipairs(payload.metrics) do
-      trace(ba.json.encode(metric)) -- debug info
-   end
-    --Process metrics and create new payload containing changed metrics
-   client:publishDeviceData(deviceId,newPayload)
-end)
-```
-
-#### Connect Event
-
-A "connect" event is emitted when the client has connected to the server.
-
-##### Example: handling an "connect" event
-
-```lua
-client:on('connect', function()
-   trace("received 'connect' event")
-end)
-```
-
-#### Reconnect Event
-
-A "reconnect" event is emitted when the client is attempting to reconnect to
-the server.
-
-##### Example: handling an "reconnect" event
-
-```lua
-client:on('reconnect', function()
-   trace("received 'reconnect' event")
-end)
-```
-
-#### Offline Event
-
-An "offline" event is emitted when the client loses connection with the server.
-
-##### Example: handling an "offline" event
-
-```lua
-client:on('offline', function()
-   trace("received 'offline' event")
-end)
-});
-```
-
-#### Error Event
-
-An "error" event is emitted when the client has experienced an error while
-trying to connect to the server.
-
-##### Example: handling an "error" event
-
-```lua
-client:on('error', function (error,status)
-   trace("received 'error' event: ", error,":",status)
-end)
-```
-
-#### Close Event
-
-A "close" event is emitted when the client's connection to the server has been
-closed.
-
-##### Example: handling a "close" event
-
-```lua
-client:on('close', function()
-   trace("received 'close' event")
-end)
-});
-```
-
-### Complete Example
-
-
-```lua
-local op={
-   username="admin",
-   password="admin",
-}
-
-local addr="localhost"
-local groupId="my groupId"
-local nodeName="my nodeName"
-
-local client=require"SparkplugB".create(addr,groupId,nodeName,op)
-
-client:on('connect', function()
-   trace("received 'connect' event")
-end)
-
-client:on('reconnect', function()
-   trace("received 'reconnect' event")
-end)
-
-client:on('offline', function()
-   trace("received 'offline' event")
-end)
-
-client:on('error', function (error,status)
-   trace("received 'error' event: ", error,":",status)
-end)
-
-client:on('close', function()
-   trace("received 'close' event")
-end)
-
-local metrics={
-   {
-     name= "my_int",
-     value= 456,
-     type= "Int32"
-   },
-   {
-     name= "my_float",
-     value= 1.23,
-     type= "Float"
-   }
-}
-
-client:on('birth', function()
-   trace("received 'birth' event")
-   local payload = {metrics=metrics}
-   client:publishNodeBirth(payload)
-   client:publishDeviceBirth("deviceID",payload)
-end)
-
-client:on('ncmd', function (payload)
-   trace("received 'ncmd' event")
-   for _,mx in ipairs(payload.metrics) do
-     trace(ba.json.encode(mx))
-     for _,m in ipairs(metrics) do
-       trace(m.name)
-       if m.name == mx.name then m.value=mx.value end
-     end
-   end
-   client:publishNodeData{metrics=metrics}
-   client:publishDeviceData(deviceId,{metrics=metrics})
-end)
-
-client:on('dcmd', function (deviceId,payload)
-   trace("received 'dcmd' event",ba.json.encode(payload))
-   for _,mx in ipairs(payload.metrics) do
-     trace(ba.json.encode(mx))
-     for _,m in ipairs(metrics) do
-       trace(m.name)
-       if m.name == mx.name then m.value=mx.value end
-     end
-   end
-   client:publishNodeData{metrics=metrics}
-   client:publishDeviceData(deviceId,{metrics=metrics})
-end)
-
-client:on('state', function (groupId,jsonStr)
-   trace("received 'state' event:", groupId,jsonStr)
-end)
-```
-
+The live tests used loopback broker settings in temporary copies. They did not exercise the supplied public broker, TLS, Xedge package installation or ESP32 hardware.
 
 ## Packaging for Xedge
 
-This directory contains multiple app roots. Package the selected app directory, not the parent directory. See [Xedge App Deployment](../Xedge-App-Deployment/README.md) for the detailed deployment workflow.
+Package the selected application directory, not the parent `Sparkplug` directory. See [Xedge App Deployment](../Xedge-App-Deployment/README.md) for the full workflow.
 
 ```bash
-cd EoN
+# From Sparkplug/EoN, package this app root with .preload at the ZIP root.
 zip -D -q -u -r -9 ../sparkplug-eon.zip .
 ```
 
 ```bash
-cd SparkplugExplorer
+# From Sparkplug/SparkplugExplorer, package the console-monitor app root.
 zip -D -q -u -r -9 ../sparkplug-explorer.zip .
 ```
 
-Upload the generated ZIP with the Xedge App Upload tool.
-
-
-## Notes / Troubleshooting
-
-- The Sparkplug client library itself is included with Mako Server and Xedge; this directory mainly provides examples and the explorer.
-- Update the broker credentials in the relevant `.preload` before connecting to your own MQTT infrastructure.
-
+Upload the selected ZIP with Xedge's App Upload tool. The target runtime still needs the native protobuf module and plugin resources listed under prerequisites.

@@ -6,6 +6,7 @@ local op={
 local addr= "broker.hivemq.com"
 local groupId="my groupId"
 local nodeName="my nodeName"
+local deviceId="deviceID"
 
 local client=require"SparkplugB".create(addr,groupId,nodeName,op)
 
@@ -46,7 +47,7 @@ client:on('birth', function()
    trace("received 'birth' event")
    local payload = {metrics=metrics}
    client:publishNodeBirth(payload)
-   client:publishDeviceBirth("deviceID",payload)
+   client:publishDeviceBirth(deviceId,payload)
 end)
 
 client:on('ncmd', function (payload)
@@ -55,26 +56,34 @@ client:on('ncmd', function (payload)
      trace(ba.json.encode(mx))
      for _,m in ipairs(metrics) do
        trace(m.name)
-       if m.name == mx.name then m.value=mx.value end
+       if m.name == mx.name and mx.type == m.type:lower()
+          and type(mx.value) == "number" then m.value=mx.value end
      end
    end
    client:publishNodeData{metrics=metrics}
    client:publishDeviceData(deviceId,{metrics=metrics})
 end)
 
-client:on('dcmd', function (deviceId,payload)
+client:on('dcmd', function (id,payload)
+   if id ~= deviceId then return end -- This example owns only one device.
    trace("received 'dcmd' event",ba.json.encode(payload))
    for _,mx in ipairs(payload.metrics) do
      trace(ba.json.encode(mx))
      for _,m in ipairs(metrics) do
        trace(m.name)
-       if m.name == mx.name then m.value=mx.value end
+       if m.name == mx.name and mx.type == m.type:lower()
+          and type(mx.value) == "number" then m.value=mx.value end
      end
    end
    client:publishNodeData{metrics=metrics}
    client:publishDeviceData(deviceId,{metrics=metrics})
 end)
 
-client:on('state', function (groupId,jsonStr)
-   trace("received 'state' event:", groupId,jsonStr)
+function onunload()
+   -- Stop reconnects and close the socket when the application is unloaded.
+   client:stop()
+end
+
+client:on('state', function (id,jsonStr)
+   trace("received 'state' event:", id,jsonStr)
 end)

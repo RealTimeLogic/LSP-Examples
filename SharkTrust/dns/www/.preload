@@ -1,0 +1,33 @@
+-- Mako can provide this same table as sharkTrustExample in a private mako.conf.
+local config=mako and require"loadconf".sharkTrustExample or {
+   acceptTerms=false, -- Enable after accepting the ACME provider's terms.
+   email="CHANGE-ME@example.com",
+   domains={"CHANGE-ME.example.com"},
+   production=false, -- Use staging until the complete flow works.
+   keyType="ecc", -- For RSA, set keyType="rsa" and bits=2048.
+   namePolicy="exact",
+   challenge={
+      type="dns-01",dns="local",reverse=false,propagationDelay=30,
+      -- Leave these nil to use the embedded zone identity.
+      -- Otherwise supply all three, including a host proof callback.
+      portalUrl=nil,zoneKey=nil,proof=nil
+   }
+}
+
+local runtime,err=require"acme/runtime".create{
+   config=config,
+   notify=function(code) trace("ACME event ",code) end
+}
+assert(runtime,err and (err.message or err.code))
+runtime:start(function(result,problem)
+   if result then trace("ACME certificate management started")
+   else trace("ACME startup failed: ",problem.message or problem.code) end
+end)
+
+-- The application owns this runtime and releases it on unload.
+function onunload()
+   runtime:close()
+end
+
+-- Forward later DHCP/address changes without rebuilding the runtime:
+-- runtime:setIpAddress(newIpAddress,function(ok,problem) end)
