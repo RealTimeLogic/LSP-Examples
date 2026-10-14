@@ -2,3 +2,4 @@
 * text=auto
 *.lua linguist-language=Lua
 *.lsp linguist-language=Lua
+* text=auto eol=lf
